@@ -6,6 +6,7 @@ Our team is developing an Augmented Reality (AR) / Extended Reality (XR) applica
 
 ## Team Members
 - John Sullins (jsullin1@asu.edu)
+- Alex Allen (ajallen4@asu.edu)
 - [Add teammates here]
 
 ## Sponsor

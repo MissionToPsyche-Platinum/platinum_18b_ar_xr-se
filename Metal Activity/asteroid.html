@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Asteroid Value Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0a0a0a;
+      color: #f0f0f0;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 { margin-bottom: 10px; }
+    .slider-container {
+      margin: 15px auto;
+      width: 60%;
+      text-align: left;
+    }
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    input[type=range] {
+      width: 100%;
+    }
+    #error {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    #junk {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #0ff;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 80%;
+    }
+    th, td {
+      border: 1px solid #555;
+      padding: 8px;
+    }
+    th { background: #333; }
+    #lastUpdated {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h1>Asteroid Value Calculator</h1>
+  <p>Enter asteroid weight (lbs):</p>
+  <input type="number" id="weightInput" value="1000000">
+
+  <h2>Composition</h2>
+  <div id="sliders"></div>
+  <p id="junk">Junk: 100%</p>
+  <p id="error"></p>
+
+  <button id="calcBtn" onclick="calculate()">Calculate</button>
+
+  <h2>Results</h2>
+  <table id="resultsTable">
+    <thead>
+      <tr>
+        <th>Metal</th>
+        <th>Percentage</th>
+        <th>Rate (USD/oz)</th>
+        <th>Total Value</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <p id="lastUpdated"></p>
+
+  <script>
+    const API_KEY = "LMK8WWQNCCKFV6OL0HQX880OL0HQX";
+    const BASE_URL = "https://api.metals.dev/v1/latest";
+    const CACHE_KEY = "metalRates";
+    const CACHE_TIME_KEY = "metalRatesTimestamp";
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+    const metalsList = ["gold", "silver", "platinum", "palladium", "copper", "nickel", "aluminum", "lead"];
+
+    // lbs to troy ounces
+    function lbsToTroyOunces(lbs) {
+      const ouncesPerPound = 16;
+      const troyOzPerAvoirOz = 0.911458;
+      return lbs * ouncesPerPound * troyOzPerAvoirOz;
+    }
+
+    // Build sliders dynamically
+    function buildSliders() {
+      const container = document.getElementById("sliders");
+      container.innerHTML = "";
+      metalsList.forEach(metal => {
+        const div = document.createElement("div");
+        div.classList.add("slider-container");
+        div.innerHTML = `
+          <div class="slider-label">
+            <span>${metal.charAt(0).toUpperCase() + metal.slice(1)}</span>
+            <span id="${metal}-val">0%</span>
+          </div>
+          <input type="range" min="0" max="100" value="0" id="${metal}-slider" oninput="updatePercent('${metal}')">
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function updatePercent(metal) {
+      const slider = document.getElementById(`${metal}-slider`);
+      const valueDisplay = document.getElementById(`${metal}-val`);
+      valueDisplay.textContent = slider.value + "%";
+      validateTotal();
+    }
+
+    function validateTotal() {
+      let total = 0;
+      metalsList.forEach(m => total += parseInt(document.getElementById(`${m}-slider`).value));
+      const errorEl = document.getElementById("error");
+      const calcBtn = document.getElementById("calcBtn");
+      const junkEl = document.getElementById("junk");
+
+      if (total > 100) {
+        errorEl.textContent = "❌ Total composition exceeds 100%. Please adjust sliders.";
+        calcBtn.disabled = true;
+        junkEl.textContent = "Junk: --% (invalid)";
+      } else {
+        errorEl.textContent = "";
+        calcBtn.disabled = false;
+        const junk = 100 - total;
+        junkEl.textContent = `Junk: ${junk}%`;
+      }
+    }
+
+    async function getRates() {
+      const cached = localStorage.getItem(CACHE_KEY);
+      const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
+
+      if (cached && cachedTime && (Date.now() - cachedTime < ONE_DAY_MS)) {
+        console.log("Using cached rates");
+        return { rates: JSON.parse(cached), timestamp: parseInt(cachedTime) };
+      }
+
+      try {
+        console.log("Fetching fresh rates");
+        const url = `${BASE_URL}?api_key=${API_KEY}&currency=USD&unit=toz`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+
+        if (data.status !== "success") throw new Error(data.message || "API error");
+
+        console.log("All metals returned by API:", Object.keys(data.metals));
+
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data.metals));
+        localStorage.setItem(CACHE_TIME_KEY, Date.now());
+        return { rates: data.metals, timestamp: Date.now() };
+
+      } catch (err) {
+        console.warn("API failed, using cache:", err.message);
+        if (cached) return { rates: JSON.parse(cached), timestamp: cachedTime };
+        else throw new Error("No cached rates available.");
+      }
+    }
+
+    async function calculate() {
+      const lbs = parseFloat(document.getElementById("weightInput").value);
+      if (isNaN(lbs) || lbs <= 0) {
+        alert("Please enter a valid weight.");
+        return;
+      }
+
+      try {
+        const { rates, timestamp } = await getRates();
+        const totalOunces = lbsToTroyOunces(lbs);
+
+        const tbody = document.querySelector("#resultsTable tbody");
+        tbody.innerHTML = "";
+
+        let totalValue = 0;
+
+        metalsList.forEach(metal => {
+          const percent = parseInt(document.getElementById(`${metal}-slider`).value);
+          if (percent > 0 && rates[metal]) {
+            const rate = rates[metal];
+            const metalOunces = totalOunces * (percent / 100);
+            const value = metalOunces * rate;
+            totalValue += value;
+
+            tbody.innerHTML += `
+              <tr>
+                <td>${metal.charAt(0).toUpperCase() + metal.slice(1)}</td>
+                <td>${percent}%</td>
+                <td>$${rate.toLocaleString(undefined, { maximumFractionDigits: 4 })}</td>
+                <td>$${value.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+              </tr>
+            `;
+          }
+        });
+
+        tbody.innerHTML += `
+          <tr style="font-weight: bold; background: #222;">
+            <td colspan="3">TOTAL</td>
+            <td>$${totalValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+          </tr>
+        `;
+
+        const date = new Date(parseInt(timestamp));
+        document.getElementById("lastUpdated").textContent = 
+          "Prices last updated: " + date.toLocaleString();
+
+      } catch (err) {
+        alert("Could not load prices.");
+        console.error(err);
+      }
+    }
+
+    // Init
+    buildSliders();
+    validateTotal();
+  </script>
+</body>
+</html>
