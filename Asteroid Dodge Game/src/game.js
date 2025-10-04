@@ -27,6 +27,8 @@ let elapsedTime = 0;     // for tracking survival time
 
 
 
+
+
 // Simple input state
 const keys = {
   left: false,
@@ -37,7 +39,9 @@ const keys = {
 window.addEventListener('keydown', (e) => {
   if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
   if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+  if (e.code === 'Space' && gameOver) restartGame();
 });
+
 
 window.addEventListener('keyup', (e) => {
   if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
@@ -69,20 +73,20 @@ function isColliding(a, b) {
 }
 
 function update(dt) {
-  if (gameOver) return; // freeze everything if game is over
+  if (gameOver) return;
 
   elapsedTime += dt;
+  score = Math.floor(elapsedTime); // 1 point per second
 
   // === Player movement ===
   let vx = 0;
   if (keys.left)  vx -= player.speed;
   if (keys.right) vx += player.speed;
   player.x += vx * dt;
-
   if (player.x < 0) player.x = 0;
   if (player.x + player.w > W) player.x = W - player.w;
 
-  // === Asteroid Spawning ===
+  // === Asteroid spawning ===
   spawnTimer += dt;
   if (spawnTimer > spawnInterval) {
     spawnTimer = 0;
@@ -95,21 +99,17 @@ function update(dt) {
     });
   }
 
-  // === Asteroid Movement + Collision ===
+  // === Asteroid movement + collision ===
   for (let i = asteroids.length - 1; i >= 0; i--) {
     const a = asteroids[i];
     a.y += a.speed * dt;
 
-    // Collision check
     if (isColliding(a, player)) {
       gameOver = true;
       break;
     }
 
-    // Remove asteroids off screen
-    if (a.y > H) {
-      asteroids.splice(i, 1);
-    }
+    if (a.y > H) asteroids.splice(i, 1);
   }
 }
 
@@ -128,14 +128,34 @@ function draw() {
     ctx.fillRect(a.x, a.y, a.w, a.h);
   }
 
-  // Game Over screen
-  if (gameOver) {
-    ctx.fillStyle = 'white';
-    ctx.font = '48px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('GAME OVER', W / 2, H / 2);
-  }
+  // Score display
+ctx.fillStyle = 'white';
+ctx.font = '24px monospace';
+ctx.textAlign = 'left';
+ctx.fillText(`Score: ${score}`, 20, 40);
+
+// Game Over screen
+if (gameOver) {
+  ctx.fillStyle = 'white';
+  ctx.font = '48px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('GAME OVER', W / 2, H / 2);
+  ctx.font = '24px sans-serif';
+  ctx.fillText('Press SPACE to Restart', W / 2, H / 2 + 40);
 }
+}
+
+function restartGame() {
+  // reset everything
+  gameOver = false;
+  score = 0;
+  elapsedTime = 0;
+  asteroids = [];
+  spawnTimer = 0;
+  player.x = W / 2 - player.w / 2;
+  player.y = H - 60;
+}
+
 
 
 
