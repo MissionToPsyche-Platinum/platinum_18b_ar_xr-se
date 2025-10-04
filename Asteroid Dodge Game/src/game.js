@@ -14,14 +14,17 @@ const player = {
   speed: 300    
 };    
 
-// Single asteroid setup
-let asteroid = {
-  w: 40,
-  h: 40,
-  x: Math.random() * (W - 40), // random X
-  y: -40,                     // start above screen
-  speed: 150                  // pixels per second downward
-};
+// creates an array of asteroid rather than a single one
+let asteroids = [];
+let spawnTimer = 0;             // control asteroid spawn timing
+const spawnInterval = 0.8;      // seconds between spawns
+
+// === Game state ===
+let gameOver = false;
+let score = 0;           // optional: we'll use this soon
+let elapsedTime = 0;     // for tracking survival time
+
+
 
 
 // Simple input state
@@ -54,25 +57,59 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
+
+// detects collision
+function isColliding(a, b) {
+  return (
+    a.x < b.x + b.w &&
+    a.x + a.w > b.x &&
+    a.y < b.y + b.h &&
+    a.y + a.h > b.y
+  );
+}
+
 function update(dt) {
-  // Player movement
+  if (gameOver) return; // freeze everything if game is over
+
+  elapsedTime += dt;
+
+  // === Player movement ===
   let vx = 0;
   if (keys.left)  vx -= player.speed;
   if (keys.right) vx += player.speed;
-
   player.x += vx * dt;
 
-  // Clamp player to screen bounds
   if (player.x < 0) player.x = 0;
   if (player.x + player.w > W) player.x = W - player.w;
 
-  // === Asteroid movement ===
-  asteroid.y += asteroid.speed * dt;
+  // === Asteroid Spawning ===
+  spawnTimer += dt;
+  if (spawnTimer > spawnInterval) {
+    spawnTimer = 0;
+    asteroids.push({
+      w: 40,
+      h: 40,
+      x: Math.random() * (W - 40),
+      y: -40,
+      speed: 100 + Math.random() * 150
+    });
+  }
 
-  // If it leaves the screen, reset it to top at random X
-  if (asteroid.y > H) {
-    asteroid.y = -asteroid.h;
-    asteroid.x = Math.random() * (W - asteroid.w);
+  // === Asteroid Movement + Collision ===
+  for (let i = asteroids.length - 1; i >= 0; i--) {
+    const a = asteroids[i];
+    a.y += a.speed * dt;
+
+    // Collision check
+    if (isColliding(a, player)) {
+      gameOver = true;
+      break;
+    }
+
+    // Remove asteroids off screen
+    if (a.y > H) {
+      asteroids.splice(i, 1);
+    }
   }
 }
 
@@ -85,10 +122,21 @@ function draw() {
   ctx.fillStyle = '#fff';
   ctx.fillRect(player.x, player.y, player.w, player.h);
 
-  // Asteroid
-  ctx.fillStyle = '#f00'; // red asteroid
-  ctx.fillRect(asteroid.x, asteroid.y, asteroid.w, asteroid.h);
+  // Asteroids
+  ctx.fillStyle = '#f00';
+  for (const a of asteroids) {
+    ctx.fillRect(a.x, a.y, a.w, a.h);
+  }
+
+  // Game Over screen
+  if (gameOver) {
+    ctx.fillStyle = 'white';
+    ctx.font = '48px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('GAME OVER', W / 2, H / 2);
+  }
 }
+
 
 
 // Start!
