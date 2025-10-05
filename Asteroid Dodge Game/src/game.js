@@ -23,6 +23,8 @@ const spawnInterval = 0.8;      // seconds between spawns
 let gameOver = false;
 let score = 0;           // optional: we'll use this soon
 let elapsedTime = 0;     // for tracking survival time
+let difficulty = 1; // starts easy, scales up
+
 
 
 
@@ -77,6 +79,8 @@ function update(dt) {
 
   elapsedTime += dt;
   score = Math.floor(elapsedTime); // 1 point per second
+  difficulty = 1 + Math.min(elapsedTime / 10, 4);
+
 
   // === Player movement ===
   let vx = 0;
@@ -88,16 +92,17 @@ function update(dt) {
 
   // === Asteroid spawning ===
   spawnTimer += dt;
-  if (spawnTimer > spawnInterval) {
-    spawnTimer = 0;
-    asteroids.push({
-      w: 40,
-      h: 40,
-      x: Math.random() * (W - 40),
-      y: -40,
-      speed: 100 + Math.random() * 150
-    });
-  }
+  if (spawnTimer > spawnInterval / difficulty) {
+  spawnTimer = 0;
+  asteroids.push({
+    w: 40,
+    h: 40,
+    x: Math.random() * (W - 40),
+    y: -40,
+    speed: (100 + Math.random() * 150) * difficulty
+  });
+}
+
 
   // === Asteroid movement + collision ===
   for (let i = asteroids.length - 1; i >= 0; i--) {
@@ -154,6 +159,7 @@ function restartGame() {
   spawnTimer = 0;
   player.x = W / 2 - player.w / 2;
   player.y = H - 60;
+  difficulty = 1;
 }
 
 
