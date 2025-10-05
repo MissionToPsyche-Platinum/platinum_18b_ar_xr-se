@@ -20,7 +20,7 @@ let spawnTimer = 0;             // control asteroid spawn timing
 const spawnInterval = 0.8;      // seconds between spawns
 
 // === Game state ===
-let gameOver = false;
+let gameState = "start"
 let score = 0;           // optional: we'll use this soon
 let elapsedTime = 0;     // for tracking survival time
 let difficulty = 1; // starts easy, scales up
@@ -41,9 +41,12 @@ const keys = {
 window.addEventListener('keydown', (e) => {
   if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
   if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
-  if (e.code === 'Space' && gameOver) restartGame();
-});
 
+  if (e.code === 'Space') {
+    if (gameState === "start") startGame();
+    else if (gameState === "gameover") restartGame();
+  }
+});
 
 window.addEventListener('keyup', (e) => {
   if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
@@ -74,11 +77,12 @@ function isColliding(a, b) {
   );
 }
 
+
 function update(dt) {
-  if (gameOver) return;
+  if (gameState !== "playing") return; // freeze updates unless in play mode
 
   elapsedTime += dt;
-  score = Math.floor(elapsedTime); // 1 point per second
+  score = Math.floor(elapsedTime);
   difficulty = 1 + Math.min(elapsedTime / 10, 4);
 
 
@@ -109,11 +113,10 @@ function update(dt) {
     const a = asteroids[i];
     a.y += a.speed * dt;
 
-    if (isColliding(a, player)) {
-      gameOver = true;
-      break;
-    }
-
+   if (isColliding(a, player)) {
+  gameState = "gameover";
+  break;
+}
     if (a.y > H) asteroids.splice(i, 1);
   }
 }
@@ -123,46 +126,57 @@ function draw() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, W, H);
 
-  // Player
-  ctx.fillStyle = '#fff';
+  if (gameState === "start") {
+    ctx.fillStyle = "white";
+    ctx.font = "48px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("ASTEROID DODGE", W / 2, H / 2 - 40);
+    ctx.font = "24px sans-serif";
+    ctx.fillText("Press SPACE to Start", W / 2, H / 2 + 20);
+    return;
+  }
+
+  // Draw gameplay
+  ctx.fillStyle = "#fff";
   ctx.fillRect(player.x, player.y, player.w, player.h);
 
-  // Asteroids
-  ctx.fillStyle = '#f00';
+  ctx.fillStyle = "#f00";
   for (const a of asteroids) {
     ctx.fillRect(a.x, a.y, a.w, a.h);
   }
 
   // Score display
-ctx.fillStyle = 'white';
-ctx.font = '24px monospace';
-ctx.textAlign = 'left';
-ctx.fillText(`Score: ${score}`, 20, 40);
+  ctx.fillStyle = "white";
+  ctx.font = "24px monospace";
+  ctx.textAlign = "left";
+  ctx.fillText(`Score: ${score}`, 20, 40);
 
-// Game Over screen
-if (gameOver) {
-  ctx.fillStyle = 'white';
-  ctx.font = '48px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('GAME OVER', W / 2, H / 2);
-  ctx.font = '24px sans-serif';
-  ctx.fillText('Press SPACE to Restart', W / 2, H / 2 + 40);
-}
+  // Game Over screen
+  if (gameState === "gameover") {
+    ctx.fillStyle = "white";
+    ctx.font = "48px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("GAME OVER", W / 2, H / 2);
+    ctx.font = "24px sans-serif";
+    ctx.fillText("Press SPACE to Restart", W / 2, H / 2 + 40);
+  }
 }
 
-function restartGame() {
-  // reset everything
-  gameOver = false;
-  score = 0;
+
+function startGame() {
+  gameState = "playing";
   elapsedTime = 0;
+  score = 0;
+  difficulty = 1;
   asteroids = [];
   spawnTimer = 0;
   player.x = W / 2 - player.w / 2;
   player.y = H - 60;
-  difficulty = 1;
 }
 
-
+function restartGame() {
+  startGame(); // reuse same logic
+}
 
 
 // Start!
