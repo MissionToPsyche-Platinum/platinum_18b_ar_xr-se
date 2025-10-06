@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Asteroid Value Calculator</title>
+  <title>Psyche Asteroid Value Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,34 +11,80 @@
       text-align: center;
       padding: 30px;
     }
+
     h1 { margin-bottom: 10px; }
+
+    .asteroid-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px auto;
+      width: 100%;
+    }
+
+    #asteroid-img {
+      width: 40%;
+      max-width: 320px;
+      border-radius: 10px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    #color-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40%;
+      max-width: 320px;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      border-radius: 10px;
+      pointer-events: none;
+      mix-blend-mode: overlay;
+      transition: background-color 0.3s ease;
+    }
+
+    .composition-header {
+      margin-top: 25px;
+    }
+
+    .slider-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px 25px;
+      width: 70%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
     .slider-container {
-      margin: 15px auto;
-      width: 60%;
       text-align: left;
     }
+
     .slider-label {
       display: flex;
       justify-content: space-between;
       margin-bottom: 5px;
     }
+
     input[type=range] {
       width: 100%;
     }
-    #error {
-      color: red;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-    #junk {
+
+    #junk, #error {
       margin-top: 10px;
       font-weight: bold;
-      color: #0ff;
     }
+    #junk { color: #0ff; }
+    #error { color: red; }
+
     table {
       margin: 20px auto;
       border-collapse: collapse;
       width: 80%;
+      max-width: 600px;
     }
     th, td {
       border: 1px solid #555;
@@ -50,15 +96,37 @@
       font-size: 14px;
       color: #aaa;
     }
+    button {
+      background: #0ff;
+      color: #000;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #09c;
+    }
   </style>
 </head>
 <body>
-  <h1>Asteroid Value Calculator</h1>
-  <p>Enter asteroid weight (lbs):</p>
-  <input type="number" id="weightInput" value="1000000">
+  <h1>Psyche Asteroid Value Calculator</h1>
 
-  <h2>Composition</h2>
-  <div id="sliders"></div>
+  <div class="asteroid-container">
+    <img id="asteroid-img" src="Psyche Asteroid.jpg" alt="Psyche Asteroid">
+    <div id="color-overlay"></div>
+  </div>
+  <p style="color:#aaa;font-size:14px;">NASA Psyche Asteroid Visualization</p>
+  <p style="color:#0ff;font-size:16px;margin-top:-5px;">
+    Estimated Mass: ≈ 2.3 × 10<sup>19</sup> kg (≈ 5.07 × 10<sup>19</sup> lbs)
+  </p>
+
+  <h2 class="composition-header">Composition</h2>
+
+  <div class="slider-grid" id="sliders"></div>
   <p id="junk">Junk: 100%</p>
   <p id="error"></p>
 
@@ -85,16 +153,64 @@
     const CACHE_TIME_KEY = "metalRatesTimestamp";
     const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
+    // Fixed mass of Psyche (2.3 × 10^19 kg)
+    // Convert to pounds: 1 kg = 2.20462 lbs
+    const PSYCHE_MASS_LBS = 2.3e19 * 2.20462;
+
     const metalsList = ["gold", "silver", "platinum", "palladium", "copper", "nickel", "aluminum", "lead"];
 
-    // lbs to troy ounces
+    const metalColors = {
+      gold: "#FFD700",
+      silver: "#C0C0C0",
+      platinum: "#E5E4E2",
+      palladium: "#CED0DD",
+      copper: "#B87333",
+      nickel: "#AFAFAF",
+      aluminum: "#D3D3D3",
+      lead: "#4D4D4D"
+    };
+
     function lbsToTroyOunces(lbs) {
       const ouncesPerPound = 16;
       const troyOzPerAvoirOz = 0.911458;
       return lbs * ouncesPerPound * troyOzPerAvoirOz;
     }
 
-    // Build sliders dynamically
+    function hexToRgb(hex) {
+      const bigint = parseInt(hex.slice(1), 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return { r, g, b };
+    }
+
+    function mixColors(metalValues) {
+      let total = 0;
+      let r = 0, g = 0, b = 0;
+      for (const [metal, percent] of Object.entries(metalValues)) {
+        const color = hexToRgb(metalColors[metal]);
+        r += color.r * (percent / 100);
+        g += color.g * (percent / 100);
+        b += color.b * (percent / 100);
+        total += percent;
+      }
+      if (total === 0) return "rgba(0,0,0,0)";
+      r = Math.min(255, Math.round(r));
+      g = Math.min(255, Math.round(g));
+      b = Math.min(255, Math.round(b));
+      const opacity = Math.min(1, total / 100);
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+
+    function updateOverlay() {
+      const metalValues = {};
+      metalsList.forEach(metal => {
+        metalValues[metal] = parseInt(document.getElementById(`${metal}-slider`).value);
+      });
+      const color = mixColors(metalValues);
+      document.getElementById("color-overlay").style.backgroundColor = color;
+    }
+
     function buildSliders() {
       const container = document.getElementById("sliders");
       container.innerHTML = "";
@@ -106,7 +222,8 @@
             <span>${metal.charAt(0).toUpperCase() + metal.slice(1)}</span>
             <span id="${metal}-val">0%</span>
           </div>
-          <input type="range" min="0" max="100" value="0" id="${metal}-slider" oninput="updatePercent('${metal}')">
+          <input type="range" min="0" max="100" value="0" id="${metal}-slider"
+                 oninput="updatePercent('${metal}')">
         `;
         container.appendChild(div);
       });
@@ -117,6 +234,7 @@
       const valueDisplay = document.getElementById(`${metal}-val`);
       valueDisplay.textContent = slider.value + "%";
       validateTotal();
+      updateOverlay();
     }
 
     function validateTotal() {
@@ -143,45 +261,29 @@
       const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
 
       if (cached && cachedTime && (Date.now() - cachedTime < ONE_DAY_MS)) {
-        console.log("Using cached rates");
         return { rates: JSON.parse(cached), timestamp: parseInt(cachedTime) };
       }
 
       try {
-        console.log("Fetching fresh rates");
         const url = `${BASE_URL}?api_key=${API_KEY}&currency=USD&unit=toz`;
         const resp = await fetch(url);
         const data = await resp.json();
-
         if (data.status !== "success") throw new Error(data.message || "API error");
-
-        console.log("All metals returned by API:", Object.keys(data.metals));
-
         localStorage.setItem(CACHE_KEY, JSON.stringify(data.metals));
         localStorage.setItem(CACHE_TIME_KEY, Date.now());
         return { rates: data.metals, timestamp: Date.now() };
-
       } catch (err) {
-        console.warn("API failed, using cache:", err.message);
         if (cached) return { rates: JSON.parse(cached), timestamp: cachedTime };
         else throw new Error("No cached rates available.");
       }
     }
 
     async function calculate() {
-      const lbs = parseFloat(document.getElementById("weightInput").value);
-      if (isNaN(lbs) || lbs <= 0) {
-        alert("Please enter a valid weight.");
-        return;
-      }
-
       try {
         const { rates, timestamp } = await getRates();
-        const totalOunces = lbsToTroyOunces(lbs);
-
+        const totalOunces = lbsToTroyOunces(PSYCHE_MASS_LBS);
         const tbody = document.querySelector("#resultsTable tbody");
         tbody.innerHTML = "";
-
         let totalValue = 0;
 
         metalsList.forEach(metal => {
@@ -191,7 +293,6 @@
             const metalOunces = totalOunces * (percent / 100);
             const value = metalOunces * rate;
             totalValue += value;
-
             tbody.innerHTML += `
               <tr>
                 <td>${metal.charAt(0).toUpperCase() + metal.slice(1)}</td>
@@ -209,20 +310,18 @@
             <td>$${totalValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
           </tr>
         `;
-
         const date = new Date(parseInt(timestamp));
-        document.getElementById("lastUpdated").textContent = 
+        document.getElementById("lastUpdated").textContent =
           "Prices last updated: " + date.toLocaleString();
-
       } catch (err) {
         alert("Could not load prices.");
         console.error(err);
       }
     }
 
-    // Init
     buildSliders();
     validateTotal();
+    updateOverlay();
   </script>
 </body>
 </html>
