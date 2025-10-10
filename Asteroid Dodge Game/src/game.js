@@ -183,7 +183,7 @@ function initStars() {
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       radius: Math.random() * 1.5,
-      velocity: Math.random() * 2.0 + 2.0,
+      velocity: Math.random() * 1.0 + 1.0,
     });
   }
 }
