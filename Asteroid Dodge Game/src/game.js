@@ -19,6 +19,11 @@ let asteroids = [];
 let spawnTimer = 0;             // control asteroid spawn timing
 const spawnInterval = 0.8;      // seconds between spawns
 
+// an array of stars to travel down the canvas
+let stars = [];
+const numStars = 300; //number of stars in the array
+const speed = 0.8; //speed the stars travel across the canvas
+
 // === Game state ===
 let gameState = "start"
 let score = 0;           // optional: we'll use this soon
@@ -94,6 +99,8 @@ function update(dt) {
   if (player.x < 0) player.x = 0;
   if (player.x + player.w > W) player.x = W - player.w;
 
+  updateStars();
+
   // === Asteroid spawning ===
   spawnTimer += dt;
   if (spawnTimer > spawnInterval / difficulty) {
@@ -123,7 +130,7 @@ function update(dt) {
 
 function draw() {
   ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = '#000';
+  ctx.fillStyle = 'midnightblue';
   ctx.fillRect(0, 0, W, H);
 
   if (gameState === "start") {
@@ -134,6 +141,13 @@ function draw() {
     ctx.font = "24px sans-serif";
     ctx.fillText("Press SPACE to Start", W / 2, H / 2 + 20);
     return;
+  }
+
+  ctx.fillStyle = "white";
+  for (const star of stars) {
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   // Draw gameplay
@@ -162,6 +176,28 @@ function draw() {
   }
 }
 
+function initStars() {
+  stars = [];
+  for (let i = 0; i < numStars; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      radius: Math.random() * 1.5,
+      velocity: Math.random() * 1.0 + 1.0,
+    });
+  }
+}
+
+function updateStars() {
+  for (const star of stars) {
+    star.y += star.velocity * speed;
+    if (star.y > canvas.height) {
+      star.y = 0;
+      star.x = Math.random() * canvas.width;
+    }
+  }
+}
+
 
 function startGame() {
   gameState = "playing";
@@ -172,6 +208,7 @@ function startGame() {
   spawnTimer = 0;
   player.x = W / 2 - player.w / 2;
   player.y = H - 60;
+  initStars();
 }
 
 function restartGame() {
