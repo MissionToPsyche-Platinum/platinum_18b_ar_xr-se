@@ -14,6 +14,20 @@
 
     h1 { margin-bottom: 10px; }
 
+    /* === Shared Button Styles === */
+    button {
+      background: #0ff;
+      color: #000;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 15px;
+    }
+    button:hover { background: #09c; }
+
     /* === Disclaimer Overlay === */
     #disclaimer {
       position: fixed;
@@ -37,21 +51,16 @@
       line-height: 1.5;
     }
 
-    #continueBtn {
-      background: #0ff;
-      color: #000;
-      border: none;
-      padding: 10px 25px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    #continueBtn:hover {
-      background: #09c;
+    /* === Page Containers === */
+    .page {
+      display: none;
     }
 
-    /* === Existing Styles === */
+    .active {
+      display: block;
+    }
+
+    /* === Main Screen Styles === */
     .asteroid-container {
       position: relative;
       display: flex;
@@ -84,9 +93,7 @@
       transition: background-color 0.3s ease;
     }
 
-    .composition-header {
-      margin-top: 25px;
-    }
+    .composition-header { margin-top: 25px; }
 
     .slider-grid {
       display: grid;
@@ -97,9 +104,7 @@
       margin: 0 auto;
     }
 
-    .slider-container {
-      text-align: left;
-    }
+    .slider-container { text-align: left; }
 
     .slider-label {
       display: flex;
@@ -107,9 +112,7 @@
       margin-bottom: 5px;
     }
 
-    input[type=range] {
-      width: 100%;
-    }
+    input[type=range] { width: 100%; }
 
     #junk, #error {
       margin-top: 10px;
@@ -118,6 +121,7 @@
     #junk { color: #0ff; }
     #error { color: red; }
 
+    /* === Results Page === */
     table {
       margin: 20px auto;
       border-collapse: collapse;
@@ -134,37 +138,22 @@
       font-size: 14px;
       color: #aaa;
     }
-    button {
-      background: #0ff;
-      color: #000;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background: #09c;
-    }
   </style>
 </head>
 <body>
-  <!-- Disclaimer Screen -->
-  <div id="disclaimer">
+  <!-- Page 1: Disclaimer -->
+  <div id="disclaimer" class="page active">
     <p>
-      Hey there! This activity is meant for fun and to spark imagination!<br><br>
+      Hey there! This activity is meant for fun and to spark imagination! 🌌<br><br>
       The Psyche asteroid is not expected to be a viable source of precious metals — and if it was, these current market values would not make sense with the influx of metals.<br><br>
       Please enjoy the activity as simply imaginative play!
     </p>
     <button id="continueBtn">Continue</button>
   </div>
 
-  <!-- Main Content -->
-  <div id="mainContent" style="display:none;">
+  <!-- Page 2: Main Composition -->
+  <div id="mainPage" class="page">
     <h1>Psyche Asteroid Value Calculator</h1>
-
     <div class="asteroid-container">
       <img id="asteroid-img" src="Psyche Asteroid.jpg" alt="Psyche Asteroid">
       <div id="color-overlay"></div>
@@ -181,8 +170,11 @@
     <p id="error"></p>
 
     <button id="calcBtn" onclick="calculate()">Calculate</button>
+  </div>
 
-    <h2>Results</h2>
+  <!-- Page 3: Results -->
+  <div id="resultsPage" class="page">
+    <h1>Results</h1>
     <table id="resultsTable">
       <thead>
         <tr>
@@ -195,16 +187,29 @@
       <tbody></tbody>
     </table>
     <p id="lastUpdated"></p>
+    <button id="backBtn">Back</button>
   </div>
 
   <script>
-    // Disclaimer button logic
+    // === Page Navigation ===
+    const disclaimer = document.getElementById("disclaimer");
+    const mainPage = document.getElementById("mainPage");
+    const resultsPage = document.getElementById("resultsPage");
+
     document.getElementById("continueBtn").addEventListener("click", () => {
-      document.getElementById("disclaimer").style.display = "none";
-      document.getElementById("mainContent").style.display = "block";
+      disclaimer.classList.remove("active");
+      disclaimer.style.display = "none";
+      mainPage.classList.add("active");
     });
 
-    // === Existing JavaScript ===
+    document.getElementById("backBtn").addEventListener("click", () => {
+      resultsPage.classList.remove("active");
+      resultsPage.style.display = "none";
+      mainPage.classList.add("active");
+      mainPage.style.display = "block";
+    });
+
+    // === Existing Logic ===
     const API_KEY = "LMK8WWQNCCKFV6OL0HQX880OL0HQX";
     const BASE_URL = "https://api.metals.dev/v1/latest";
     const CACHE_KEY = "metalRates";
@@ -368,6 +373,12 @@
         const date = new Date(parseInt(timestamp));
         document.getElementById("lastUpdated").textContent =
           "Prices last updated: " + date.toLocaleString();
+
+        // Switch to results page
+        mainPage.classList.remove("active");
+        mainPage.style.display = "none";
+        resultsPage.classList.add("active");
+        resultsPage.style.display = "block";
       } catch (err) {
         alert("Could not load prices.");
         console.error(err);
