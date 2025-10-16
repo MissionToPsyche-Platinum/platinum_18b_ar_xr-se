@@ -14,6 +14,13 @@ const player = {
   speed: 300    
 };    
 
+// === Audio === //
+const sounds = { bg: new Audio('../sounds/spaceship.mp3'), 
+start: new Audio('../sounds/game-start.mp3'), 
+gameover: new Audio('../sounds/game-over.mp3')
+};
+
+
 // creates an array of asteroid rather than a single one
 let asteroids = [];
 let spawnTimer = 0;             // control asteroid spawn timing
@@ -29,11 +36,6 @@ let gameState = "start"
 let score = 0;           // optional: we'll use this soon
 let elapsedTime = 0;     // for tracking survival time
 let difficulty = 1; // starts easy, scales up
-
-
-
-
-
 
 
 // Simple input state
@@ -121,9 +123,14 @@ function update(dt) {
     a.y += a.speed * dt;
 
    if (isColliding(a, player)) {
-  gameState = "gameover";
-  break;
+    sounds.bg.pause();
+    sounds.gameover.currentTime = 0;
+    sounds.gameover.play();
+    gameState = "gameover";
+    break;
 }
+
+
     if (a.y > H) asteroids.splice(i, 1);
   }
 }
@@ -209,10 +216,18 @@ function startGame() {
   player.x = W / 2 - player.w / 2;
   player.y = H - 60;
   initStars();
+
+  //plays sounds
+  sounds.start.currentTime = 0;
+  sounds.start.play();
+  sounds.bg.currentTime = 0;
+  sounds.bg.play();
+
 }
 
 function restartGame() {
   startGame(); // reuse same logic
+  sounds.bg.play();
 }
 
 
