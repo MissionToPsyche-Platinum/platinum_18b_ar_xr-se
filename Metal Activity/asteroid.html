@@ -14,6 +14,47 @@
 
     h1 { margin-bottom: 10px; }
 
+    /* Shared Button Styles */
+    button {
+      background: #0ff;
+      color: #000;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 15px;
+    }
+    button:hover { background: #09c; }
+
+    /* Disclaimer Page */
+    #disclaimer {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      z-index: 999;
+      padding: 20px;
+    }
+    #disclaimer p {
+      font-size: 18px;
+      max-width: 700px;
+      margin-bottom: 25px;
+      color: #0ff;
+      line-height: 1.5;
+    }
+
+    /* Page Containers */
+    .page { display: none; }
+    .active { display: block; }
+
+    /* Main Screen */
     .asteroid-container {
       position: relative;
       display: flex;
@@ -22,7 +63,6 @@
       margin: 20px auto;
       width: 100%;
     }
-
     #asteroid-img {
       width: 40%;
       max-width: 320px;
@@ -30,7 +70,6 @@
       display: block;
       margin: 0 auto;
     }
-
     #color-overlay {
       position: absolute;
       top: 50%;
@@ -46,10 +85,7 @@
       transition: background-color 0.3s ease;
     }
 
-    .composition-header {
-      margin-top: 25px;
-    }
-
+    .composition-header { margin-top: 25px; }
     .slider-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -58,162 +94,159 @@
       max-width: 600px;
       margin: 0 auto;
     }
-
-    .slider-container {
-      text-align: left;
-    }
-
+    .slider-container { text-align: left; }
     .slider-label {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 5px;
+      display: flex; justify-content: space-between; margin-bottom: 5px;
     }
-
-    input[type=range] {
-      width: 100%;
-    }
-
-    #junk, #error {
-      margin-top: 10px;
-      font-weight: bold;
-    }
+    input[type=range] { width: 100%; }
+    #junk, #error { margin-top: 10px; font-weight: bold; }
     #junk { color: #0ff; }
     #error { color: red; }
 
+    /* Results */
     table {
       margin: 20px auto;
       border-collapse: collapse;
       width: 80%;
       max-width: 600px;
     }
-    th, td {
-      border: 1px solid #555;
-      padding: 8px;
-    }
+    th, td { border: 1px solid #555; padding: 8px; }
     th { background: #333; }
-    #lastUpdated {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #aaa;
-    }
-    button {
-      background: #0ff;
-      color: #000;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background: #09c;
-    }
+    #lastUpdated { margin-top: 15px; font-size: 14px; color: #aaa; }
+    #funFact { margin-top: 16px; font-size: 16px; color: #0ff; }
   </style>
 </head>
 <body>
-  <h1>Psyche Asteroid Value Calculator</h1>
-
-  <div class="asteroid-container">
-    <img id="asteroid-img" src="Psyche Asteroid.jpg" alt="Psyche Asteroid">
-    <div id="color-overlay"></div>
+  <!-- Page 1: Disclaimer -->
+  <div id="disclaimer" class="page active">
+    <p>
+      Hey there! This activity is meant for fun and to spark imagination! 🌌<br><br>
+      The Psyche asteroid is not expected to be a viable source of precious metals — and if it was, these current market values would not make sense with the influx of metals.<br><br>
+      Please enjoy the activity as simply imaginative play!
+    </p>
+    <button id="continueBtn">Continue</button>
   </div>
-  <p style="color:#aaa;font-size:14px;">NASA Psyche Asteroid Visualization</p>
-  <p style="color:#0ff;font-size:16px;margin-top:-5px;">
-    Estimated Mass: ≈ 2.3 × 10<sup>19</sup> kg (≈ 5.07 × 10<sup>19</sup> lbs)
-  </p>
 
-  <h2 class="composition-header">Composition</h2>
+  <!-- Page 2: Main Composition -->
+  <div id="mainPage" class="page">
+    <h1>Psyche Asteroid Value Calculator</h1>
+    <div class="asteroid-container">
+      <img id="asteroid-img" src="Psyche Asteroid.jpg" alt="Psyche Asteroid">
+      <div id="color-overlay"></div>
+    </div>
+    <p style="color:#aaa;font-size:14px;">NASA Psyche Asteroid Visualization</p>
+    <p style="color:#0ff;font-size:16px;margin-top:-5px;">
+      Estimated Mass: ≈ 2.3 × 10<sup>19</sup> kg (≈ 5.07 × 10<sup>19</sup> lbs)
+    </p>
 
-  <div class="slider-grid" id="sliders"></div>
-  <p id="junk">Junk: 100%</p>
-  <p id="error"></p>
+    <h2 class="composition-header">Composition</h2>
+    <div class="slider-grid" id="sliders"></div>
+    <p id="junk">Junk: 100%</p>
+    <p id="error"></p>
 
-  <button id="calcBtn" onclick="calculate()">Calculate</button>
+    <button id="calcBtn" onclick="calculate()">Calculate</button>
+  </div>
 
-  <h2>Results</h2>
-  <table id="resultsTable">
-    <thead>
-      <tr>
-        <th>Metal</th>
-        <th>Percentage</th>
-        <th>Rate (USD/oz)</th>
-        <th>Total Value</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <p id="lastUpdated"></p>
+  <!-- Page 3: Results -->
+  <div id="resultsPage" class="page">
+    <h1>Results</h1>
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>Metal</th>
+          <th>Percentage</th>
+          <th>Rate (USD/oz)</th>
+          <th>Total Value</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p id="lastUpdated"></p>
+    <p id="funFact"></p>
+    <button id="backBtn">Back</button>
+  </div>
 
   <script>
+    // Page navigation
+    const disclaimer = document.getElementById("disclaimer");
+    const mainPage = document.getElementById("mainPage");
+    const resultsPage = document.getElementById("resultsPage");
+
+    document.getElementById("continueBtn").addEventListener("click", () => {
+      disclaimer.classList.remove("active"); disclaimer.style.display = "none";
+      mainPage.classList.add("active");      mainPage.style.display = "block";
+    });
+    document.getElementById("backBtn").addEventListener("click", () => {
+      resultsPage.classList.remove("active"); resultsPage.style.display = "none";
+      mainPage.classList.add("active");       mainPage.style.display = "block";
+    });
+
+    // Data + constants
     const API_KEY = "LMK8WWQNCCKFV6OL0HQX880OL0HQX";
     const BASE_URL = "https://api.metals.dev/v1/latest";
     const CACHE_KEY = "metalRates";
     const CACHE_TIME_KEY = "metalRatesTimestamp";
     const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-    // Fixed mass of Psyche (2.3 × 10^19 kg)
-    // Convert to pounds: 1 kg = 2.20462 lbs
+    // Fixed mass of Psyche in pounds (2.3e19 kg)
     const PSYCHE_MASS_LBS = 2.3e19 * 2.20462;
 
     const metalsList = ["gold", "silver", "platinum", "palladium", "copper", "nickel", "aluminum", "lead"];
-
     const metalColors = {
-      gold: "#FFD700",
-      silver: "#C0C0C0",
-      platinum: "#E5E4E2",
-      palladium: "#CED0DD",
-      copper: "#B87333",
-      nickel: "#AFAFAF",
-      aluminum: "#D3D3D3",
-      lead: "#4D4D4D"
+      gold: "#FFD700", silver: "#C0C0C0", platinum: "#E5E4E2", palladium: "#CED0DD",
+      copper: "#B87333", nickel: "#AFAFAF", aluminum: "#D3D3D3", lead: "#4D4D4D"
     };
 
+    // Olympic pool volume (approx): 50m x 25m x 2m = 2,500 m^3
+    const OLYMPIC_POOL_M3 = 2500;
+
+    // US bill dimensions
+    const INCH_TO_M = 0.0254;
+    const BILL_L = 6.14 * INCH_TO_M;     // meters
+    const BILL_W = 2.61 * INCH_TO_M;     // meters
+    const BILL_T = 0.0043 * INCH_TO_M;   // meters (thickness)
+    const BILL_VOLUME_M3 = BILL_L * BILL_W * BILL_T; // ≈ 1.13e-6 m^3 per bill
+
+ function formatLarge(n) {
+  if (!isFinite(n)) return "∞";
+
+  // Convert to readable billions/trillions instead of scientific
+  if (n >= 1e12) return (n / 1e12).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " trillion";
+  if (n >= 1e9)  return (n / 1e9).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " billion";
+  if (n >= 1e6)  return (n / 1e6).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " million";
+
+  return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+}
+
+
+    // Helpers
     function lbsToTroyOunces(lbs) {
-      const ouncesPerPound = 16;
-      const troyOzPerAvoirOz = 0.911458;
+      const ouncesPerPound = 16, troyOzPerAvoirOz = 0.911458;
       return lbs * ouncesPerPound * troyOzPerAvoirOz;
     }
-
     function hexToRgb(hex) {
       const bigint = parseInt(hex.slice(1), 16);
-      const r = (bigint >> 16) & 255;
-      const g = (bigint >> 8) & 255;
-      const b = bigint & 255;
-      return { r, g, b };
+      return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
     }
-
     function mixColors(metalValues) {
-      let total = 0;
-      let r = 0, g = 0, b = 0;
+      let total = 0, r = 0, g = 0, b = 0;
       for (const [metal, percent] of Object.entries(metalValues)) {
-        const color = hexToRgb(metalColors[metal]);
-        r += color.r * (percent / 100);
-        g += color.g * (percent / 100);
-        b += color.b * (percent / 100);
+        const c = hexToRgb(metalColors[metal]);
+        r += c.r * (percent / 100); g += c.g * (percent / 100); b += c.b * (percent / 100);
         total += percent;
       }
       if (total === 0) return "rgba(0,0,0,0)";
-      r = Math.min(255, Math.round(r));
-      g = Math.min(255, Math.round(g));
-      b = Math.min(255, Math.round(b));
+      r = Math.min(255, Math.round(r)); g = Math.min(255, Math.round(g)); b = Math.min(255, Math.round(b));
       const opacity = Math.min(1, total / 100);
       return `rgba(${r}, ${g}, ${b}, ${opacity})`;
     }
-
     function updateOverlay() {
       const metalValues = {};
-      metalsList.forEach(metal => {
-        metalValues[metal] = parseInt(document.getElementById(`${metal}-slider`).value);
-      });
-      const color = mixColors(metalValues);
-      document.getElementById("color-overlay").style.backgroundColor = color;
+      metalsList.forEach(metal => metalValues[metal] = parseInt(document.getElementById(`${metal}-slider`).value));
+      document.getElementById("color-overlay").style.backgroundColor = mixColors(metalValues);
     }
-
     function buildSliders() {
-      const container = document.getElementById("sliders");
-      container.innerHTML = "";
+      const container = document.getElementById("sliders"); container.innerHTML = "";
       metalsList.forEach(metal => {
         const div = document.createElement("div");
         div.classList.add("slider-container");
@@ -228,53 +261,40 @@
         container.appendChild(div);
       });
     }
-
     function updatePercent(metal) {
       const slider = document.getElementById(`${metal}-slider`);
-      const valueDisplay = document.getElementById(`${metal}-val`);
-      valueDisplay.textContent = slider.value + "%";
-      validateTotal();
-      updateOverlay();
+      document.getElementById(`${metal}-val`).textContent = slider.value + "%";
+      validateTotal(); updateOverlay();
     }
-
     function validateTotal() {
-      let total = 0;
-      metalsList.forEach(m => total += parseInt(document.getElementById(`${m}-slider`).value));
+      let total = 0; metalsList.forEach(m => total += parseInt(document.getElementById(`${m}-slider`).value));
       const errorEl = document.getElementById("error");
       const calcBtn = document.getElementById("calcBtn");
       const junkEl = document.getElementById("junk");
-
       if (total > 100) {
         errorEl.textContent = "❌ Total composition exceeds 100%. Please adjust sliders.";
-        calcBtn.disabled = true;
-        junkEl.textContent = "Junk: --% (invalid)";
+        calcBtn.disabled = true; junkEl.textContent = "Junk: --% (invalid)";
       } else {
-        errorEl.textContent = "";
-        calcBtn.disabled = false;
-        const junk = 100 - total;
-        junkEl.textContent = `Junk: ${junk}%`;
+        errorEl.textContent = ""; calcBtn.disabled = false; junkEl.textContent = `Junk: ${100 - total}%`;
       }
     }
 
     async function getRates() {
       const cached = localStorage.getItem(CACHE_KEY);
       const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
-
       if (cached && cachedTime && (Date.now() - cachedTime < ONE_DAY_MS)) {
         return { rates: JSON.parse(cached), timestamp: parseInt(cachedTime) };
       }
-
       try {
         const url = `${BASE_URL}?api_key=${API_KEY}&currency=USD&unit=toz`;
-        const resp = await fetch(url);
-        const data = await resp.json();
+        const resp = await fetch(url); const data = await resp.json();
         if (data.status !== "success") throw new Error(data.message || "API error");
         localStorage.setItem(CACHE_KEY, JSON.stringify(data.metals));
         localStorage.setItem(CACHE_TIME_KEY, Date.now());
         return { rates: data.metals, timestamp: Date.now() };
       } catch (err) {
         if (cached) return { rates: JSON.parse(cached), timestamp: cachedTime };
-        else throw new Error("No cached rates available.");
+        throw new Error("No cached rates available.");
       }
     }
 
@@ -313,15 +333,25 @@
         const date = new Date(parseInt(timestamp));
         document.getElementById("lastUpdated").textContent =
           "Prices last updated: " + date.toLocaleString();
+
+        // ----- Fun Fact: Olympic pools of $100 bills -----
+        const bills = totalValue / 100; // number of $100 bills
+        const volume_m3 = bills * BILL_VOLUME_M3; // total bill volume
+        const pools = volume_m3 / OLYMPIC_POOL_M3;
+        document.getElementById("funFact").textContent =
+          `💡 Fun fact: That’s enough $100 bills (by volume) to fill about ${formatLarge(pools)} Olympic-size swimming ` +
+          `pool${pools >= 2 ? "s" : ""}!`;
+
+        // Show results page
+        mainPage.classList.remove("active"); mainPage.style.display = "none";
+        resultsPage.classList.add("active"); resultsPage.style.display = "block";
       } catch (err) {
         alert("Could not load prices.");
         console.error(err);
       }
     }
 
-    buildSliders();
-    validateTotal();
-    updateOverlay();
+    buildSliders(); validateTotal(); updateOverlay();
   </script>
 </body>
 </html>
