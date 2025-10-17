@@ -31,6 +31,18 @@ let stars = [];
 const numStars = 300; //number of stars in the array
 const speed = 0.8; //speed the stars travel across the canvas
 
+// === Power-ups ===
+let powerUps = []; 
+const powerUpInterval = 10; // seconds between power-up spawns
+let powerUpTimer = 0;
+
+let activePowerUps = { shield: false, scoreBoost: false };
+let powerupDuration = 5; // seconds active
+let powerupTimers = { shield: 0, scoreBoost: 0 };
+
+
+
+
 // === Game state ===
 let gameState = "start"
 let score = 0;           // optional: we'll use this soon
@@ -43,6 +55,8 @@ const keys = {
   left: false,
   right: false
 };
+
+
 
 // Input Handlers 
 window.addEventListener('keydown', (e) => {
@@ -89,7 +103,8 @@ function update(dt) {
   if (gameState !== "playing") return; // freeze updates unless in play mode
 
   elapsedTime += dt;
-  score = Math.floor(elapsedTime);
+  score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? 2 : 1));
+
   difficulty = 1 + Math.min(elapsedTime / 10, 4);
 
 
@@ -116,6 +131,20 @@ function update(dt) {
   });
 }
 
+// ==== Power-up spawning ====
+powerUpTimer += dt;
+if (powerUpTimer > powerUpInterval) {
+  powerUpTimer = 0;
+  const type = Math.random() < 0.5 ? 'shield' : 'scoreBoost';
+  powerUps.push({
+    w: 30,
+    h: 30,
+    x: Math.random() * (W - 30),
+    y: -30,
+    speed: 100 + Math.random() * 50
+  });
+}
+
 
   // === Asteroid movement + collision ===
   for (let i = asteroids.length - 1; i >= 0; i--) {
@@ -123,23 +152,62 @@ function update(dt) {
     a.y += a.speed * dt;
 
    if (isColliding(a, player)) {
+  if (activePowerUps.shield) {
+    // consume shield instead of dying
+    activePowerUps.shield = false;
+    powerupTimers.shield = 0;
+    asteroids.splice(i, 1); // destroy the asteroid
+    continue;
+  } else {
     sounds.bg.pause();
     sounds.gameover.currentTime = 0;
     sounds.gameover.play();
     gameState = "gameover";
     break;
-}
-
-
-    if (a.y > H) asteroids.splice(i, 1);
   }
 }
+if (a.y > H) asteroids.splice(i, 1);
+  
+}
+    
+
+  // === Power-up movement + collision ===
+  for (let i = powerUps.length - 1; i >= 0; i--) {
+    const p = powerUps[i];
+    p.y += p.speed * dt;
+
+    if (isColliding(p, player)) {
+      if (p.type === 'shield') {
+        activePowerUps.shield = true;
+        powerupTimers.shield = powerupDuration
+      } else if (p.type === 'scoreBoost') {
+        activePowerUps.scoreBoost = true;
+        powerupTimers.scoreBoost = powerupDuration;
+      }
+      powerUps.splice(i, 1);
+      continue;
+    }
+    if (p.y > H) powerUps.splice(i, 1);
+}
+// === Power-up timers ===
+for (const key in powerupTimers) {
+  if (activePowerUps[key]) {
+    powerupTimers[key] -= dt;
+    if (powerupTimers[key] <= 0) {
+      activePowerUps[key] = false;
+    }
+  }
+}
+}
+
+
 
 function draw() {
   ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = 'midnightblue';
   ctx.fillRect(0, 0, W, H);
 
+  // Draw Start Screen 
   if (gameState === "start") {
     ctx.fillStyle = "white";
     ctx.font = "48px sans-serif";
@@ -150,12 +218,21 @@ function draw() {
     return;
   }
 
+  // Draw stars
   ctx.fillStyle = "white";
   for (const star of stars) {
     ctx.beginPath();
     ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
     ctx.fill();
   }
+
+  // Draw power-ups
+for (const p of powerUps) {
+  if (p.type === "shield") ctx.fillStyle = "cyan";
+  else if (p.type === "scoreBoost") ctx.fillStyle = "gold";
+  ctx.fillRect(p.x, p.y, p.w, p.h);
+}
+
 
   // Draw gameplay
   ctx.fillStyle = "#fff";
@@ -171,6 +248,18 @@ function draw() {
   ctx.font = "24px monospace";
   ctx.textAlign = "left";
   ctx.fillText(`Score: ${score}`, 20, 40);
+
+  // Power-up indicators
+let y = 70;
+if (activePowerUps.shield) {
+  ctx.fillStyle = "cyan";
+  ctx.fillText("🛡️ Shield Active", 20, y);
+  y += 30;
+}
+if (activePowerUps.scoreBoost) {
+  ctx.fillStyle = "gold";
+  ctx.fillText("💫 Score x2", 20, y);
+}
 
   // Game Over screen
   if (gameState === "gameover") {
