@@ -30,6 +30,18 @@ let score = 0;           // optional: we'll use this soon
 let elapsedTime = 0;     // for tracking survival time
 let difficulty = 1; // starts easy, scales up
 
+// High Score - implemented as stringified json in localStorage in case we want to add extra bits to it later
+let highScore;
+const localKey = "asteroidDodge";
+let storedInfo = localStorage.getItem(localKey);
+if(storedInfo === null) {
+  storedInfo = {
+    "highScore": 0
+  };
+} else {
+  storedInfo = JSON.parse(storedInfo);
+}
+highScore = storedInfo.highScore;
 
 
 
@@ -120,10 +132,14 @@ function update(dt) {
     const a = asteroids[i];
     a.y += a.speed * dt;
 
-   if (isColliding(a, player)) {
-  gameState = "gameover";
-  break;
-}
+    if (isColliding(a, player)) {
+      gameState = "gameover";
+      if(score > highScore) {
+        setHighScore(score);
+      }
+      break;
+    }
+
     if (a.y > H) asteroids.splice(i, 1);
   }
 }
@@ -140,6 +156,8 @@ function draw() {
     ctx.fillText("ASTEROID DODGE", W / 2, H / 2 - 40);
     ctx.font = "24px sans-serif";
     ctx.fillText("Press SPACE to Start", W / 2, H / 2 + 20);
+    ctx.font = "16px sans-serif";
+    ctx.fillText(`High Score: ${highScore}`, W / 2, H / 2 + 60)
     return;
   }
 
@@ -173,6 +191,8 @@ function draw() {
     ctx.fillText("GAME OVER", W / 2, H / 2);
     ctx.font = "24px sans-serif";
     ctx.fillText("Press SPACE to Restart", W / 2, H / 2 + 40);
+    ctx.font = "16px sans-serif";
+    ctx.fillText(`High Score: ${highScore}`, W / 2, H / 2 + 80)
   }
 }
 
@@ -196,6 +216,11 @@ function updateStars() {
       star.x = Math.random() * canvas.width;
     }
   }
+}
+
+function setHighScore(score) {
+  storedInfo.highScore = score;
+  localStorage.setItem(localKey, JSON.stringify(storedInfo)); 
 }
 
 
