@@ -9,7 +9,7 @@ const powerUpDuration = 5;
 export const activePowerUps = { shield: false, scoreBoost: false };
 export const powerUpTimers = { shield: 0, scoreBoost: 0 };
 
-export function updatePowerUps(dt, player, H) {
+export function updatePowerUps(dt, player, W, H) {
   powerUpTimer += dt;
   if (powerUpTimer > powerUpInterval) {
     powerUpTimer = 0;
@@ -18,11 +18,12 @@ export function updatePowerUps(dt, player, H) {
       type,
       w: 30,
       h: 30,
-      x: Math.random() * (player.canvasWidth - 30),
+      x: Math.random() * (W - 30),   // ← use W
       y: -30,
       speed: 100 + Math.random() * 50
     });
   }
+
 
   for (let i = powerUps.length - 1; i >= 0; i--) {
     const p = powerUps[i];
@@ -50,4 +51,14 @@ export function drawPowerUps(ctx) {
     ctx.fillStyle = p.type === "shield" ? "cyan" : "gold";
     ctx.fillRect(p.x, p.y, p.w, p.h);
   }
+}
+
+
+export function resetPowerUps() {
+  powerUps.length = 0;
+  powerUpTimer = 0;
+  activePowerUps.shield = false;
+  activePowerUps.scoreBoost = false;
+  powerUpTimers.shield = 0;
+  powerUpTimers.scoreBoost = 0;
 }
