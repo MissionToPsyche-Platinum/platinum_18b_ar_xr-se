@@ -8,8 +8,19 @@ export let gameState = "start";
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+
+// Auto-scale to fit screen
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
 const W = canvas.width;
 const H = canvas.height;
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
 
 player.init(W, H);
 
@@ -31,6 +42,32 @@ window.addEventListener('keyup', e => {
   if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
   if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
 });
+
+// Support for mobile controls
+let touchStartX = null;
+
+canvas.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+});
+
+canvas.addEventListener('touchmove', e => {
+  const currentX = e.touches[0].clientX;
+  const delta = currentX - touchStartX;
+  touchStartX = currentX;
+  player.x += delta; // move relative to drag
+  if (player.x < 0) player.x = 0;
+if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
+
+});
+
+canvas.addEventListener('touchend', e => {
+  // A tap (short touch) triggers shooting
+  if (e.changedTouches.length === 1 && e.changedTouches[0].clientX === touchStartX) {
+    shoot(player);
+  }
+  touchStartX = null;
+});
+
 
 function startGame() {
   gameState = "playing";
