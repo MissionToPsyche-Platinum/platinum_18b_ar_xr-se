@@ -37,6 +37,10 @@ let score = 0;           // optional: we'll use this soon
 let elapsedTime = 0;     // for tracking survival time
 let difficulty = 1; // starts easy, scales up
 
+// Control images
+const controlsImg = new Image();
+controlsImg.src = './resources/controls.svg';
+
 // High Score - implemented as stringified json in localStorage in case we want to add extra bits to it later
 let highScore;
 const localKey = "asteroidDodge";
@@ -164,6 +168,7 @@ function draw() {
     ctx.fillText("Press SPACE to Start", W / 2, H / 2 + 20);
     ctx.font = "16px sans-serif";
     ctx.fillText(`High Score: ${highScore}`, W / 2, H / 2 + 60)
+    ctx.drawImage(controlsImg, W / 2, H / 2 + 100)
     return;
   }
 
