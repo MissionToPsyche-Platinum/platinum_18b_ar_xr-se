@@ -99,8 +99,8 @@
       display: flex; justify-content: space-between; margin-bottom: 5px;
     }
     input[type=range] { width: 100%; }
-    #junk, #error { margin-top: 10px; font-weight: bold; }
-    #junk { color: #0ff; }
+    #dirt, #error { margin-top: 10px; font-weight: bold; }
+    #dirt { color: #0ff; }
     #error { color: red; }
 
     /* Results */
@@ -141,7 +141,7 @@
 
     <h2 class="composition-header">Composition</h2>
     <div class="slider-grid" id="sliders"></div>
-    <p id="junk">Junk: 100%</p>
+    <p id="dirt">dirt: 100%</p>
     <p id="error"></p>
 
     <button id="calcBtn" onclick="calculate()">Calculate</button>
@@ -270,12 +270,13 @@
       let total = 0; metalsList.forEach(m => total += parseInt(document.getElementById(`${m}-slider`).value));
       const errorEl = document.getElementById("error");
       const calcBtn = document.getElementById("calcBtn");
-      const junkEl = document.getElementById("junk");
-      if (total > 100) {
-        errorEl.textContent = "❌ Total composition exceeds 100%. Please adjust sliders.";
-        calcBtn.disabled = true; junkEl.textContent = "Junk: --% (invalid)";
+      const dirtEl = document.getElementById("dirt");
+      if (total > 60) {
+          errorEl.innerHTML = "❌ Total metal composition exceeds 60%.<br>The Psyche Asteroid is thought to be between 30% and 60% metal.<br>Please adjust the sliders to have dirt be above 40%.";
+
+        calcBtn.disabled = true; dirtEl.textContent = `Dirt: ${100 - total}%`;
       } else {
-        errorEl.textContent = ""; calcBtn.disabled = false; junkEl.textContent = `Junk: ${100 - total}%`;
+        errorEl.textContent = ""; calcBtn.disabled = false; dirtEl.textContent = `Dirt: ${100 - total}%`;
       }
     }
 
