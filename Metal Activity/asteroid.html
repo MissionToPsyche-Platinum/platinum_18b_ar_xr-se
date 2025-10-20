@@ -11,7 +11,6 @@
       text-align: center;
       padding: 30px;
     }
-
     h1 { margin-bottom: 10px; }
 
     button {
@@ -32,62 +31,39 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.9);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      text-align: center;
-      z-index: 999;
-      padding: 20px;
+      display: flex; justify-content: center; align-items: center;
+      flex-direction: column; text-align: center;
+      z-index: 999; padding: 20px;
     }
     #disclaimer p {
-      font-size: 18px;
-      max-width: 700px;
-      margin-bottom: 25px;
-      color: #0ff;
-      line-height: 1.5;
+      font-size: 18px; max-width: 700px; margin-bottom: 25px;
+      color: #0ff; line-height: 1.5;
     }
-
     .page { display: none; }
     .active { display: block; }
 
     .asteroid-container {
       position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 20px auto;
-      width: 100%;
+      display: flex; justify-content: center; align-items: center;
+      margin: 20px auto; width: 100%;
     }
     #asteroid-img {
-      width: 40%;
-      max-width: 320px;
-      border-radius: 10px;
-      display: block;
-      margin: 0 auto;
+      width: 40%; max-width: 320px; border-radius: 10px;
+      display: block; margin: 0 auto;
     }
     #color-overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 40%;
-      max-width: 320px;
-      aspect-ratio: 1 / 1;
-      border-radius: 10px;
-      pointer-events: none;
-      mix-blend-mode: overlay;
+      width: 40%; max-width: 320px;
+      aspect-ratio: 1 / 1; border-radius: 10px;
+      pointer-events: none; mix-blend-mode: overlay;
       transition: background-color 0.3s ease;
     }
 
     .composition-header { margin-top: 25px; }
     .slider-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px 25px;
-      width: 70%;
-      max-width: 600px;
-      margin: 0 auto;
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 15px 25px; width: 70%; max-width: 600px; margin: 0 auto;
     }
     .slider-container { text-align: left; }
     .slider-label {
@@ -99,10 +75,8 @@
     #error { color: red; }
 
     table {
-      margin: 20px auto;
-      border-collapse: collapse;
-      width: 80%;
-      max-width: 600px;
+      margin: 20px auto; border-collapse: collapse;
+      width: 80%; max-width: 600px;
     }
     th, td { border: 1px solid #555; padding: 8px; }
     th { background: #333; }
@@ -111,7 +85,6 @@
   </style>
 </head>
 <body>
-  <!-- Page 1: Disclaimer -->
   <div id="disclaimer" class="page active">
     <p>
       Hey there! This activity is meant for fun and to spark imagination! 🌌<br><br>
@@ -121,7 +94,6 @@
     <button id="continueBtn">Continue</button>
   </div>
 
-  <!-- Page 2: Main Composition -->
   <div id="mainPage" class="page">
     <h1>Psyche Asteroid Value Calculator</h1>
     <div class="asteroid-container">
@@ -129,15 +101,9 @@
       <div id="color-overlay"></div>
     </div>
     <p style="color:#aaa;font-size:14px;">NASA Psyche Asteroid Visualization</p>
-
-    <!-- ✅ Updated from Mass → Volume -->
     <p style="color:#0ff;font-size:16px;margin-top:-5px;">
-      Estimated Volume: ≈ 5.75 × 10<sup>6</sup> km<sup>3</sup> (≈ 5.75 × 10<sup>15</sup> m<sup>3</sup>)
+      Estimated Volume: ≈ 5,750,000 km<sup>3</sup>
     </p>
-    <p style="color:#aaa;font-size:14px;">
-      Note: pricing still uses Psyche’s estimated mass (2.3 × 10<sup>19</sup> kg) for consistent value calculations.
-    </p>
-    <!-- ✅ End update -->
 
     <h2 class="composition-header">Composition</h2>
     <div class="slider-grid" id="sliders"></div>
@@ -147,7 +113,6 @@
     <button id="calcBtn" onclick="calculate()">Calculate</button>
   </div>
 
-  <!-- Page 3: Results -->
   <div id="resultsPage" class="page">
     <h1>Results</h1>
     <table id="resultsTable">
@@ -167,153 +132,90 @@
   </div>
 
   <script>
-    const disclaimer = document.getElementById("disclaimer");
-    const mainPage = document.getElementById("mainPage");
-    const resultsPage = document.getElementById("resultsPage");
+    // Navigation
+    const disclaimer=document.getElementById("disclaimer"),
+          mainPage=document.getElementById("mainPage"),
+          resultsPage=document.getElementById("resultsPage");
+    document.getElementById("continueBtn").onclick=()=>{disclaimer.style.display="none";mainPage.classList.add("active");};
+    document.getElementById("backBtn").onclick=()=>{resultsPage.classList.remove("active");mainPage.style.display="block";};
 
-    document.getElementById("continueBtn").addEventListener("click", () => {
-      disclaimer.classList.remove("active"); disclaimer.style.display = "none";
-      mainPage.classList.add("active");      mainPage.style.display = "block";
-    });
-    document.getElementById("backBtn").addEventListener("click", () => {
-      resultsPage.classList.remove("active"); resultsPage.style.display = "none";
-      mainPage.classList.add("active");       mainPage.style.display = "block";
-    });
+    // Constants
+    const API_KEY="LMK8WWQNCCKFV6OL0HQX880OL0HQX";
+    const BASE_URL="https://api.metals.dev/v1/latest"; // fixed URL
+    const VOLUME_M3=5.75e15; // Psyche’s volume
+    const DENSITY={gold:19300,silver:10490,platinum:21450,palladium:12000,copper:8960,nickel:8900,aluminum:2700,lead:11340,dirt:3000};
+    const metalsList=["gold","silver","platinum","palladium","copper","nickel","aluminum","lead"];
+    const metalColors={gold:"#FFD700",silver:"#C0C0C0",platinum:"#E5E4E2",palladium:"#CED0DD",copper:"#B87333",nickel:"#AFAFAF",aluminum:"#D3D3D3",lead:"#4D4D4D"};
+    const OLYMPIC_POOL_M3=2500, INCH_TO_M=0.0254, BILL_L=6.14*INCH_TO_M, BILL_W=2.61*INCH_TO_M, BILL_T=0.0043*INCH_TO_M;
+    const BILL_VOLUME_M3=BILL_L*BILL_W*BILL_T;
 
-    const API_KEY = "LMK8WWQNCCKFV6OL0HQX880OL0HQX";
-    const BASE_URL = "https://api.metals.dev/v1/latest";
-    const CACHE_KEY = "metalRates";
-    const CACHE_TIME_KEY = "metalRatesTimestamp";
-    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+    function lbsToTroyOunces(lbs){return lbs*16*0.911458;}
+    function formatLarge(n){if(!isFinite(n))return"∞";if(n>=1e12)return(n/1e12).toFixed(2)+" trillion";if(n>=1e9)return(n/1e9).toFixed(2)+" billion";if(n>=1e6)return(n/1e6).toFixed(2)+" million";return n.toLocaleString();}
+    function hexToRgb(hex){const b=parseInt(hex.slice(1),16);return{r:(b>>16)&255,g:(b>>8)&255,b:b&255};}
+    function mixColors(vals){let t=0,r=0,g=0,b=0;for(const[m,p]of Object.entries(vals)){const c=hexToRgb(metalColors[m]);r+=c.r*(p/100);g+=c.g*(p/100);b+=c.b*(p/100);t+=p;}if(t===0)return"rgba(0,0,0,0)";r=Math.round(r);g=Math.round(g);b=Math.round(b);return`rgba(${r},${g},${b},${Math.min(1,t/100)})`;}
 
-    const PSYCHE_MASS_LBS = 2.3e19 * 2.20462;
-    const metalsList = ["gold","silver","platinum","palladium","copper","nickel","aluminum","lead"];
-    const metalColors = {
-      gold:"#FFD700", silver:"#C0C0C0", platinum:"#E5E4E2", palladium:"#CED0DD",
-      copper:"#B87333", nickel:"#AFAFAF", aluminum:"#D3D3D3", lead:"#4D4D4D"
-    };
-
-    const OLYMPIC_POOL_M3 = 2500;
-    const INCH_TO_M = 0.0254;
-    const BILL_L = 6.14 * INCH_TO_M;
-    const BILL_W = 2.61 * INCH_TO_M;
-    const BILL_T = 0.0043 * INCH_TO_M;
-    const BILL_VOLUME_M3 = BILL_L * BILL_W * BILL_T;
-
-    function formatLarge(n){
-      if(!isFinite(n))return"∞";
-      if(n>=1e12)return(n/1e12).toLocaleString(undefined,{maximumFractionDigits:2})+" trillion";
-      if(n>=1e9)return(n/1e9).toLocaleString(undefined,{maximumFractionDigits:2})+" billion";
-      if(n>=1e6)return(n/1e6).toLocaleString(undefined,{maximumFractionDigits:2})+" million";
-      return n.toLocaleString(undefined,{maximumFractionDigits:2});
-    }
-
-    function lbsToTroyOunces(lbs){
-      const ozPerLb=16, troyPerOz=0.911458;
-      return lbs*ozPerLb*troyPerOz;
-    }
-    function hexToRgb(hex){
-      const b=parseInt(hex.slice(1),16);
-      return{r:(b>>16)&255,g:(b>>8)&255,b:b&255};
-    }
-    function mixColors(vals){
-      let t=0,r=0,g=0,b=0;
-      for(const[m,p]of Object.entries(vals)){
-        const c=hexToRgb(metalColors[m]);
-        r+=c.r*(p/100);g+=c.g*(p/100);b+=c.b*(p/100);t+=p;
-      }
-      if(t===0)return"rgba(0,0,0,0)";
-      r=Math.min(255,Math.round(r));g=Math.min(255,Math.round(g));b=Math.min(255,Math.round(b));
-      const o=Math.min(1,t/100);
-      return`rgba(${r},${g},${b},${o})`;
-    }
-    function updateOverlay(){
-      const vals={};
-      metalsList.forEach(m=>vals[m]=parseInt(document.getElementById(`${m}-slider`).value));
-      document.getElementById("color-overlay").style.backgroundColor=mixColors(vals);
-    }
-    function buildSliders(){
-      const c=document.getElementById("sliders");c.innerHTML="";
-      metalsList.forEach(m=>{
-        const d=document.createElement("div");
-        d.classList.add("slider-container");
-        d.innerHTML=`
-          <div class="slider-label">
-            <span>${m.charAt(0).toUpperCase()+m.slice(1)}</span>
-            <span id="${m}-val">0%</span>
-          </div>
-          <input type="range" min="0" max="100" value="0" id="${m}-slider" oninput="updatePercent('${m}')">
-        `;
-        c.appendChild(d);
-      });
-    }
-    function updatePercent(m){
-      const s=document.getElementById(`${m}-slider`);
-      document.getElementById(`${m}-val`).textContent=s.value+"%";
-      validateTotal();updateOverlay();
-    }
-    function validateTotal(){
-      let total=0;metalsList.forEach(m=>total+=parseInt(document.getElementById(`${m}-slider`).value));
-      const e=document.getElementById("error"),b=document.getElementById("calcBtn"),d=document.getElementById("dirt");
-      if(total>60){
-        e.innerHTML="❌ Total metal composition exceeds 60%.<br>The Psyche Asteroid is thought to be between 30% and 60% metal.<br>Please adjust the sliders to have dirt be above 40%.";
-        b.disabled=true;d.textContent=`Dirt: ${100-total}%`;
-      }else{
-        e.textContent="";b.disabled=false;d.textContent=`Dirt: ${100-total}%`;
-      }
-    }
+    function buildSliders(){const c=document.getElementById("sliders");c.innerHTML="";metalsList.forEach(m=>{const d=document.createElement("div");d.classList.add("slider-container");d.innerHTML=`<div class="slider-label"><span>${m.charAt(0).toUpperCase()+m.slice(1)}</span><span id="${m}-val">0%</span></div><input type="range" min="0" max="100" value="0" id="${m}-slider" oninput="updatePercent('${m}')">`;c.appendChild(d);});}
+    function updatePercent(m){const s=document.getElementById(`${m}-slider`);document.getElementById(`${m}-val`).textContent=s.value+"%";validateTotal();updateOverlay();}
+    function validateTotal(){let total=0;metalsList.forEach(m=>total+=parseInt(document.getElementById(`${m}-slider`).value));const e=document.getElementById("error"),b=document.getElementById("calcBtn"),d=document.getElementById("dirt");if(total>60){e.innerHTML="❌ Total metal composition exceeds 60%.<br>The Psyche Asteroid is thought to be 30–60% metal.";b.disabled=true;}else{e.textContent="";b.disabled=false;}d.textContent=`Dirt: ${100-total}%`;}
+    function updateOverlay(){const v={};metalsList.forEach(m=>v[m]=parseInt(document.getElementById(`${m}-slider`).value));document.getElementById("color-overlay").style.backgroundColor=mixColors(v);}
 
     async function getRates(){
-      const c=localStorage.getItem(CACHE_KEY),t=localStorage.getItem(CACHE_TIME_KEY);
-      if(c&&t&&(Date.now()-t<ONE_DAY_MS))return{rates:JSON.parse(c),timestamp:parseInt(t)};
       try{
-        const u=`${BASE_URL}?api_key=${API_KEY}&currency=USD&unit=toz`;
-        const r=await fetch(u);const d=await r.json();
-        if(d.status!=="success")throw new Error(d.message||"API error");
-        localStorage.setItem(CACHE_KEY,JSON.stringify(d.metals));
-        localStorage.setItem(CACHE_TIME_KEY,Date.now());
-        return{rates:d.metals,timestamp:Date.now()};
+        const url=`${BASE_URL}?api_key=${API_KEY}&currency=USD`;
+        const r=await fetch(url);
+        const d=await r.json();
+        if(!d.metals) throw new Error("Invalid response");
+        return d.metals;
       }catch(err){
-        if(c)return{rates:JSON.parse(c),timestamp:t};
-        throw new Error("No cached rates available.");
+        console.warn("⚠️ Using offline fallback rates due to fetch error:", err.message);
+        return {
+          gold: 4362.26, silver: 25.46, platinum: 975.20, palladium: 1100.00,
+          copper: 0.35, nickel: 6.85, aluminum: 1.03, lead: 0.98
+        };
       }
     }
 
     async function calculate(){
       try{
-        const{rates,timestamp}=await getRates();
-        const totalOz=lbsToTroyOunces(PSYCHE_MASS_LBS);
+        const rates=await getRates();
         const tbody=document.querySelector("#resultsTable tbody");tbody.innerHTML="";
-        let totalVal=0;
+        let totalValue=0,totalMassKg=0;
+        const metalMasses={};
+
         metalsList.forEach(m=>{
-          const p=parseInt(document.getElementById(`${m}-slider`).value);
-          if(p>0&&rates[m]){
-            const r=rates[m];const oz=totalOz*(p/100);const v=oz*r;totalVal+=v;
-            tbody.innerHTML+=`
-              <tr>
-                <td>${m.charAt(0).toUpperCase()+m.slice(1)}</td>
-                <td>${p}%</td>
-                <td>$${r.toLocaleString(undefined,{maximumFractionDigits:4})}</td>
-                <td>$${v.toLocaleString(undefined,{maximumFractionDigits:2})}</td>
-              </tr>`;
+          const percent=parseInt(document.getElementById(`${m}-slider`).value);
+          const volFrac=percent/100;
+          const volM3=VOLUME_M3*volFrac;
+          const massKg=volM3*DENSITY[m];
+          metalMasses[m]=massKg;
+          totalMassKg+=massKg;
+        });
+        const dirtPercent=Math.max(0,100-metalsList.reduce((a,m)=>a+parseInt(document.getElementById(`${m}-slider`).value),0));
+        totalMassKg+=VOLUME_M3*(dirtPercent/100)*DENSITY.dirt;
+
+        const totalLbs=totalMassKg*2.20462;
+        const totalTroyOunces=lbsToTroyOunces(totalLbs);
+
+        metalsList.forEach(m=>{
+          const percent=parseInt(document.getElementById(`${m}-slider`).value);
+          if(percent>0&&rates[m]){
+            const metalMassFrac=metalMasses[m]/totalMassKg;
+            const metalOunces=totalTroyOunces*metalMassFrac;
+            const rate=rates[m];
+            const value=metalOunces*rate;
+            totalValue+=value;
+            tbody.innerHTML+=`<tr><td>${m.charAt(0).toUpperCase()+m.slice(1)}</td><td>${percent}%</td><td>$${rate.toFixed(2)}</td><td>$${value.toLocaleString(undefined,{maximumFractionDigits:2})}</td></tr>`;
           }
         });
-        tbody.innerHTML+=`
-          <tr style="font-weight:bold;background:#222;">
-            <td colspan="3">TOTAL</td>
-            <td>$${totalVal.toLocaleString(undefined,{maximumFractionDigits:2})}</td>
-          </tr>`;
-        const d=new Date(parseInt(timestamp));
-        document.getElementById("lastUpdated").textContent="Prices last updated: "+d.toLocaleString();
-        const bills=totalVal/100;
+
+        tbody.innerHTML+=`<tr style="font-weight:bold;background:#222;"><td colspan="3">TOTAL</td><td>$${totalValue.toLocaleString(undefined,{maximumFractionDigits:2})}</td></tr>`;
+
+        const bills=totalValue/100;
         const vol=bills*BILL_VOLUME_M3;
         const pools=vol/OLYMPIC_POOL_M3;
         document.getElementById("funFact").textContent=`💡 Fun fact: That’s enough $100 bills (by volume) to fill about ${formatLarge(pools)} Olympic-size swimming pool${pools>=2?"s":""}!`;
-        mainPage.classList.remove("active");mainPage.style.display="none";
-        resultsPage.classList.add("active");resultsPage.style.display="block";
-      }catch(err){
-        alert("Could not load prices.");console.error(err);
-      }
+        resultsPage.classList.add("active");mainPage.classList.remove("active");mainPage.style.display="none";
+      }catch(err){alert("Error calculating values.");console.error(err);}
     }
 
     buildSliders();validateTotal();updateOverlay();
