@@ -141,8 +141,8 @@
 
     // Constants
     const API_KEY="LMK8WWQNCCKFV6OL0HQX880OL0HQX";
-    const BASE_URL="https://api.metals.dev/v1/latest"; // fixed URL
-    const VOLUME_M3=5.75e15; // Psyche’s volume
+    const BASE_URL="https://api.metals.dev/v1/latest";
+    const VOLUME_M3=5.75e15;
     const DENSITY={gold:19300,silver:10490,platinum:21450,palladium:12000,copper:8960,nickel:8900,aluminum:2700,lead:11340,dirt:3000};
     const metalsList=["gold","silver","platinum","palladium","copper","nickel","aluminum","lead"];
     const metalColors={gold:"#FFD700",silver:"#C0C0C0",platinum:"#E5E4E2",palladium:"#CED0DD",copper:"#B87333",nickel:"#AFAFAF",aluminum:"#D3D3D3",lead:"#4D4D4D"};
@@ -159,15 +159,19 @@
     function validateTotal(){let total=0;metalsList.forEach(m=>total+=parseInt(document.getElementById(`${m}-slider`).value));const e=document.getElementById("error"),b=document.getElementById("calcBtn"),d=document.getElementById("dirt");if(total>60){e.innerHTML="❌ Total metal composition exceeds 60%.<br>The Psyche Asteroid is thought to be 30–60% metal.";b.disabled=true;}else{e.textContent="";b.disabled=false;}d.textContent=`Dirt: ${100-total}%`;}
     function updateOverlay(){const v={};metalsList.forEach(m=>v[m]=parseInt(document.getElementById(`${m}-slider`).value));document.getElementById("color-overlay").style.backgroundColor=mixColors(v);}
 
+    // 🕒 Track last API call
+    let lastApiTime = null;
+
     async function getRates(){
       try{
         const url=`${BASE_URL}?api_key=${API_KEY}&currency=USD`;
         const r=await fetch(url);
         const d=await r.json();
         if(!d.metals) throw new Error("Invalid response");
+        lastApiTime = new Date(); // record time of successful API
         return d.metals;
       }catch(err){
-        console.warn("⚠️ Using offline fallback rates due to fetch error:", err.message);
+        console.warn("⚠️ Using offline fallback rates:", err.message);
         return {
           gold: 4362.26, silver: 25.46, platinum: 975.20, palladium: 1100.00,
           copper: 0.35, nickel: 6.85, aluminum: 1.03, lead: 0.98
@@ -209,6 +213,14 @@
         });
 
         tbody.innerHTML+=`<tr style="font-weight:bold;background:#222;"><td colspan="3">TOTAL</td><td>$${totalValue.toLocaleString(undefined,{maximumFractionDigits:2})}</td></tr>`;
+
+        // 🕓 Show last API time
+        const lastUpdated = document.getElementById("lastUpdated");
+        if (lastApiTime) {
+          lastUpdated.textContent = `🕒 Last metal price API update: ${lastApiTime.toLocaleString()}`;
+        } else {
+          lastUpdated.textContent = `⚠️ Using fallback prices (no recent API data)`;
+        }
 
         const bills=totalValue/100;
         const vol=bills*BILL_VOLUME_M3;
