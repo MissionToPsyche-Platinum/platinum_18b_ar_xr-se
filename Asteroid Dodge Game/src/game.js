@@ -39,7 +39,7 @@ let difficulty = 1; // starts easy, scales up
 
 // Control images
 const controlsImg = new Image();
-controlsImg.src = './resources/controls.svg';
+controlsImg.src = '../resources/controls.svg';
 
 // High Score - implemented as stringified json in localStorage in case we want to add extra bits to it later
 let highScore;
@@ -168,7 +168,7 @@ function draw() {
     ctx.fillText("Press SPACE to Start", W / 2, H / 2 + 20);
     ctx.font = "16px sans-serif";
     ctx.fillText(`High Score: ${highScore}`, W / 2, H / 2 + 60)
-    ctx.drawImage(controlsImg, W / 2, H / 2 + 100)
+    //ctx.drawImage(controlsImg, W / 2, H / 2 + 100)
     return;
   }
 
