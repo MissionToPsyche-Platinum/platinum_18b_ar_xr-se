@@ -38,8 +38,14 @@ let elapsedTime = 0;     // for tracking survival time
 let difficulty = 1; // starts easy, scales up
 
 // Control images
-const controlsImg = new Image();
-controlsImg.src = '../resources/controls.svg';
+const controlLeftArrow = new Image();
+const controlRightArrow = new Image();
+const controlAKey = new Image();
+const controlDKey = new Image();
+controlLeftArrow.src = '../resources/leftkey.svg';
+controlRightArrow.src = '../resources/rightkey.svg';
+controlAKey.src = '../resources/a_key.svg';
+controlDKey.src = '../resources/d_key.svg';
 
 // High Score - implemented as stringified json in localStorage in case we want to add extra bits to it later
 let highScore;
@@ -168,7 +174,12 @@ function draw() {
     ctx.fillText("Press SPACE to Start", W / 2, H / 2 + 20);
     ctx.font = "16px sans-serif";
     ctx.fillText(`High Score: ${highScore}`, W / 2, H / 2 + 60)
-    //ctx.drawImage(controlsImg, W / 2, H / 2 + 100)
+    ctx.fillText("Left", W / 2 - 150, H / 2 + 110);
+    ctx.drawImage(controlLeftArrow, W / 2 -250, H / 2 + 120);
+    ctx.drawImage(controlAKey, W / 2 -150, H / 2 + 120);
+    ctx.fillText("Right", W / 2 + 150, H / 2 + 110);
+    ctx.drawImage(controlRightArrow, W / 2 + 50, H / 2 + 120);
+    ctx.drawImage(controlDKey, W / 2 + 150, H / 2 + 120);
     return;
   }
 
