@@ -1,16 +1,45 @@
 ---
+import Base from "../layouts/Base.astro";
+import { APPLETS } from "../data/applets";
 
+const title = "Psyche — App Hub";
 ---
+<Base {title}>
+  {APPLETS.length === 0 ? (
+    <p>No applets registered yet. Need to add entries in src/data/applets.ts</code>.</p>
+  ) : (
+    <ul class="grid">
+      {APPLETS.map(a => (
+        <li class="card">
+          <a href={a.href}>
+            <h2>{a.name}</h2>
+            {a.description && <p>{a.description}</p>}
+            <code>{a.href}</code>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+  <style>
+    .grid {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      border: 1px solid color-mix(in oklab, canvasText 15%, transparent);
+      border-radius: 12px;
+      padding: 1rem;
+      transition: transform .06s ease, border-color .12s ease;
+      background: color-mix(in oklab, canvas 92%, canvasText 8%);
+    }
+    .card:hover { transform: translateY(-2px); border-color: currentColor; }
+    h2 { margin: 0 0 .25rem; font-size: 1.1rem; }
+    p  { margin: 0 0 .5rem; color: color-mix(in oklab, currentColor 70%, transparent); }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+  </style>
+</Base>
