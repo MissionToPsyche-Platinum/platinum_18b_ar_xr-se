@@ -177,7 +177,6 @@ function draw() {
     // blackout overlay
     ctx.fillStyle = "rgba(0,0,0,0.85)";
     ctx.fillRect(0, 0, W, H);
-
     ctx.textAlign = "center";
     ctx.font = "bold 60px sans-serif";
     ctx.fillStyle = "red";
