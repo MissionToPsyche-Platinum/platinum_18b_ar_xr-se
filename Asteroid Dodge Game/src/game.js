@@ -1,3 +1,5 @@
+import { drawMenuOverlay, toggleMenu, isMenuVisible } from "./menu.js";
+
 // Canvas setup
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -33,19 +35,10 @@ const speed = 0.8; //speed the stars travel across the canvas
 
 // === Game state ===
 let gameState = "start"
+let prevState;
 let score = 0;           // optional: we'll use this soon
 let elapsedTime = 0;     // for tracking survival time
 let difficulty = 1; // starts easy, scales up
-
-// Control images
-const controlLeftArrow = new Image();
-const controlRightArrow = new Image();
-const controlAKey = new Image();
-const controlDKey = new Image();
-controlLeftArrow.src = '../resources/leftkey.svg';
-controlRightArrow.src = '../resources/rightkey.svg';
-controlAKey.src = '../resources/a_key.svg';
-controlDKey.src = '../resources/d_key.svg';
 
 // High Score - implemented as stringified json in localStorage in case we want to add extra bits to it later
 let highScore;
@@ -75,6 +68,10 @@ window.addEventListener('keydown', (e) => {
     if (gameState === "start") startGame();
     else if (gameState === "gameover") restartGame();
   }
+
+  if (e.code === 'Escape') {
+    toggleMenu();
+  }
 });
 
 window.addEventListener('keyup', (e) => {
@@ -94,7 +91,6 @@ function loop(now) {
 
   requestAnimationFrame(loop);
 }
-
 
 // detects collision
 function isColliding(a, b) {
@@ -173,13 +169,10 @@ function draw() {
     ctx.font = "24px sans-serif";
     ctx.fillText("Press SPACE to Start", W / 2, H / 2 + 20);
     ctx.font = "16px sans-serif";
-    ctx.fillText(`High Score: ${highScore}`, W / 2, H / 2 + 60)
-    ctx.fillText("Left", W / 2 - 150, H / 2 + 110);
-    ctx.drawImage(controlLeftArrow, W / 2 -250, H / 2 + 120);
-    ctx.drawImage(controlAKey, W / 2 -150, H / 2 + 120);
-    ctx.fillText("Right", W / 2 + 150, H / 2 + 110);
-    ctx.drawImage(controlRightArrow, W / 2 + 50, H / 2 + 120);
-    ctx.drawImage(controlDKey, W / 2 + 150, H / 2 + 120);
+    ctx.fillText(`High Score: ${highScore}`, W / 2, H / 2 + 60);
+    if(isMenuVisible) {
+      drawMenuOverlay(ctx);
+    }
     return;
   }
 
@@ -215,6 +208,10 @@ function draw() {
     ctx.fillText("Press SPACE to Restart", W / 2, H / 2 + 40);
     ctx.font = "16px sans-serif";
     ctx.fillText(`High Score: ${highScore}`, W / 2, H / 2 + 80)
+  }
+
+  if(isMenuVisible) {
+    drawMenuOverlay(ctx);
   }
 }
 
