@@ -4,7 +4,7 @@ import { sounds } from './audio.js';
 import { updateAsteroids, drawAsteroids, resetAsteroids } from './asteroid.js';
 import { updatePowerUps, drawPowerUps, activePowerUps, resetPowerUps } from './powerups.js';
 import { initStars, updateStars, drawStars } from './stars.js';
-import { drawMenuOverlay, toggleMenu, isMenuVisible } from "./menu.js";
+import { drawMenuOverlay, toggleMenu, isMenuVisible, handleClick } from "./menu.js";
 
 
 export let gameState = "start";
@@ -64,6 +64,19 @@ canvas.addEventListener('touchmove', e => {
 canvas.addEventListener('touchend', () => {
   touchStartX = null;
 });
+
+// This might need to be changed/edited later if we want to support more clicks
+// --- Mute Icon Listener --- //
+canvas.addEventListener('click', (e) => {
+
+  if(gameState !== "menu") return;
+
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+
+  handleClick(mouseX, mouseY);
+})
 
 // --- Scoring / difficulty ---
 let score = 0;
