@@ -5,10 +5,10 @@ const controlLeftArrow = new Image();
 const controlRightArrow = new Image();
 const controlAKey = new Image();
 const controlDKey = new Image();
-controlLeftArrow.src = '../resources/leftkey.svg';
-controlRightArrow.src = '../resources/rightkey.svg';
-controlAKey.src = '../resources/a_key.svg';
-controlDKey.src = '../resources/d_key.svg';
+controlLeftArrow.src = './resources/leftkey.svg';
+controlRightArrow.src = './resources/rightkey.svg';
+controlAKey.src = './resources/a_key.svg';
+controlDKey.src = './resources/d_key.svg';
 
 export function toggleMenu() {
     showMenu = !showMenu;

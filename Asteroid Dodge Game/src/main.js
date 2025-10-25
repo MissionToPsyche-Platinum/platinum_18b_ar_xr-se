@@ -4,9 +4,11 @@ import { sounds } from './audio.js';
 import { updateAsteroids, drawAsteroids, resetAsteroids } from './asteroid.js';
 import { updatePowerUps, drawPowerUps, activePowerUps, resetPowerUps } from './powerups.js';
 import { initStars, updateStars, drawStars } from './stars.js';
+import { drawMenuOverlay, toggleMenu, isMenuVisible } from "./menu.js";
 
 
 export let gameState = "start";
+let prevState;
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -28,6 +30,15 @@ window.addEventListener('keydown', e => {
   if (e.code === 'Space') {
     if (gameState === "start") startGame();
     else if (gameState === "gameover") restartGame();
+  }
+  if (e.code === 'Escape') {
+    toggleMenu();
+    if(isMenuVisible()) {
+      prevState = gameState;
+      gameState = "menu";
+    } else {
+      gameState = prevState;
+    }
   }
 });
 window.addEventListener('keyup', e => {
@@ -145,6 +156,9 @@ function draw() {
     ctx.fillText("ASTEROID DODGE", W / 2, H / 2 - 40);
     ctx.font = "24px sans-serif";
     ctx.fillText("Press SPACE to Start", W / 2, H / 2 + 20);
+    if(isMenuVisible) {
+      drawMenuOverlay(ctx);
+    }
     return;
   }
 
@@ -192,6 +206,9 @@ function draw() {
     ctx.font = "22px sans-serif";
     ctx.fillStyle = "lightgray";
     ctx.fillText("Press SPACE to Restart", W / 2, H / 2 + 100);
+  }
+  if(isMenuVisible) {
+    drawMenuOverlay(ctx);
   }
 }
 
