@@ -8,6 +8,7 @@ Our team is developing an Augmented Reality (AR) / Extended Reality (XR) applica
 - John Sullins (jsullin1@asu.edu)
 - Alex Allen (ajallen4@asu.edu)
 - Bryce Marrello (bamarre@asu.edu
+- Mitchell Allen (mallen40@asu.edu)
 
 ## Sponsor
 [Cassie Bowman] 
