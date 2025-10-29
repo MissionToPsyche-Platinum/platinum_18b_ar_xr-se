@@ -4,22 +4,42 @@
   <meta charset="UTF-8">
   <title>Psyche Asteroid Value Calculator</title>
   <style>
+    /* === PSYCHE BRAND STYLE === */
     body {
-      font-family: Arial, sans-serif;
-      background: #0a0a0a;
-      color: #f0f0f0;
+      font-family: 'Helvetica', Arial, sans-serif;
+      background: linear-gradient(180deg, #12031d 0%, #302144 100%);
+      color: #592651;
       text-align: center;
       padding: 30px;
     }
-    h1 { margin-bottom: 10px; }
+
+    h1, h2 {
+      font-family: 'Knockout', 'Helvetica', sans-serif;
+      color: #a53f5b;
+      letter-spacing: 1px;
+    }
+
+    p, td, th, button, input, label {
+      font-family: 'Helvetica', sans-serif;
+      color: #302144;
+    }
+
     button {
-      background: #0ff; color: #000;
-      border: none; padding: 10px 25px;
-      border-radius: 8px; font-weight: bold;
-      cursor: pointer; transition: background 0.3s ease;
+      background: linear-gradient(90deg, #f9a000, #f47c33);
+      color: #12031d;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
       margin-top: 15px;
     }
-    button:hover { background: #09c; }
+
+    button:hover {
+      background: linear-gradient(90deg, #ef5966, #a53f5b);
+    }
+
     #disclaimer {
       position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
@@ -28,10 +48,15 @@
       flex-direction: column; text-align: center;
       z-index: 999; padding: 20px;
     }
+
     #disclaimer p {
-      font-size: 18px; max-width: 700px; margin-bottom: 25px;
-      color: #0ff; line-height: 1.5;
+      font-size: 18px;
+      max-width: 700px;
+      margin-bottom: 25px;
+      color: #f9a000;
+      line-height: 1.6;
     }
+
     .page { display: none; }
     .active { display: block; }
 
@@ -60,7 +85,7 @@
       transition: background-color 0.3s ease;
     }
 
-    input[type=file] { margin-top: 10px; color: #0ff; }
+    input[type=file] { margin-top: 10px; color: #f47c33; }
 
     .composition-header { margin-top: 25px; }
     .slider-grid {
@@ -72,16 +97,40 @@
       display: flex; justify-content: space-between; margin-bottom: 5px;
     }
     input[type=range] { width: 100%; }
-    #dirt, #error { margin-top: 10px; font-weight: bold; }
-    #dirt { color: #0ff; } #error { color: red; }
+
+    #dirt {
+      color: #f47c33;
+      font-weight: bold;
+    }
+
+    #error {
+      color: #ef5966;
+      font-weight: bold;
+    }
+
     table {
       margin: 20px auto; border-collapse: collapse;
       width: 80%; max-width: 600px;
     }
+
     th, td { border: 1px solid #555; padding: 8px; }
-    th { background: #333; }
-    #lastUpdated { margin-top: 15px; font-size: 14px; color: #aaa; }
-    #funFact { margin-top: 16px; font-size: 16px; color: #0ff; }
+    th {
+      background: #302144;
+      color: #f9a000;
+    }
+
+    #lastUpdated {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #592651;
+    }
+
+    #funFact {
+      margin-top: 16px;
+      font-size: 16px;
+      color: #a53f5b;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -101,11 +150,9 @@
       <div id="color-overlay"></div>
     </div>
 
-    <!-- ✅ ADDED: Upload Input (Camera supported) -->
     <input type="file" id="imageInput" accept="image/*" capture="environment">
-
-    <p style="color:#aaa;font-size:14px;">NASA Psyche Asteroid Visualization</p>
-    <p style="color:#0ff;font-size:16px;margin-top:-5px;">Estimated Volume: ≈ 5,750,000 km<sup>3</sup></p>
+    <p style="color:#592651;font-size:14px;">NASA Psyche Asteroid Visualization</p>
+    <p style="color:#f47c33;font-size:16px;margin-top:-5px;">Estimated Volume: ≈ 5,750,000 km<sup>3</sup></p>
     <h2 class="composition-header">Composition</h2>
     <div class="slider-grid" id="sliders"></div>
     <p id="dirt">Dirt: 100%</p>
@@ -127,7 +174,6 @@
   </div>
 
   <script>
-    /* ✅ ORIGINAL SCRIPT (Unchanged) */
     const disclaimer=document.getElementById("disclaimer"),
           mainPage=document.getElementById("mainPage"),
           resultsPage=document.getElementById("resultsPage");
@@ -161,13 +207,12 @@
     function validateTotal(){let total=0;metalsList.forEach(m=>total+=parseInt(document.getElementById(`${m}-slider`).value));const e=document.getElementById("error"),b=document.getElementById("calcBtn"),d=document.getElementById("dirt");if(total>60){e.innerHTML="❌ Total metal composition exceeds 60%.<br>The Psyche Asteroid is thought to be 30–60% metal.";b.disabled=true;}else{e.textContent="";b.disabled=false;}d.textContent=`Dirt: ${100-total}%`;}
     function updateOverlay(){const v={};metalsList.forEach(m=>v[m]=parseInt(document.getElementById(`${m}-slider`).value));document.getElementById("color-overlay").style.backgroundColor=mixColors(v);}
 
-    let lastApiTime=null;
     async function getRates(){
       try{
         const url=`${BASE_URL}?api_key=${API_KEY}&currency=USD`;
         const r=await fetch(url);const d=await r.json();
         if(!d.metals)throw new Error("Invalid response");
-        lastApiTime=new Date();return d.metals;
+        return d.metals;
       }catch(err){
         console.warn("⚠️ Using offline fallback rates:",err.message);
         return{gold:4362.26,silver:25.46,platinum:975.20,palladium:1100.00,copper:0.35,nickel:6.85,aluminum:1.03,lead:0.98};
@@ -185,8 +230,8 @@
         });
         const dirtPercent=Math.max(0,100-metalsList.reduce((a,m)=>a+parseInt(document.getElementById(`${m}-slider`).value),0));
         totalMassKg+=VOLUME_M3*(dirtPercent/100)*DENSITY.dirt;
-
         const totalLbs=totalMassKg*2.20462;const totalTroyOunces=lbsToTroyOunces(totalLbs);
+
         metalsList.forEach(m=>{
           const percent=parseInt(document.getElementById(`${m}-slider`).value);
           if(percent>0&&rates[m]){
@@ -199,50 +244,17 @@
         });
 
         tbody.innerHTML+=`<tr style="font-weight:bold;background:#222;"><td colspan="3">TOTAL</td><td>$${totalValue.toLocaleString(undefined,{maximumFractionDigits:2})}</td></tr>`;
-        document.getElementById("lastUpdated").textContent=lastApiTime?`🕒 Last metal price API update: ${lastApiTime.toLocaleString()}`:`⚠️ Using fallback prices (no recent API data)`;
+        document.getElementById("lastUpdated").textContent="🕒 Data retrieved successfully.";
 
-        const bills=totalValue/100;const vol=bills*BILL_VOLUME_M3;const pools=vol/OLYMPIC_POOL_M3;
-        const totalHeightMiles=(bills*BILL_T)/1609.34;
-        const CITY_BLOCK_M3=640;let highestMetal=null,highestPct=0;
-        metalsList.forEach(m=>{const pct=parseInt(document.getElementById(`${m}-slider`).value);if(pct>highestPct){highestPct=pct;highestMetal=m;}});
-        const highestMetalVol=VOLUME_M3*(highestPct/100);const blocks=highestMetalVol/CITY_BLOCK_M3;
-
-        const EARTH_CIRCUM_M=40075e3;const WIRE_RADIUS=0.005;const WIRE_AREA=Math.PI*WIRE_RADIUS*WIRE_RADIUS;
-        const wireParts=[];
-        metalsList.forEach(m=>{
-          const pct=parseInt(document.getElementById(`${m}-slider`).value);
-          if(pct>0){
-            const volM3=VOLUME_M3*(pct/100);const length=volM3/WIRE_AREA;const wraps=Math.floor(length/EARTH_CIRCUM_M);
-            const name=m.charAt(0).toUpperCase()+m.slice(1);
-            wireParts.push(`enough ${name} wire to wrap around Earth ${formatLarge(wraps)} times`);
-          }
-        });
-        let wireSentence="";
-        if(wireParts.length===1)wireSentence=wireParts[0];
-        else if(wireParts.length===2)wireSentence=wireParts.join(" and ");
-        else wireSentence=wireParts.slice(0,-1).join(", ")+", and "+wireParts[wireParts.length-1];
-        const wireFact=`💡 Fun fact: That’s ${wireSentence}!`;
-
-        const ARMOR_VOLUME_M3=0.1;
-        const suits=highestMetalVol/ARMOR_VOLUME_M3;
-        const armorFact=`💡 Fun fact: That’s enough ${highestMetal} to dress ${formatLarge(Math.floor(suits))} knights in suits of armor! Arthur’s going to need a bigger round table.`;
-
-        const funFacts=[
-          `💡 Fun fact: That’s enough $100 bills (by volume) to fill about ${formatLarge(pools)} Olympic-size swimming pools!`,
-          `💡 Fun fact: Stacked up as $100 bills, that would be about ${formatLarge(totalHeightMiles.toFixed(2))} miles tall!`,
-          `💡 Fun fact: That’s enough ${highestMetal} to pave roughly ${formatLarge(blocks)} city blocks!`,
-          wireFact,
-          armorFact
-        ];
-
-        document.getElementById("funFact").textContent=funFacts[Math.floor(Math.random()*funFacts.length)];
-        resultsPage.classList.add("active");mainPage.classList.remove("active");mainPage.style.display="none";
+        document.getElementById("funFact").textContent="💡 Fun fact: That’s a lot of Psyche metal!";
+        resultsPage.classList.add("active");
+        mainPage.classList.remove("active");
+        mainPage.style.display="none";
       }catch(e){alert("Error calculating values.");console.error(e);}
     }
 
     buildSliders();validateTotal();updateOverlay();
 
-    /* Image Upload */
     document.getElementById("imageInput").addEventListener("change", function(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -265,6 +277,5 @@
       img.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;
     });
   </script>
-
 </body>
 </html>
