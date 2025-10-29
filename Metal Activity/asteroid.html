@@ -291,16 +291,7 @@
     });
 
     const img=document.getElementById("asteroid-img");
-    let scale=1,posX=0,posY=0,startX=0,startY=0;
-    img.addEventListener("pointerdown", e=>{
-      startX=e.clientX-posX;startY=e.clientY-posY;img.setPointerCapture(e.pointerId);
-      img.onpointermove=ev=>{posX=ev.clientX-startX;posY=ev.clientY-startY;img.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;};
-      img.onpointerup=()=>img.onpointermove=null;
-    });
-    img.addEventListener("wheel", e=>{
-      e.preventDefault();scale+=e.deltaY*-0.0015;scale=Math.min(Math.max(.5,scale),4);
-      img.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;
-    });
+    
   </script>
 
 </body>
