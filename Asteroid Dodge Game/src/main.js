@@ -69,6 +69,8 @@ function updateHighScore() {
   }
 }
 
+startMenu.init(canvas);
+
 // --- Game flow ---
 function startGame() {
   gameState = "playing";
