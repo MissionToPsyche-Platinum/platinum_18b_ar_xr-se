@@ -4,6 +4,8 @@ import { sounds } from './audio.js';
 import { updateAsteroids, drawAsteroids, resetAsteroids } from './asteroid.js';
 import { updatePowerUps, drawPowerUps, activePowerUps, resetPowerUps } from './powerups.js';
 import { initStars, updateStars, drawStars } from './stars.js';
+import { startMenu } from './start.js';
+
 
 
 export let gameState = "start";
@@ -104,6 +106,12 @@ function loop(now) {
 
 // --- Update ---
 function update(dt) {
+  if (gameState === "start") {
+  startMenu.update(dt, canvas);
+  updateStars(canvas);
+  return;
+}
+
   if (gameState !== "playing") return;
 
   // world + score
@@ -138,15 +146,13 @@ function draw() {
   // background stars on all screens
   drawStars(ctx);
 
+
   if (gameState === "start") {
-    ctx.fillStyle = "white";
-    ctx.font = "48px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("ASTEROID DODGE", W / 2, H / 2 - 40);
-    ctx.font = "24px sans-serif";
-    ctx.fillText("Press SPACE to Start", W / 2, H / 2 + 20);
-    return;
-  }
+  drawStars(ctx);
+  startMenu.draw(ctx, W, H);
+  return;
+}
+
 
   // game play layer
   drawAsteroids(ctx);
