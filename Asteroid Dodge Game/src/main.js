@@ -12,6 +12,8 @@ let prevState;
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+const disclaimer = "This is not an accurate representation of the Mission to Psyche." +
+                  "The Mission to Psyche will not travel through the asteroid belt and will not be dodging asteroids/meteoroids.";
 
 // Fit to screen once for mobile devices
 canvas.width = window.innerWidth;
@@ -169,6 +171,8 @@ function draw() {
     ctx.fillText("ASTEROID DODGE", W / 2, H / 2 - 40);
     ctx.font = "24px sans-serif";
     ctx.fillText("Press SPACE to Start", W / 2, H / 2 + 20);
+    ctx.font = "16px sans-serif";
+    ctx.fillText(disclaimer, W / 2, H - 100);
     if(isMenuVisible) {
       drawMenuOverlay(ctx);
     }

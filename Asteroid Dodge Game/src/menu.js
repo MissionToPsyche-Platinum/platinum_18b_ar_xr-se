@@ -11,6 +11,7 @@ const muteIcon = new Image();
 const unmuteIcon = new Image();
 
 let muteButtonBounds;
+let creditsButtonBounds;
 
 const MUTE_ICON_SIZE = 48;
 const MUTE_ICON_PADDING = 20;
@@ -30,7 +31,13 @@ export function handleClick(mouseX, mouseY) {
         mouseY >= muteButtonBounds.mute_y && mouseY <= muteButtonBounds.mute_y + muteButtonBounds.mute_height ) {
             isMuted = !isMuted;
             toggleMute();
-        }
+    } else if ( creditsButtonBounds &&
+        mouseX >= creditsButtonBounds.credit_x && mouseX <= creditsButtonBounds.credit_x + creditsButtonBounds.credit_width &&
+        mouseY >= creditsButtonBounds.credit_y && mouseY <= creditsButtonBounds.mute_y + creditsButtonBounds.credit_height ) {
+            console.log("Credits clicked");
+    } else {
+        console.log("No Button Pressed");
+    }
 }
 
 export function toggleMenu() {
@@ -75,7 +82,18 @@ export function drawMenuOverlay(ctx) {
 
     muteButtonBounds = {mute_x, mute_y, mute_width, mute_height};
 
+    const credit_height = 72;
+    const credit_width = 192;
+    const credit_pad = 10;
+    const credit_x = credit_pad;
+    const credit_y = H - credit_pad;
+
+    creditsButtonBounds = {credit_height, credit_width, credit_x, credit_y};
+
     ctx.drawImage(mute_icon, mute_x, mute_y, mute_width, mute_height);
+
+    ctx.fillStyle = 'rgba(106, 106, 106, 0.9)';
+    ctx.fillRect(credit_x, credit_y, credit_width, credit_height);
 
 
 
