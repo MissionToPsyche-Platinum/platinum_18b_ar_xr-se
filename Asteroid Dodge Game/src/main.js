@@ -5,22 +5,28 @@ import { updateAsteroids, drawAsteroids, resetAsteroids } from './asteroid.js';
 import { updatePowerUps, drawPowerUps, activePowerUps, resetPowerUps } from './powerups.js';
 import { initStars, updateStars, drawStars } from './stars.js';
 import { startMenu } from './start.js';
-
-
-
+import { effects } from './effects.js';
 export let gameState = "start";
+
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+let gameOverFade = 0;
 
-// Fit to screen once for mobile devices
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+//fit to screen for mobile/web
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+let W = canvas.width;
+let H = canvas.height;
 
-const W = canvas.width;
-const H = canvas.height;
-
-player.init(W, H);
+// Keep updated when window resizes
+window.addEventListener('resize', () => {
+  W = canvas.width;
+  H = canvas.height;
+});
 
 // --- Input (keyboard) ---
 let keys = { left: false, right: false };
@@ -69,6 +75,8 @@ function updateHighScore() {
   }
 }
 
+startMenu.init(canvas);
+
 // --- Game flow ---
 function startGame() {
   gameState = "playing";
@@ -107,10 +115,10 @@ function loop(now) {
 // --- Update ---
 function update(dt) {
   if (gameState === "start") {
-  startMenu.update(dt, canvas);
-  updateStars(canvas);
-  return;
-}
+    startMenu.update(dt, canvas);
+    updateStars(canvas);
+    return;
+  }
 
   if (gameState !== "playing") return;
 
@@ -120,41 +128,49 @@ function update(dt) {
   score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? 2 : 1));
   difficulty = 1 + Math.min(elapsedTime / 10, 4);
 
-  // player movement (keyboard)
+  // player movement
   player.update(dt, keys, W);
 
-  // asteroids
+  // --- Collision check + asteroid update ---
   updateAsteroids(dt, player, W, H, difficulty, activePowerUps, () => {
-  if (gameState !== "gameover") {
-    gameState = "gameover";
-    sounds.bg.pause();
-    updateHighScore();   
-  }
-});
+    if (gameState !== "gameover") {
+      //  Trigger collision visuals
+      effects.triggerExplosion(player.x + player.w / 2, player.y + player.h / 2);
+      effects.triggerFlash();
+      effects.triggerShake();
+
+      sounds.bg.pause();
+      updateHighScore();
+
+      // brief delay for animation before game over
+      setTimeout(() => {
+        gameState = "gameover";
+      }, 1300);
+    }
+  });
 
   // power-ups
- updatePowerUps(dt, player, W, H);
+  updatePowerUps(dt, player, W, H);
 
+  // effects update
+  effects.update(dt);
 }
 
-// --- Draw ---
+// --Draw ---
 function draw() {
   ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = 'midnightblue';
   ctx.fillRect(0, 0, W, H);
 
-  // background stars on all screens
+  // background stars
   drawStars(ctx);
-
 
   if (gameState === "start") {
-  drawStars(ctx);
-  startMenu.draw(ctx, W, H);
-  return;
-}
+    startMenu.draw(ctx, W, H);
+    return;
+  }
 
-
-  // game play layer
+  // --- Gameplay visuals ---
   drawAsteroids(ctx);
   drawPowerUps(ctx);
   player.draw(ctx);
@@ -179,6 +195,9 @@ function draw() {
     }
   }
 
+  // --- Draw effects on top of everything ---
+  effects.draw(ctx, W, H);
+
   if (gameState === "gameover") {
     // blackout overlay
     ctx.fillStyle = "rgba(0,0,0,0.85)";
@@ -197,7 +216,7 @@ function draw() {
 
     ctx.font = "22px sans-serif";
     ctx.fillStyle = "lightgray";
-    ctx.fillText("Press SPACE to Restart", W / 2, H / 2 + 100);
+    ctx.fillText("Tap to Restart", W / 2, H / 2 + 100);
   }
 }
 
