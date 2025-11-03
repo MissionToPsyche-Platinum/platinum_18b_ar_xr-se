@@ -1,5 +1,7 @@
 // powerups.js
 import { isColliding } from './utils.js';
+import { sounds } from './audio.js';
+
 
 export const powerUps = [];
 const powerUpInterval = 10;
@@ -32,9 +34,20 @@ export function updatePowerUps(dt, player, W, H) {
     if (isColliding(p, player)) {
       activePowerUps[p.type] = true;
       powerUpTimers[p.type] = powerUpDuration;
-      powerUps.splice(i, 1);
+        
+      // Play power-up sound based on type
+      if (p.type === 'shield' && sounds.powerupShield) {
+        sounds.powerupShield.currentTime = 0;
+        sounds.powerupShield.play();
+      } 
+      else if (p.type === 'scoreBoost' && sounds.powerupScore) {
+        sounds.powerupScore.currentTime = 0;
+        sounds.powerupScore.play();
+      }
+          powerUps.splice(i, 1);
       continue;
     }
+
     if (p.y > H) powerUps.splice(i, 1);
   }
 
