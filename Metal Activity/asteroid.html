@@ -267,7 +267,7 @@
         const suits=highestMetalVol/ARMOR_VOLUME_M3;
         const armorFact=`💡 Fun fact: That’s enough ${highestMetal} to dress ${formatLarge(Math.floor(suits))} knights in suits of armor! Arthur’s going to need a bigger round table.`;
 
-        // funFacts array
+        // Default fun facts
         let funFacts=[
           `💡 Fun fact: That’s enough $100 bills (by volume) to fill about ${formatLarge(pools)} Olympic-size swimming pools!`,
           `💡 Fun fact: Stacked up as $100 bills, that would be about ${formatLarge(totalHeightMiles.toFixed(2))} miles tall!`,
@@ -275,21 +275,36 @@
           wireFact,
           armorFact
         ];
-        let currentFactIndex=Math.floor(Math.random()*funFacts.length);
+
+        // Zero-composition placeholder facts
+        let zeroCompositionFacts=[
+          "💡 The asteroid Psyche orbits our sun and is between Mars and Jupiter inside the Asteroid Belt.",
+          "💡 The satellite sent to investigate Psyche is about the size of a singles tennis court.",
+          "💡 The satellite will take about 6 years to reach the asteroid Psyche.",
+          "💡 The asteroid Psyche gets its name from Greek Mythology, Psyche is the name of the goddess of the soul.",
+          "💡 The asteroid Psyche was first discovered by Italian astronomer Annibale de Gasparis in 1852, it was the 16th asteroid to be discovered."
+        ];
+
+        // Detect if all sliders are 0
+        const allZero=metalsList.every(m=>parseInt(document.getElementById(`${m}-slider`).value)===0);
+
+        // Decide which facts to use
+        let combinedFacts=allZero?zeroCompositionFacts:[...funFacts,...zeroCompositionFacts];
+        let currentFactIndex=Math.floor(Math.random()*combinedFacts.length);
         const funFactElem=document.getElementById("funFact");
 
         function showFact(index){
-          funFactElem.textContent=funFacts[index];
+          funFactElem.textContent=combinedFacts[index];
         }
 
         showFact(currentFactIndex);
 
         document.getElementById("nextFactBtn").onclick=()=>{
-          currentFactIndex=(currentFactIndex+1)%funFacts.length;
+          currentFactIndex=(currentFactIndex+1)%combinedFacts.length;
           showFact(currentFactIndex);
         };
         document.getElementById("prevFactBtn").onclick=()=>{
-          currentFactIndex=(currentFactIndex-1+funFacts.length)%funFacts.length;
+          currentFactIndex=(currentFactIndex-1+combinedFacts.length)%combinedFacts.length;
           showFact(currentFactIndex);
         };
 
