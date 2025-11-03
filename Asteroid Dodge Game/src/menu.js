@@ -26,6 +26,9 @@ unmuteIcon.src = './resources/unmute.svg';
 let isMuted = false;
 
 export function handleClick(mouseX, mouseY) {
+    console.log("Mouse X: ", mouseX, "Mouse Y", mouseY);
+    console.log(muteButtonBounds);
+    console.log(creditsButtonBounds);
     if( muteButtonBounds &&
         mouseX >= muteButtonBounds.mute_x && mouseX <= muteButtonBounds.mute_x + muteButtonBounds.mute_width &&
         mouseY >= muteButtonBounds.mute_y && mouseY <= muteButtonBounds.mute_y + muteButtonBounds.mute_height ) {
@@ -33,7 +36,7 @@ export function handleClick(mouseX, mouseY) {
             toggleMute();
     } else if ( creditsButtonBounds &&
         mouseX >= creditsButtonBounds.credit_x && mouseX <= creditsButtonBounds.credit_x + creditsButtonBounds.credit_width &&
-        mouseY >= creditsButtonBounds.credit_y && mouseY <= creditsButtonBounds.mute_y + creditsButtonBounds.credit_height ) {
+        mouseY >= creditsButtonBounds.credit_y && mouseY <= creditsButtonBounds.credit_y + creditsButtonBounds.credit_height ) {
             console.log("Credits clicked");
     } else {
         console.log("No Button Pressed");
@@ -82,11 +85,11 @@ export function drawMenuOverlay(ctx) {
 
     muteButtonBounds = {mute_x, mute_y, mute_width, mute_height};
 
-    const credit_height = 72;
+    const credit_height = 144;
     const credit_width = 192;
     const credit_pad = 10;
     const credit_x = credit_pad;
-    const credit_y = H - credit_pad;
+    const credit_y = H - credit_pad - credit_height;
 
     creditsButtonBounds = {credit_height, credit_width, credit_x, credit_y};
 
