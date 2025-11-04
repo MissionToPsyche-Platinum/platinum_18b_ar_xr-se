@@ -50,7 +50,6 @@
     }
     .page { display: none; }
     .active { display: block; }
-
     .asteroid-container {
       position: relative;
       display: flex;
@@ -61,7 +60,6 @@
       overflow: hidden;
       touch-action: none;
     }
-
     #asteroid-img {
       width: 40%;
       max-width: 320px;
@@ -72,7 +70,6 @@
       user-select: none;
       transform-origin: center center;
     }
-
     #color-overlay {
       position: absolute;
       top: 50%; left: 50%;
@@ -84,12 +81,10 @@
       mix-blend-mode: overlay;
       transition: background-color 0.3s ease;
     }
-
     input[type=file] {
       margin-top: 10px;
       color: #f9a000;
     }
-
     .composition-header { margin-top: 25px; }
     .slider-grid {
       display: grid;
@@ -177,7 +172,7 @@
     document.getElementById("continueBtn").onclick=()=>{disclaimer.style.display="none";mainPage.classList.add("active");};
     document.getElementById("backBtn").onclick=()=>{resultsPage.classList.remove("active");mainPage.style.display="block";};
 
-    const API_KEY="LMK8WWQNCCKFV6OL0HQX880OL0HQX";
+    const API_KEY="KOROCWV5DK8X4JRMHNFP279RMHNFP";
     const BASE_URL="https://api.metals.dev/v1/latest";
     const VOLUME_M3=5.75e15;
     const DENSITY={gold:19300,silver:10490,platinum:21450,palladium:12000,copper:8960,nickel:8900,aluminum:2700,lead:11340,dirt:3000};
@@ -187,14 +182,7 @@
     const BILL_VOLUME_M3=BILL_L*BILL_W*BILL_T;
 
     function lbsToTroyOunces(lbs){return lbs*16*0.911458;}
-    function formatLarge(n){
-      if(!isFinite(n))return"∞";
-      if(n>=1e12)return(n/1e12).toFixed(2)+" trillion";
-      if(n>=1e9)return(n/1e9).toFixed(2)+" billion";
-      if(n>=1e6)return(n/1e6).toFixed(2)+" million";
-      return n.toLocaleString();
-    }
-
+    function formatLarge(n){if(!isFinite(n))return"∞";if(n>=1e12)return(n/1e12).toFixed(2)+" trillion";if(n>=1e9)return(n/1e9).toFixed(2)+" billion";if(n>=1e6)return(n/1e6).toFixed(2)+" million";return n.toLocaleString();}
     function hexToRgb(hex){const b=parseInt(hex.slice(1),16);return{r:(b>>16)&255,g:(b>>8)&255,b:b&255};}
     function mixColors(vals){let t=0,r=0,g=0,b=0;for(const[m,p]of Object.entries(vals)){const c=hexToRgb(metalColors[m]);r+=c.r*(p/60);g+=c.g*(p/60);b+=c.b*(p/60);t+=p;}if(t===0)return"rgba(0,0,0,0)";return`rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${Math.min(1,t/100)})`;}
     function buildSliders(){const c=document.getElementById("sliders");c.innerHTML="";metalsList.forEach(m=>{const d=document.createElement("div");d.classList.add("slider-container");d.innerHTML=`<div class="slider-label"><span>${m.charAt(0).toUpperCase()+m.slice(1)}</span><span id="${m}-val">0%</span></div><input type="range" min="0" max="60" value="0" id="${m}-slider" oninput="updatePercent('${m}')">`;c.appendChild(d);});}
@@ -204,14 +192,32 @@
 
     let lastApiTime=null;
     async function getRates(){
+      const CACHE_FILE="cachedMetals.json";
+      const CACHE_DURATION_MS=2*24*60*60*1000; // 2 days
       try{
+        const cacheResp=await fetch(CACHE_FILE);
+        if(cacheResp.ok){
+          const cacheData=await cacheResp.json();
+          const age=Date.now()-cacheData.timestamp;
+          if(age<CACHE_DURATION_MS){
+            console.log("💾 Using cached metal data from cachedMetals.json");
+            lastApiTime=new Date(cacheData.timestamp);
+            return cacheData.metals;
+          } else {
+            console.log("⚠️ Cache expired — fetching new metal data from API...");
+          }
+        } else {
+          console.log("📂 No cached file found — fetching metal data from API...");
+        }
         const r=await fetch(`${BASE_URL}?api_key=${API_KEY}&currency=USD`);
         const d=await r.json();
         if(!d.metals)throw new Error("Invalid response");
-        lastApiTime=new Date();return d.metals;
-      }catch(err){
+        lastApiTime=new Date();
+        console.log("🌐 Fetched fresh data — remember to update cachedMetals.json manually if you want to share it.");
+        return d.metals;
+      } catch(err){
         console.warn("⚠️ Using offline fallback rates:",err.message);
-        return{gold:4362.26,silver:25.46,platinum:975.20,palladium:1100.00,copper:0.35,nickel:6.85,aluminum:1.03,lead:0.98};
+        return{gold:3937.615,silver:47.242,platinum:1539.112,palladium:1398.277,copper:0.3419,nickel:0.4677,aluminum:0.0888,lead:0.0626};
       }
     }
 
@@ -242,7 +248,7 @@
         });
 
         tbody.innerHTML+=`<tr style="font-weight:bold;background:#222;"><td colspan="3">TOTAL</td><td>$${totalValue.toLocaleString(undefined,{maximumFractionDigits:2})}</td></tr>`;
-        document.getElementById("lastUpdated").textContent=lastApiTime?`🕒 Last metal price API update: ${lastApiTime.toLocaleString()}`:`⚠️ Using fallback prices (no recent API data)`;
+        document.getElementById("lastUpdated").textContent=lastApiTime?`🕒 Last metal price update: ${lastApiTime.toLocaleString()}`:`⚠️ Using fallback prices (no recent API data)`;
 
         const bills=totalValue/100;const vol=bills*BILL_VOLUME_M3;const pools=vol/OLYMPIC_POOL_M3;
         const totalHeightMiles=(bills*BILL_T)/1609.34;
@@ -267,7 +273,6 @@
         const suits=highestMetalVol/ARMOR_VOLUME_M3;
         const armorFact=`💡 Fun fact: That’s enough ${highestMetal} to dress ${formatLarge(Math.floor(suits))} knights in suits of armor! Arthur’s going to need a bigger round table.`;
 
-        // Default fun facts
         let funFacts=[
           `💡 Fun fact: That’s enough $100 bills (by volume) to fill about ${formatLarge(pools)} Olympic-size swimming pools!`,
           `💡 Fun fact: Stacked up as $100 bills, that would be about ${formatLarge(totalHeightMiles.toFixed(2))} miles tall!`,
@@ -276,37 +281,23 @@
           armorFact
         ];
 
-        // Zero-composition placeholder facts
         let zeroCompositionFacts=[
           "💡 The asteroid Psyche orbits our sun and is between Mars and Jupiter inside the Asteroid Belt.",
           "💡 The satellite sent to investigate Psyche is about the size of a singles tennis court.",
           "💡 The satellite will take about 6 years to reach the asteroid Psyche.",
-          "💡 The asteroid Psyche gets its name from Greek Mythology, Psyche is the name of the goddess of the soul.",
-          "💡 The asteroid Psyche was first discovered by Italian astronomer Annibale de Gasparis in 1852, it was the 16th asteroid to be discovered."
+          "💡 The asteroid Psyche gets its name from Greek Mythology — Psyche is the name of the goddess of the soul.",
+          "💡 The asteroid Psyche was first discovered by Italian astronomer Annibale de Gasparis in 1852 — it was the 16th asteroid to be discovered."
         ];
 
-        // Detect if all sliders are 0
         const allZero=metalsList.every(m=>parseInt(document.getElementById(`${m}-slider`).value)===0);
-
-        // Decide which facts to use
         let combinedFacts=allZero?zeroCompositionFacts:[...funFacts,...zeroCompositionFacts];
         let currentFactIndex=Math.floor(Math.random()*combinedFacts.length);
         const funFactElem=document.getElementById("funFact");
 
-        function showFact(index){
-          funFactElem.textContent=combinedFacts[index];
-        }
-
+        function showFact(index){funFactElem.textContent=combinedFacts[index];}
         showFact(currentFactIndex);
-
-        document.getElementById("nextFactBtn").onclick=()=>{
-          currentFactIndex=(currentFactIndex+1)%combinedFacts.length;
-          showFact(currentFactIndex);
-        };
-        document.getElementById("prevFactBtn").onclick=()=>{
-          currentFactIndex=(currentFactIndex-1+combinedFacts.length)%combinedFacts.length;
-          showFact(currentFactIndex);
-        };
+        document.getElementById("nextFactBtn").onclick=()=>{currentFactIndex=(currentFactIndex+1)%combinedFacts.length;showFact(currentFactIndex);};
+        document.getElementById("prevFactBtn").onclick=()=>{currentFactIndex=(currentFactIndex-1+combinedFacts.length)%combinedFacts.length;showFact(currentFactIndex);};
 
         resultsPage.classList.add("active");
         mainPage.classList.remove("active");
