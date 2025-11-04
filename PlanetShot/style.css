@@ -1,0 +1,101 @@
+  :root {
+    --bg1:#000010;
+    --bg2:#000020;
+    --ship:#00ffff;
+    --asteroid1:#555;
+    --asteroid2:#222;
+    --hud:#d0f0ff;
+  }
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: radial-gradient(circle at 50% 50%, var(--bg1) 0%, var(--bg2) 80%);
+    color: var(--hud);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    overflow: hidden;
+  }
+  .stage {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    cursor: crosshair;
+  }
+  .stars {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(2px 2px at 10% 20%, #ffffffaa 50%, transparent 52%) no-repeat,
+      radial-gradient(2px 2px at 30% 70%, #ffffffaa 50%, transparent 52%) no-repeat,
+      radial-gradient(1px 1px at 50% 40%, #ffffff88 50%, transparent 52%) no-repeat,
+      radial-gradient(2px 2px at 70% 30%, #ffffffaa 50%, transparent 52%) no-repeat,
+      radial-gradient(1px 1px at 80% 80%, #ffffff88 50%, transparent 52%) no-repeat,
+      radial-gradient(1px 1px at 15% 85%, #ffffff88 50%, transparent 52%) no-repeat,
+      radial-gradient(2px 2px at 90% 55%, #ffffffaa 50%, transparent 52%) no-repeat,
+      radial-gradient(1px 1px at 40% 85%, #ffffff88 50%, transparent 52%) no-repeat;
+    background-size: 100% 100%;
+    pointer-events: none;
+  }
+  .hud {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(20,30,60,.5);
+    border: 1px solid rgba(255,255,255,.15);
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    letter-spacing: .3px;
+    backdrop-filter: blur(4px);
+  }
+  .hud .row { display: grid; grid-template-columns: 70px 1fr; gap: 8px; margin: 4px 0; }
+  .asteroid {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    right: min(12vw, 220px);
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--asteroid1) 0%, var(--asteroid2) 70%);
+    box-shadow: 0 0 0 2px #888 inset, 0 0 40px #000 inset, 0 0 20px #111;
+  }
+  .ship {
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: min(12vw, 220px);
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    border-left: 0 solid transparent;
+    border-right: 28px solid var(--ship);
+    border-top: 16px solid transparent;
+    border-bottom: 16px solid transparent;
+    filter: drop-shadow(0 0 10px #00ffff80);
+  }
+  .ship-core {
+    position: absolute;
+    left: -18px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: #e6ffff;
+    border-radius: 2px;
+  }
+  .msg {
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(0,0,0,.35);
+    border: 1px solid rgba(255,255,255,.12);
+    font-size: 15px;
+    text-align: center;
+    backdrop-filter: blur(3px);
+  }
+  .hint {
+    opacity: .9;
+    font-size: 12px;
+  }
