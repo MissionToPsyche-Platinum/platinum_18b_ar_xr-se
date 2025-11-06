@@ -22,11 +22,15 @@ resizeCanvas();
 let W = canvas.width;
 let H = canvas.height;
 
+// --- Initialize Player ---
+player.init(W, H);
+
 // Keep updated when window resizes
 window.addEventListener('resize', () => {
   W = canvas.width;
   H = canvas.height;
 });
+
 
 // --- Input (keyboard) ---
 let keys = { left: false, right: false };
