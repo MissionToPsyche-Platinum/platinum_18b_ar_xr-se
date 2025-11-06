@@ -145,6 +145,11 @@
     <div class="slider-grid" id="sliders"></div>
     <p id="dirt">Dirt: 100%</p>
     <p id="error"></p>
+    <label style="color:#f9a000; margin-top:10px; display:block;">
+  <input type="checkbox" id="priceToggle" style="transform:scale(1.3); margin-right:6px;">
+  Use 1852 Metal Prices (Aluminum is not used)
+</label>
+
     <button id="calcBtn" onclick="calculate()">Calculate</button>
   </div>
 
@@ -177,6 +182,19 @@
     const VOLUME_M3=5.75e15;
     const DENSITY={gold:19300,silver:10490,platinum:21450,palladium:12000,copper:8960,nickel:8900,aluminum:2700,lead:11340,dirt:3000};
     const metalsList=["gold","silver","platinum","palladium","copper","nickel","aluminum","lead"];
+   
+ // 1852 historical metal prices (USD/oz)
+const HISTORIC_1852_PRICES = {
+  gold: 20.67,
+  silver: 1.30,
+  platinum: 3.76,
+  palladium: 3.00,
+  copper: 0.01,
+  nickel: 0.02,
+  aluminum: 0.00, // basically not commercially produced yet
+  lead: 0.01
+};
+
     const metalColors={gold:"#FFD700",silver:"#C0C0C0",platinum:"#E5E4E2",palladium:"#CED0DD",copper:"#B87333",nickel:"#AFAFAF",aluminum:"#D3D3D3",lead:"#4D4D4D"};
     const OLYMPIC_POOL_M3=2500, INCH_TO_M=0.0254, BILL_L=6.14*INCH_TO_M, BILL_W=2.61*INCH_TO_M, BILL_T=0.0043*INCH_TO_M;
     const BILL_VOLUME_M3=BILL_L*BILL_W*BILL_T;
@@ -223,7 +241,8 @@
 
     async function calculate(){
       try{
-        const rates=await getRates();
+const use1852 = document.getElementById("priceToggle").checked;
+const rates = use1852 ? HISTORIC_1852_PRICES : await getRates();
         const tbody=document.querySelector("#resultsTable tbody");
         tbody.innerHTML="";
         let totalValue=0,totalMassKg=0;const metalMasses={};
@@ -248,7 +267,12 @@
         });
 
         tbody.innerHTML+=`<tr style="font-weight:bold;background:#222;"><td colspan="3">TOTAL</td><td>$${totalValue.toLocaleString(undefined,{maximumFractionDigits:2})}</td></tr>`;
-        document.getElementById("lastUpdated").textContent=lastApiTime?`🕒 Last metal price update: ${lastApiTime.toLocaleString()}`:`⚠️ Using fallback prices (no recent API data)`;
+document.getElementById("lastUpdated").textContent =
+  use1852
+    ? "📜 Using Historical Metal Prices from 1852"
+    : lastApiTime
+      ? `🕒 Last metal price update: ${lastApiTime.toLocaleString()}`
+      : `⚠️ Using fallback prices (no recent API data)`;
 
         const bills=totalValue/100;const vol=bills*BILL_VOLUME_M3;const pools=vol/OLYMPIC_POOL_M3;
         const totalHeightMiles=(bills*BILL_T)/1609.34;
