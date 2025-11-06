@@ -1,25 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Asteroid Launch — WIP</title>
-    <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" href="style.css" />
+<title>Asteroid Launch</title>
+<script src="main.js"></script>
+
 </head>
 <body>
-    <div class="stage">
-    <div class="stars"></div>
-    <div class="hud">
-        <div class="row"><div>Angle</div><div>0°</div></div>
-        <div class="row"><div>Power</div><div>0%</div></div>
-        <div class="row"><div>Shots</div><div>0</div></div>
-        <div class="hint">Click and hold to charge. Drag to aim. Release to launch.</div>
+    <canvas id="game"></canvas>
+    <div id="hud">
+        <div>Angle: <span id="angle">0°</span></div>
+        <div>Power: <span id="power">0%</span></div>
+        <div>Shots: <span id="shots">0</span></div>
+        <div><small>Click + hold to charge. Aim and release to shoot.</small></div>
     </div>
-    <div class="ship">
-        <div class="ship-core"></div>
-    </div>
-    <div class="asteroid"></div>
-    <div class="msg">WIP. Interaction not wired yet.</div>
-    </div>
+    <div id="msg"></div>
+
 </body>
 </html>
