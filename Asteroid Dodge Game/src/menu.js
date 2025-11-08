@@ -45,6 +45,13 @@ export function handleClick(mouseX, mouseY) {
 
 export function toggleMenu() {
     showMenu = !showMenu;
+    let menu = document.getElementById("game-overlay");
+    if (menu) {
+        menu.classList.toggle("hidden", !showMenu);
+    } else if (showMenu) {
+        const newMenu = buildMenuDOM();
+        document.body.appendChild(newMenu);
+    }
 }
 
 export function isMenuVisible() {
@@ -53,22 +60,44 @@ export function isMenuVisible() {
 
 //Rewrite to use HTML elements instead of draw on the canvas
 export function drawMenuOverlay(ctx) {
-    if (!showMenu) return;
-    let menu = document.getElementById("game-menu");
-
-    if (!menu) {
-        menu = buildMenuDOM();
-    }
 }
 
 function buildMenuDOM() {
     const menu = document.createElement("div");
-    menu.id = "game-menu";
-    menu.className = "overlay-menu";
+    menu.id = "game-overlay";
+    menu.className = "game-overlay";
     menu.innerHTML = `
-    <div class=menuContent>
-    Placeholder
+    <div class="paused-label">Paused</div>
+    <div id="menu-container" class="menu-container">
+        <div class="menu-buttons">
+            <button id="controls-btn">Controls</button>
+            <button id="credits-btn">Credits</button>
+            <button id="exit-btn">Exit</button>
+        </div>
+        <div class="mute-container">
+            <img id="mute-icon" src="./resources/mute.svg" alt = "Mute toggle" />
+        </div>
     </div>
     `;
+
+    const muteIcon = menu.querySelector("#mute-icon");
+    muteIcon.addEventListener("click", () => {
+        isMuted = !isMuted
+        toggleMute();
+        muteIcon.src = isMuted ? "./resources/unmute.svg" : "./resources/mute.svg";
+    });
+
+    menu.querySelector("#controls-btn").addEventListener("click", () => {
+        alert("open controls menu");
+    });
+
+    menu.querySelector("#credits-btn").addEventListener("click", () => {
+        alert("Open credits page");
+    });
+
+    menu.querySelector("#exit-btn").addEventListener("click", () => {
+        alert("Return to hub page");
+    });
+    
     return menu;
 }

@@ -6,8 +6,101 @@ body {
     height: 100vh;
     margin: 0;      
 }
+
 canvas {
     border: 2px solid white;
     display: block;
     margin: auto;
+}
+
+.game-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.game-overlay.hidden {
+    display: none;
+}
+
+.menu-container {
+    position: relative;
+    width: 33%;
+    min-width: 300px;
+    background: #111;
+    color: #fff;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.mute-container {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    cursor: pointer;
+}
+
+.mute-container img {
+    width: 32px;
+    height: 32px;
+    opacity: 0.8;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.mute-container img:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.menu-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+    width: 60%;
+    max-width: 400px;
+    margin-bottom: 30px;
+}
+
+.menu-buttons button {
+    flex: 1;
+    min-width: 120px;
+    max-width: 200px;
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 12px 0;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    text-align: center;
+}
+
+.menu-buttons button:hover {
+    background: #555;
+    transform: scale(1.1);
+}
+
+.paused-label {
+    position: absolute;
+    top: 15%;
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    letter-spacing: 2px;
+    user-select: none;
 }
