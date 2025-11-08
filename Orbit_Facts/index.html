@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Psyche 16 Orbit Simulation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -43,28 +44,10 @@
             z-index: 0;
         }
 
-        .psyche {
+        #three-container {
             position: absolute;
-            left: 50%;
-            top: 50%;
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #666, #999, #555);
-            border-radius: 50%;
-            box-shadow: inset -10px 0 20px rgba(0,0,0,0.6);
-            transform-origin: center;
-            transition: transform 0.1s linear;
-        }
-
-        .axis-line {
-            position: absolute;
-            width: 2px;
-            height: 160px;
-            background: rgba(255, 255, 255, 0.5);
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%) rotate(23.5deg);
-            transform-origin: center center;
+            width: 600px;
+            height: 600px;
             pointer-events: none;
         }
 
@@ -75,6 +58,7 @@
             text-align: center;
             color: white;
             font-family: sans-serif;
+            z-index: 10;
         }
 
         .info-box {
@@ -90,6 +74,7 @@
             border-radius: 5px;
             text-align: center;
             font-size: 14px;
+            z-index: 10;
         }
     </style>
 </head>
@@ -97,9 +82,7 @@
 <div class="space">
     <div class="sun"></div>
     <div class="orbit">
-        <div class="psyche">
-            <div class="axis-line"></div>
-        </div>
+        <div id="three-container"></div>
     </div>
 </div>
 <div class="info-box" id="infoBox">Fun Fact: Psyche has an axial tilt of approximately 98°, leading to extreme seasonal variations!</div>
@@ -108,12 +91,38 @@
 </div>
 
 <script>
-    const psyche = document.querySelector('.psyche');
     const slider = document.querySelector('#orbitSlider');
     const infoBox = document.querySelector('#infoBox');
-    const radius = 300; // Matches orbit width/2
+    const container = document.getElementById('three-container');
+    const radius = 460; // Adjusted to align cube with orbit circle
 
-    // Fun facts about seasons on 16 Psyche due to its ~98° axial tilt
+    // Three.js setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 2000);
+    camera.position.z = 1000;
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(600, 600);
+    container.appendChild(renderer.domElement);
+
+    // Create a cube to represent Psyche
+    const geometry = new THREE.BoxGeometry(30, 30, 30);
+    const material = new THREE.MeshPhongMaterial({
+        color: 0x888888,
+        shininess: 30
+    });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    // Add lighting
+    const ambientLight = new THREE.AmbientLight(0x404040, 2);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(0, 0, 50);
+    scene.add(directionalLight);
+
+    // Fun facts about seasons on 16 Psyche
     const facts = [
         {
             range: [0, 90],
@@ -138,24 +147,17 @@
         const x = Math.cos(rad) * radius;
         const y = Math.sin(rad) * radius;
 
-        // Psyche spins (4 rotations per orbit)
+        // Move the cube along the orbit - matching the orbit circle exactly
+        cube.position.x = x;
+        cube.position.y = -y;
+
+        // Rotate the cube (spin)
         const spin = angle * 4;
-
-        // Axis tilt: always face the Sun (roughly toward the center)
-        const axisTilt = angle + 90; // +90 so it's perpendicular to the orbit direction
-
-        psyche.style.transform = `
-                translate(-50%, -50%)
-                translate(${x}px, ${y}px)
-                rotate(${spin}deg)
-            `;
-
-        // Rotate the axis line separately so it points toward the Sun
-        const axisLine = psyche.querySelector('.axis-line');
-        axisLine.style.transform = `translateX(-50%) rotate(${axisTilt}deg)`;
+        cube.rotation.x = spin * Math.PI / 180;
+        cube.rotation.y = spin * Math.PI / 180;
 
         // Update fun fact based on angle
-        let currentFact = facts[0].text; // Default
+        let currentFact = facts[0].text;
         for (const fact of facts) {
             if (angle >= fact.range[0] && angle < fact.range[1]) {
                 currentFact = fact.text;
@@ -163,6 +165,8 @@
             }
         }
         infoBox.textContent = `Fun Fact: ${currentFact}`;
+
+        renderer.render(scene, camera);
     }
 
     // Update position when slider changes
@@ -174,5 +178,6 @@
     // Initialize position
     updatePosition(0);
 </script>
+
 </body>
 </html>
