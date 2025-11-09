@@ -9,7 +9,7 @@
     const gravityWell = {
         x: 0,
         y: 0,
-        r: 28,          // purely visual
+        r: 50,          // purely visual
         mu: 12_000_000,  // strength of pull
         soften: 1_500,  // prevents singularity when very close
     };
@@ -44,8 +44,8 @@
     let won = false;
     let lost = false;
 
-    const MAX_POWER = 1.0;
-    const POWER_RATE = 0.6;
+    const MAX_POWER = 2.0;
+    const POWER_RATE = 1.5;
     const SPEED_SCALE = 380;
     const FRICTION = 0.0;
     const STOP_EPS = 0.05;
