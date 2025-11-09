@@ -130,11 +130,11 @@
     // Load GLTF model to replace cube
     const loader = new THREE.GLTFLoader();
     loader.load(
-        './models/psyche/scene.gltf',
+        './Orbit_Facts/models/psyche/scene.gltf',
         function(gltf) {
             const model = gltf.scene;
             model.scale.set(10000, 10000, 10000); // Size of the sun
-            psycheModel = model; // Replace cube reference
+            psycheModel = model;
             scene.add(model);
 
             // Set initial position based on slider
