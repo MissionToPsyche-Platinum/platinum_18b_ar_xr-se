@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Psyche 16 Orbit Simulation</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <style>
         body {
             margin: 0;
@@ -46,9 +47,10 @@
 
         #three-container {
             position: absolute;
-            width: 600px;
-            height: 600px;
+            width: 1200px;
+            height: 1200px;
             pointer-events: none;
+            overflow: visible;
         }
 
         .controls {
@@ -94,7 +96,7 @@
     const slider = document.querySelector('#orbitSlider');
     const infoBox = document.querySelector('#infoBox');
     const container = document.getElementById('three-container');
-    const radius = 460; // Adjusted to align cube with orbit circle
+    const radius = 233; // Adjusted for larger container
 
     // Three.js setup
     const scene = new THREE.Scene();
@@ -102,17 +104,20 @@
     camera.position.z = 1000;
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(600, 600);
+    renderer.setSize(1200, 1200);
     container.appendChild(renderer.domElement);
 
-    // Create a cube to represent Psyche
+    // Create a cube to represent Psyche (placeholder)
+    let psycheModel = null;
+
     const geometry = new THREE.BoxGeometry(30, 30, 30);
     const material = new THREE.MeshPhongMaterial({
         color: 0x888888,
         shininess: 30
     });
     const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+    // Don't add cube to scene yet - will be replaced by GLTF
+    psycheModel = cube;
 
     // Add lighting
     const ambientLight = new THREE.AmbientLight(0x404040, 2);
@@ -121,6 +126,30 @@
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(0, 0, 50);
     scene.add(directionalLight);
+
+    // Load GLTF model to replace cube
+    const loader = new THREE.GLTFLoader();
+    loader.load(
+        './models/psyche/scene.gltf',
+        function(gltf) {
+            const model = gltf.scene;
+            model.scale.set(10000, 10000, 10000); // Size of the sun
+            psycheModel = model; // Replace cube reference
+            scene.add(model);
+
+            // Set initial position based on slider
+            const currentAngle = parseFloat(slider.value);
+            updatePosition(currentAngle);
+
+            console.log('GLTF model loaded and orbiting!');
+        },
+        function(xhr) {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        function(error) {
+            console.error('Error loading GLTF:', error);
+        }
+    );
 
     // Fun facts about seasons on 16 Psyche
     const facts = [
@@ -147,14 +176,16 @@
         const x = Math.cos(rad) * radius;
         const y = Math.sin(rad) * radius;
 
-        // Move the cube along the orbit - matching the orbit circle exactly
-        cube.position.x = x;
-        cube.position.y = -y;
+        // Move the model along the orbit
+        if (psycheModel) {
+            psycheModel.position.x = x;
+            psycheModel.position.y = -y;
 
-        // Rotate the cube (spin)
-        const spin = angle * 4;
-        cube.rotation.x = spin * Math.PI / 180;
-        cube.rotation.y = spin * Math.PI / 180;
+            // Rotate the model (spin)
+            const spin = angle * 4;
+            psycheModel.rotation.x = spin * Math.PI / 180;
+            psycheModel.rotation.y = spin * Math.PI / 180;
+        }
 
         // Update fun fact based on angle
         let currentFact = facts[0].text;
