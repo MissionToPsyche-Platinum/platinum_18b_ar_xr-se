@@ -1,0 +1,72 @@
+body {
+    margin: 0;
+    background: radial-gradient(circle at center, #000010 0%, #000000 100%);
+    overflow: hidden;
+    height: 100vh;
+}
+
+.space {
+    position: relative;
+    width: 100vw;
+    height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sun {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, #ffec8b, #f4c542, #e69500);
+    border-radius: 50%;
+    box-shadow: 0 0 80px 30px rgba(255, 200, 50, 0.6);
+    z-index: 1;
+}
+
+.orbit {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 0;
+}
+
+.psyche {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #666, #999, #555);
+    border-radius: 50%;
+    box-shadow: inset -10px 0 20px rgba(0,0,0,0.6);
+    transform-origin: center;
+    transition: transform 0.1s linear;
+}
+
+
+.axis-line {
+    position: absolute;
+    width: 2px;
+    height: 160px;
+    background: rgba(255, 255, 255, 0.5);
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%) rotate(23.5deg);
+    transform-origin: center center;
+    pointer-events: none;
+}
+
+.controls {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-family: sans-serif;
+}
