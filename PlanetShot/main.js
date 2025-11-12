@@ -9,9 +9,9 @@
     const gravityWell = {
         x: 0,
         y: 0,
-        r: 50,          // purely visual
-        mu: 12_000_000,  // strength of pull
-        soften: 1_500,  // prevents singularity when very close
+        r: 50,
+        mu: 12000000,
+        soften: 1500
     };
 
     function resize() {
@@ -29,13 +29,13 @@
         vx: 0,
         vy: 0,
         r: 12,
-        angle: 0,
+        angle: 0
     };
 
     const asteroid = {
         x: canvas.width - 200,
         y: Math.random() * (canvas.height - 200) + 100,
-        r: 40,
+        r: 40
     };
 
     let charging = false;
@@ -156,6 +156,40 @@
         ship.vy += ay * dt;
     }
 
+    function computeTrajectory(angle, powerValue) {
+        const points = [];
+        let x = ship.x;
+        let y = ship.y;
+        const speed = powerValue * SPEED_SCALE;
+        let vx = Math.cos(angle) * speed;
+        let vy = Math.sin(angle) * speed;
+        const dtMs = 16;
+        const dt = dtMs / 1000;
+        const maxSteps = 1200;
+        for (let i = 0; i < maxSteps; i++) {
+            points.push({ x, y });
+            if (x < -50 || x > canvas.width + 50 || y < -50 || y > canvas.height + 50) break;
+            const dAst = Math.hypot(x - asteroid.x, y - asteroid.y);
+            if (dAst < asteroid.r) {
+                points.push({ x: asteroid.x, y: asteroid.y });
+                break;
+            }
+            const dx = gravityWell.x - x;
+            const dy = gravityWell.y - y;
+            const r2 = dx * dx + dy * dy + gravityWell.soften;
+            const r = Math.sqrt(r2);
+            const a = gravityWell.mu / r2;
+            const ax = (dx / r) * a;
+            const ay = (dy / r) * a;
+            vx += ax * dt;
+            vy += ay * dt;
+            x += vx * dt;
+            y += vy * dt;
+            if (Math.hypot(vx, vy) <= STOP_EPS) break;
+        }
+        return points;
+    }
+
     function step(dt) {
         if (charging && !won && !lost) {
             power = Math.min(MAX_POWER, power + POWER_RATE * (dt / 1000));
@@ -166,11 +200,9 @@
 
         if (!won && !lost && (ship.vx !== 0 || ship.vy !== 0)) {
             applyGravity(dt);
-
             const dtSec = dt / 1000;
             ship.x += ship.vx * dtSec;
             ship.y += ship.vy * dtSec;
-
             const speed = Math.hypot(ship.vx, ship.vy);
             if (speed <= STOP_EPS) {
                 ship.vx = ship.vy = 0;
@@ -180,7 +212,6 @@
                 const s = newSpeed / speed;
                 ship.vx *= s; ship.vy *= s;
             }
-
             if (
                 ship.x - ship.r <= 0 ||
                 ship.x + ship.r >= canvas.width ||
@@ -200,22 +231,43 @@
         }
     }
 
+    function drawTrajectoryPreview() {
+        if (!charging) return;
+        const points = computeTrajectory(ship.angle, power);
+        if (!points || points.length < 2) return;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+        ctx.strokeStyle = "#00ffb388";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([8, 6]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        for (let i = 0; i < points.length; i += Math.max(1, Math.floor(points.length / 30))) {
+            const p = points[i];
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+            ctx.fillStyle = "#00ffb3aa";
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         ctx.save();
         ctx.fillStyle = "#ffffff10";
         for (let i = 0; i < 150; i++) {
             const x = (i * 137) % canvas.width;
-            const y = ((i * 61) % canvas.height);
+            const y = (i * 61) % canvas.height;
             ctx.fillRect(x, y, 2, 2);
         }
         ctx.restore();
-
         drawGravityWell();
         drawAsteroid();
+        drawTrajectoryPreview();
         drawShip();
-
         if (charging) {
             ctx.beginPath();
             ctx.moveTo(ship.x, ship.y);
