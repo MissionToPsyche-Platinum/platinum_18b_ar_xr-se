@@ -31,6 +31,15 @@ window.addEventListener('resize', () => {
   H = canvas.height;
 });
 
+// --- Load Asteroid Images ---
+const asteroidImgs = [];
+for (let i = 1; i <= 3; i++) {
+  const img = new Image();
+  img.src = `assets/asteroids/asteroid${i}.png`;
+  asteroidImgs.push(img);
+}
+
+
 
 // --- Input (keyboard) ---
 let keys = { left: false, right: false };
