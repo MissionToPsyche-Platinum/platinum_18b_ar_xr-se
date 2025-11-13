@@ -151,6 +151,31 @@ function renderMainMenu() {
     
 }
 
+function renderCreditsMenu() {
+    const container = decodeURIComponent.createElement("div");
+    container.className = "credits-container";
+    container.innerHTML = `
+    <h2>Credits</h2>
+    <div class="credits-layout">
+        <p>
+            <!-- Placeholder for future credits -->
+        </p>
+    <div class="credits-disclaimer"> 
+        <p>
+            This is not an accurate representation of the Mission to Psyche<br>
+            The Mission to Psyche will not travel through the asteroid belt and will not be dodging asteroids nor meteroids<br>
+            This game is simply for your enjoyment<br>
+        </p>
+    <div class="credits-footer">
+        <button id="cr-return-btn" class="cr-return-btn">Return</button>
+    </div>
+    `;
+
+    container.querySelector("#cr-return-btn").addEventListener("click", () => {
+        renderMainMenu();
+    })
+}
+
 function updateMenuContent(newContent) {
     const menuContent = document.getElementById("menu-content");
     menuContent.innerHTML = '';
