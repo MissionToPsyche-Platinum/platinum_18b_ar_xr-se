@@ -9,9 +9,13 @@ import { effects } from './effects.js';
 export let gameState = "start";
 
 
+
+
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 let gameOverFade = 0;
+effects.playerRef = player;
+
 
 //fit to screen for mobile/web
 function resizeCanvas() {
