@@ -1,12 +1,23 @@
 // powerups.js
 import { isColliding } from './utils.js';
 import { sounds } from './audio.js';
+import { effects } from './effects.js';
+
 
 
 export const powerUps = [];
 const powerUpInterval = 10;
 let powerUpTimer = 0;
 const powerUpDuration = 5;
+
+// Load Power-Up Images
+const powerUpImgs = {
+  shield: new Image(),
+  scoreBoost: new Image()
+};
+powerUpImgs.shield.src = "src/assets/shield.png";
+powerUpImgs.scoreBoost.src = "src/assets/doubleScore.png";
+
 
 export const activePowerUps = { shield: false, scoreBoost: false };
 export const powerUpTimers = { shield: 0, scoreBoost: 0 };
@@ -34,6 +45,10 @@ export function updatePowerUps(dt, player, W, H) {
     if (isColliding(p, player)) {
       activePowerUps[p.type] = true;
       powerUpTimers[p.type] = powerUpDuration;
+
+      activePowerUps[p.type] = true;
+      powerUpTimers[p.type] = powerUpDuration;
+      effects.triggerPowerGlow(p.type, player);
         
       // Play power-up sound based on type
       if (p.type === 'shield' && sounds.powerupShield) {
@@ -61,10 +76,20 @@ export function updatePowerUps(dt, player, W, H) {
 
 export function drawPowerUps(ctx) {
   for (const p of powerUps) {
-    ctx.fillStyle = p.type === "shield" ? "cyan" : "gold";
-    ctx.fillRect(p.x, p.y, p.w, p.h);
+    ctx.save();
+    ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
+
+    if (powerUpImgs[p.type] && powerUpImgs[p.type].complete) {
+      ctx.drawImage(powerUpImgs[p.type], -p.w / 2, -p.h / 2, p.w, p.h);
+    } else {
+      ctx.fillStyle = p.type === "shield" ? "cyan" : "gold";
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    }
+
+    ctx.restore();
   }
 }
+
 
 
 export function resetPowerUps() {
