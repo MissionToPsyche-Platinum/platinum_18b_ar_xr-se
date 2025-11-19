@@ -145,8 +145,8 @@
       margin-bottom: 5px;
     }
     input[type=range] { width: 100%; }
-    #dirt, #error { margin-top: 10px; font-weight: bold; }
-    #dirt { color: #f9a000; }
+    #Regolith, #error { margin-top: 10px; font-weight: bold; }
+    #Regolith { color: #f9a000; }
     #error { color: #ffffff; }
     table {
       margin: 20px auto;
@@ -156,7 +156,7 @@
     }
     th, td { border: 1px solid #592651; padding: 8px; }
     th { background: rgba(89,38,81,0.2); }
-    #lastUpdated { margin-top: 15px; font-size: 14px; color: #aaaaaa; }
+    #lastUpdated { margin-top: 15px; font-size: 8px; color: #aaaaaa; }
     #funFact {
       margin-top: 16px;
       font-size: 16px;
@@ -218,7 +218,7 @@
   .slider-grid { grid-template-columns: 1fr; width: 100%; max-width: 350px; gap: 18px; }
   .slider-label span { font-size: 15px; }
   input[type="range"] { width: 100%; }
-  #dirt, #error { font-size: 15px; margin-top: 10px; }
+  #Regolith, #error { font-size: 15px; margin-top: 10px; }
   button { width: 80%; max-width: 300px; font-size: 16px; padding: 12px 18px; }
   table { width: 95%; font-size: 14px; }
   #funFact { font-size: 15px; margin: 15px auto; max-width: 90%; }
@@ -254,13 +254,13 @@
 
     <input type="file" id="imageInput" accept="image/*" capture="environment" style="display:none;">
 
-    <p style="color:#aaa;font-size:14px;">NASA Psyche Asteroid Visualization</p>
-    <p style="color:#f9a000;font-size:16px;margin-top:-5px;">Estimated Volume: ≈ 5,750,000 km<sup>3</sup></p>
+    <p style="color:#aaa;font-size:8px;">NASA Psyche Asteroid Illustration</p>
+   <!-- commented out display of asteroid volume. <p style="color:#f9a000;font-size:16px;margin-top:-5px;">Estimated Volume: ≈ 5,750,000 km<sup>3</sup></p> -->
 
     <h2 class="composition-header">Composition</h2>
     <div class="slider-grid" id="sliders"></div>
 
-    <p id="dirt">Dirt: 100%</p>
+    <p id="Regolith">Regolith: 100%</p>
     <p id="error"></p>
 
     <label style="color:#f9a000; margin-top:10px; display:block;">
@@ -314,7 +314,7 @@
 
   const DENSITY={
     gold:19300,silver:10490,platinum:21450,palladium:12000,
-    copper:8960,nickel:8900,aluminum:2700,lead:11340,dirt:3000
+    copper:8960,nickel:8900,aluminum:2700,lead:11340,Regolith:3000
   };
 
   const metalsList=[
@@ -414,7 +414,7 @@
 
     const e=document.getElementById("error"),
           b=document.getElementById("calcBtn"),
-          d=document.getElementById("dirt");
+          d=document.getElementById("Regolith");
 
     if(total>60){
       e.innerHTML="❌ Total metal composition exceeds 60%.<br>The Psyche Asteroid is thought to be 30–60% metal.";
@@ -424,7 +424,7 @@
       b.disabled=false;
     }
 
-    d.textContent=`Dirt: ${100-total}%`;
+    d.textContent=`Regolith: ${100-total}%`;
   }
 
   function updateOverlay(){
@@ -485,10 +485,10 @@
         totalMassKg+=massKg;
       });
 
-      const dirtPercent=
+      const RegolithPercent=
         Math.max(0,100-metalsList.reduce((a,m)=>a+parseInt(document.getElementById(`${m}-slider`).value),0));
 
-      totalMassKg+=VOLUME_M3*(dirtPercent/100)*DENSITY.dirt;
+      totalMassKg+=VOLUME_M3*(RegolithPercent/100)*DENSITY.Regolith;
 
       const totalLbs=totalMassKg*2.20462;
       const totalTroyOunces=lbsToTroyOunces(totalLbs);
@@ -521,8 +521,8 @@
         use1852
           ? "📜 Using Historical Metal Prices from 1852"
           : lastApiTime
-            ? `🕒 Last metal price update: ${lastApiTime.toLocaleString()}`
-            : `⚠️ Using fallback prices (no recent API data)`;
+            ? `Last metal price update: ${lastApiTime.toLocaleString()}`
+            : `Using fallback prices (no recent API data)`;
 
 /* -----------------------------------------
    FUN FACTS
