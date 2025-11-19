@@ -156,7 +156,7 @@
     }
     th, td { border: 1px solid #592651; padding: 8px; }
     th { background: rgba(89,38,81,0.2); }
-    #lastUpdated { margin-top: 15px; font-size: 14px; color: #aaaaaa; }
+    #lastUpdated { margin-top: 15px; font-size: 8px; color: #aaaaaa; }
     #funFact {
       margin-top: 16px;
       font-size: 16px;
@@ -521,8 +521,8 @@
         use1852
           ? "📜 Using Historical Metal Prices from 1852"
           : lastApiTime
-            ? `🕒 Last metal price update: ${lastApiTime.toLocaleString()}`
-            : `⚠️ Using fallback prices (no recent API data)`;
+            ? `Last metal price update: ${lastApiTime.toLocaleString()}`
+            : `Using fallback prices (no recent API data)`;
 
 /* -----------------------------------------
    FUN FACTS
