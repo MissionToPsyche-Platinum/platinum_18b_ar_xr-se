@@ -78,9 +78,61 @@
             font-size: 14px;
             z-index: 10;
         }
+
+        .view-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-family: sans-serif;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: rgba(100, 200, 255, 0.5);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(26px);
+        }
+
+        .toggle-label {
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
+<div class="view-toggle">
+    <span class="toggle-label">Normal View</span>
+    <div class="toggle-switch" id="viewToggle">
+        <div class="toggle-slider"></div>
+    </div>
+    <span class="toggle-label">To scale</span>
+</div>
 <div class="space">
     <div class="sun"></div>
     <div class="orbit">
@@ -96,7 +148,10 @@
     const slider = document.querySelector('#orbitSlider');
     const infoBox = document.querySelector('#infoBox');
     const container = document.getElementById('three-container');
+    const viewToggle = document.getElementById('viewToggle');
     const radius = 233; // Adjusted for larger container
+
+    let isToScale = false; // Start with normal view
 
     // Three.js setup
     const scene = new THREE.Scene();
@@ -130,11 +185,11 @@
     // Load GLTF model to replace cube
     const loader = new THREE.GLTFLoader();
     loader.load(
-        './models/psyche/scene.gltf',
+        './models/psyche/scene.glb',
         function(gltf) {
             const model = gltf.scene;
-            model.scale.set(10000, 10000, 10000); // Size of the sun
-            psycheModel = model;
+            model.scale.set(10000, 10000, 10000);
+            psycheModel = model; // Replace cube reference
             scene.add(model);
 
             // Set initial position based on slider
@@ -208,6 +263,26 @@
 
     // Initialize position
     updatePosition(0);
+
+    // Toggle between usable and realistic view
+    viewToggle.addEventListener('click', () => {
+        isToScale = !isToScale;
+        viewToggle.classList.toggle('active');
+
+        if (psycheModel) {
+            if (isToScale) {
+                // Realistic view - actual scale relative to sun
+                psycheModel.scale.set(1, 1, 1);
+            } else {
+                // Normal view - easier to see
+                psycheModel.scale.set(10, 10, 10);
+            }
+
+            // Re-render the scene
+            const currentAngle = parseFloat(slider.value);
+            updatePosition(currentAngle);
+        }
+    });
 </script>
 
 </body>
