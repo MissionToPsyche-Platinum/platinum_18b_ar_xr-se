@@ -3,79 +3,90 @@ body {
     background: radial-gradient(circle at center, #000010 0%, #000000 100%);
     overflow: hidden;
     height: 100vh;
+    font-family: sans-serif;
 }
 
 .space {
     position: relative;
     width: 100vw;
-    height: 90vh;
+    height: 80vh;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
+/* Sun scales with viewport */
 .sun {
     position: absolute;
-    width: 120px;
-    height: 120px;
+    width: clamp(80px, 10vmin, 140px);
+    height: clamp(80px, 10vmin, 140px);
     background: radial-gradient(circle, #ffec8b, #f4c542, #e69500);
     border-radius: 50%;
     box-shadow: 0 0 80px 30px rgba(255, 200, 50, 0.6);
     z-index: 1;
 }
 
+/* Orbit scales with viewport and stays centered */
 .orbit {
-    position: absolute;
-    width: 600px;
-    height: 600px;
+    position: relative;
+    width: min(70vmin, 90vw);
+    height: min(70vmin, 90vw);
     border: 1px dashed rgba(255, 255, 255, 0.2);
-    border-radius: 100%;
+    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 0;
 }
 
+/* Three.js canvas fills the orbit container */
 #three-container {
     position: absolute;
-    width: 1200px;
-    height: 1200px;
+    inset: 0;
+    margin: auto;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
     overflow: visible;
 }
 
+/* Info + controls */
+
 .controls {
     position: absolute;
-    bottom: 30px;
+    bottom: 20px;
     width: 100%;
     text-align: center;
     color: white;
-    font-family: sans-serif;
     z-index: 10;
+}
+
+.controls input[type="range"] {
+    width: min(80vw, 500px);
 }
 
 .info-box {
     position: absolute;
     bottom: 60px;
-    width: 300px;
     left: 50%;
     transform: translateX(-50%);
+    width: min(80vw, 360px);
     color: white;
-    font-family: sans-serif;
     background: rgba(255, 255, 255, 0.1);
-    padding: 10px;
+    padding: 10px 14px;
     border-radius: 5px;
     text-align: center;
     font-size: 14px;
     z-index: 10;
 }
 
+/* View toggle */
+
 .view-toggle {
     position: absolute;
     top: 20px;
     left: 20px;
     color: white;
-    font-family: sans-serif;
     z-index: 10;
     display: flex;
     align-items: center;
