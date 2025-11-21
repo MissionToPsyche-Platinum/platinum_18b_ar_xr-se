@@ -231,9 +231,10 @@
 <body>
   <div id="disclaimer" class="page active">
     <p>
-      Hey there! This activity is meant for fun and to spark imagination! 🌌<br><br>
-      The Psyche asteroid is not expected to be a viable source of precious metals — and if it was, these current market values would not make sense with the influx of metals.<br><br>
-      Please enjoy the activity as simply imaginative play!
+      Hey there! This activity is meant for fun and to spark imagination! <br><br>
+      NASA has sent a satellite to check out an asteroid called Psyche. The interesting thing about this asteroid is that it is mostly metal!<br><br>
+      There are no plans to to take metal from this asteroid, and current market values for metal wouldn't make sense on an asteroid made up of so much metal.<br><br>
+      Just for fun, use the sliders in this activity to learn what the "value" of the different metals would be if Psyche had different metal compositions.
     </p>
     <button id="continueBtn">Continue</button>
   </div>
@@ -417,7 +418,7 @@
           d=document.getElementById("Regolith");
 
     if(total>60){
-      e.innerHTML="❌ Total metal composition exceeds 60%.<br>The Psyche Asteroid is thought to be 30–60% metal.";
+      e.innerHTML="❌ Total metal composition exceeds 60%.<br>The Psyche Asteroid is thought to be up to 60% metal.<br>Please reduce your metal composition.";
       b.disabled=true;
     } else {
       e.textContent="";
