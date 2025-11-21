@@ -6,6 +6,50 @@
 
   <title>Psyche Asteroid Value Calculator</title>
 <style>
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 55px;
+  height: 28px;
+  vertical-align: middle;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.sliderRound {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0;
+  right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .3s;
+  border-radius: 34px;
+}
+
+.sliderRound:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+.switch input:checked + .sliderRound {
+  background-color: #f9a000;
+}
+
+.switch input:checked + .sliderRound:before {
+  transform: translateX(26px);
+}
 
     /* Smooth fade-out → fade-in animation for Fun Facts */
     #funFact {
@@ -232,7 +276,7 @@
   <div id="disclaimer" class="page active">
     <p>
       Hey there! This activity is meant for fun and to spark imagination! <br><br>
-      NASA has sent a satellite to check out an asteroid called Psyche. The interesting thing about this asteroid is that it is mostly metal!<br><br>
+      NASA has sent a satellite to check out an asteroid that was discovered in 1852, called Psyche. The interesting thing about this asteroid is that it is mostly metal!<br><br>
       There are no plans to to take metal from this asteroid, and current market values for metal wouldn't make sense on an asteroid made up of so much metal.<br><br>
       Just for fun, use the sliders in this activity to learn what the "value" of the different metals would be if Psyche had different metal compositions.
     </p>
@@ -282,8 +326,19 @@
     <tbody></tbody>
   </table>
 
-  <p id="lastUpdated"></p>
-  <p id="funFact"></p>
+ <p id="lastUpdated"></p>
+
+<!-- New Toggle Switch -->
+<div style="margin-top:15px;">
+  <label class="switch">
+    <input type="checkbox" id="resultsPriceToggle">
+    <span class="sliderRound"></span>
+  </label>
+  <span style="color:#f9a000;margin-left:10px;">Use 1852 Metal Prices</span>
+</div>
+
+<p id="funFact"></p>
+
 
   <!-- REPLACED BUTTONS -->
   <div>
@@ -657,6 +712,7 @@ document.getElementById("newFactBtn").onclick = () => {
   clearInterval(factInterval);
   factInterval = setInterval(nextFact, 8000);
 };
+syncPriceToggleToResults();
 
       resultsPage.classList.add("active");
       mainPage.classList.remove("active");
@@ -667,6 +723,8 @@ document.getElementById("newFactBtn").onclick = () => {
       console.error(e);
     }
   }
+const resultsToggle = document.getElementById("resultsPriceToggle");
+const mainToggle = document.getElementById("priceToggle");
 
   buildSliders();
   validateTotal();
@@ -682,6 +740,18 @@ document.getElementById("newFactBtn").onclick = () => {
     };
     reader.readAsDataURL(file);
   });
+
+
+// When results toggle flips → sync, then recalc instantly
+resultsToggle.addEventListener("change", () => {
+  mainToggle.checked = resultsToggle.checked;
+  calculate();
+});
+
+// When calculate() opens results page → sync toggle state
+function syncPriceToggleToResults() {
+  resultsToggle.checked = mainToggle.checked;
+}
 
 </script>
 
