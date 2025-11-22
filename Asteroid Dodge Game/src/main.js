@@ -164,7 +164,7 @@ function draw() {
   // background stars on all screens
   drawStars(ctx);
 
-  if (gameState === "start") {
+  if (gameState === "start" || (isMenuVisible && prevState === "start")) {
     ctx.fillStyle = "white";
     ctx.font = "48px sans-serif";
     ctx.textAlign = "center";
@@ -184,7 +184,7 @@ function draw() {
   drawPowerUps(ctx);
   player.draw(ctx);
 
-  if (gameState === "playing") {
+  if (gameState === "playing" || (isMenuVisible && prevState === "playing")) {
     // in-game HUD
     ctx.fillStyle = "white";
     ctx.font = "24px monospace";
@@ -204,7 +204,7 @@ function draw() {
     }
   }
 
-  if (gameState === "gameover") {
+  if (gameState === "gameover" || (isMenuVisible && prevState === "gameover")) {
     // blackout overlay
     ctx.fillStyle = "rgba(0,0,0,0.85)";
     ctx.fillRect(0, 0, W, H);
