@@ -6,6 +6,13 @@
     const hudShots = document.getElementById("shots");
     const msg = document.getElementById("msg");
 
+    const shipImg = new Image();
+    shipImg.src = "ship.png";
+    const marsImg = new Image();
+    marsImg.src = "mars.png";
+    const psycheImg = new Image();
+    psycheImg.src = "asteroid.png";
+
     const gravityWell = {
         x: 0,
         y: 0,
@@ -29,7 +36,9 @@
         vx: 0,
         vy: 0,
         r: 12,
-        angle: 0
+        angle: 0,
+        width: 60,
+        height: 90
     };
 
     const asteroid = {
@@ -87,14 +96,24 @@
     function drawShip() {
         ctx.save();
         ctx.translate(ship.x, ship.y);
-        ctx.rotate(ship.angle);
-        ctx.beginPath();
-        ctx.moveTo(ship.r, 0);
-        ctx.lineTo(-ship.r * 0.8, ship.r * 0.6);
-        ctx.lineTo(-ship.r * 0.8, -ship.r * 0.6);
-        ctx.closePath();
-        ctx.fillStyle = "#00ffff";
-        ctx.fill();
+        ctx.rotate(ship.angle + Math.PI / 2);
+        if (shipImg.complete && shipImg.naturalWidth > 0) {
+            ctx.drawImage(
+                shipImg,
+                -ship.width / 2,
+                -ship.height / 2,
+                ship.width,
+                ship.height
+            );
+        } else {
+            ctx.beginPath();
+            ctx.moveTo(ship.r, 0);
+            ctx.lineTo(-ship.r * 0.8, ship.r * 0.6);
+            ctx.lineTo(-ship.r * 0.8, -ship.r * 0.6);
+            ctx.closePath();
+            ctx.fillStyle = "#00ffff";
+            ctx.fill();
+        }
         if (charging) {
             const glow = ctx.createRadialGradient(-ship.r, 0, 0, -ship.r, 0, 20);
             glow.addColorStop(0, "#ff6600cc");
@@ -109,37 +128,57 @@
 
     function drawAsteroid() {
         ctx.save();
-        const grad = ctx.createRadialGradient(
-            asteroid.x - 10, asteroid.y - 10, asteroid.r * 0.2,
-            asteroid.x, asteroid.y, asteroid.r
-        );
-        grad.addColorStop(0, "#555");
-        grad.addColorStop(1, "#222");
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(asteroid.x, asteroid.y, asteroid.r, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = "#888";
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        const size = asteroid.r * 2;
+        if (psycheImg.complete && psycheImg.naturalWidth > 0) {
+            ctx.translate(asteroid.x, asteroid.y);
+            ctx.drawImage(psycheImg, -size / 2, -size / 2, size, size);
+        } else {
+            const grad = ctx.createRadialGradient(
+                asteroid.x - 10,
+                asteroid.y - 10,
+                asteroid.r * 0.2,
+                asteroid.x,
+                asteroid.y,
+                asteroid.r
+            );
+            grad.addColorStop(0, "#555");
+            grad.addColorStop(1, "#222");
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(asteroid.x, asteroid.y, asteroid.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = "#888";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
         ctx.restore();
     }
 
     function drawGravityWell() {
         ctx.save();
-        const g = ctx.createRadialGradient(
-            gravityWell.x - 6, gravityWell.y - 6, 6,
-            gravityWell.x, gravityWell.y, gravityWell.r
-        );
-        g.addColorStop(0, "#ffe680");
-        g.addColorStop(1, "#b38f00");
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(gravityWell.x, gravityWell.y, gravityWell.r, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = "#ffd24d";
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        const size = gravityWell.r * 2;
+        if (marsImg.complete && marsImg.naturalWidth > 0) {
+            ctx.translate(gravityWell.x, gravityWell.y);
+            ctx.drawImage(marsImg, -size / 2, -size / 2, size, size);
+        } else {
+            const g = ctx.createRadialGradient(
+                gravityWell.x - 6,
+                gravityWell.y - 6,
+                6,
+                gravityWell.x,
+                gravityWell.y,
+                gravityWell.r
+            );
+            g.addColorStop(0, "#ffe680");
+            g.addColorStop(1, "#b38f00");
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(gravityWell.x, gravityWell.y, gravityWell.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = "#ffd24d";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
         ctx.restore();
     }
 
@@ -210,7 +249,8 @@
                 const slow = FRICTION * dt * speed;
                 const newSpeed = Math.max(0, speed - slow);
                 const s = newSpeed / speed;
-                ship.vx *= s; ship.vy *= s;
+                ship.vx *= s;
+                ship.vy *= s;
             }
             if (
                 ship.x - ship.r <= 0 ||
