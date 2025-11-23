@@ -59,6 +59,10 @@
     const FRICTION = 0.0;
     const STOP_EPS = 0.05;
 
+    function isShipMoving() {
+        return Math.hypot(ship.vx, ship.vy) > STOP_EPS;
+    }
+
     function placeStart() {
         ship.x = 200;
         ship.y = canvas.height / 2;
@@ -70,7 +74,7 @@
 
     canvas.addEventListener("mousedown", () => {
         if (won || lost) return;
-        if (Math.hypot(ship.vx, ship.vy) > 0.1) return;
+        if (isShipMoving()) return; // no new shot while in flight
         charging = true;
         power = 0;
     });
@@ -87,6 +91,8 @@
     });
 
     canvas.addEventListener("mousemove", (e) => {
+        if (won || lost) return;
+        if (isShipMoving()) return; // while moving, player cannot aim
         const rect = canvas.getBoundingClientRect();
         const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
         const my = (e.clientY - rect.top) * (canvas.height / rect.height);
@@ -234,14 +240,13 @@
             power = Math.min(MAX_POWER, power + POWER_RATE * (dt / 1000));
         }
         hudPower.textContent = Math.round(power * 100) + "%";
-        const deg = ((ship.angle * 180) / Math.PI + 360) % 360;
-        hudAngle.textContent = Math.round(deg) + "°";
 
-        if (!won && !lost && (ship.vx !== 0 || ship.vy !== 0)) {
+        if (!won && !lost && isShipMoving()) {
             applyGravity(dt);
             const dtSec = dt / 1000;
             ship.x += ship.vx * dtSec;
             ship.y += ship.vy * dtSec;
+
             const speed = Math.hypot(ship.vx, ship.vy);
             if (speed <= STOP_EPS) {
                 ship.vx = ship.vy = 0;
@@ -252,6 +257,12 @@
                 ship.vx *= s;
                 ship.vy *= s;
             }
+
+            // While in motion, ship aims in direction of travel
+            if (isShipMoving()) {
+                ship.angle = Math.atan2(ship.vy, ship.vx);
+            }
+
             if (
                 ship.x - ship.r <= 0 ||
                 ship.x + ship.r >= canvas.width ||
@@ -267,8 +278,12 @@
         const d = Math.hypot(ship.x - asteroid.x, ship.y - asteroid.y);
         if (!won && !lost && d < asteroid.r - ship.r / 2) {
             won = true;
+            ship.vx = ship.vy = 0;
             msg.innerHTML = `🚀 Direct hit in ${shots} ${shots === 1 ? "shot" : "shots"}!<br><small>Press [Space] to reset.</small>`;
         }
+
+        const deg = ((ship.angle * 180) / Math.PI + 360) % 360;
+        hudAngle.textContent = Math.round(deg) + "°";
     }
 
     function drawTrajectoryPreview() {
