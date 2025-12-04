@@ -1,5 +1,8 @@
+import { activePowerUps } from './powerups.js'; 
+
 // effects.js
 export const effects = {
+powerGlows: [],
   explosions: [],
   flashAlpha: 0,
   shakeTimer: 0,
@@ -29,6 +32,9 @@ export const effects = {
   },
 
   update(dt) {
+  // existing explosion, flash, shake logic…
+  this.updatePowerGlows(dt);
+
     // Update explosions
     this.explosions.forEach(p => {
       p.x += p.vx * dt;
@@ -49,6 +55,27 @@ export const effects = {
       if (this.shakeTimer < 0) this.shakeTimer = 0;
     }
   },
+  
+  triggerPowerGlow(type, player) {
+  // Creates a quick pulse around player when a power-up is collected
+  const color = type === "shield" ? "rgba(0,255,255,0.8)" : "rgba(255,215,0,0.8)";
+  this.powerGlows.push({
+    x: player.x + player.w / 2,
+    y: player.y + player.h / 2,
+    r: player.w,
+    color,
+    life: 0.6
+  });
+},
+
+  updatePowerGlows(dt) {
+    this.powerGlows.forEach(g => {
+      g.r += 60 * dt;   // expand
+      g.life -= dt;     // fade
+    });
+    this.powerGlows = this.powerGlows.filter(g => g.life > 0);
+  },
+
 
   draw(ctx, W, H) {
     ctx.save();
@@ -70,12 +97,27 @@ export const effects = {
       ctx.globalAlpha = 1;
     });
 
-    ctx.restore();
+      if (activePowerUps.shield && this.playerRef) {
+  const p = this.playerRef;
+  const time = Date.now() * 0.005;
+  const pulse = 0.8 + Math.sin(time) * 0.2;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(p.x + p.w / 2, p.y + p.h / 2, p.w * 1.1, 0, Math.PI * 2);
+  ctx.strokeStyle = `rgba(0, 255, 255, ${pulse})`; // cyan glow
+  ctx.lineWidth = 4;
+  ctx.shadowBlur = 15;
+  ctx.shadowColor = "cyan";
+  ctx.stroke();
+  ctx.restore();
+}
 
     // white flash overlay
     if (this.flashAlpha > 0) {
       ctx.fillStyle = `rgba(255,255,255,${this.flashAlpha})`;
       ctx.fillRect(0, 0, W, H);
     }
+    
   }
 };

@@ -9,9 +9,13 @@ import { effects } from './effects.js';
 export let gameState = "start";
 
 
+
+
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 let gameOverFade = 0;
+effects.playerRef = player;
+
 
 //fit to screen for mobile/web
 function resizeCanvas() {
@@ -30,6 +34,15 @@ window.addEventListener('resize', () => {
   W = canvas.width;
   H = canvas.height;
 });
+
+// --- Load Asteroid Images ---
+const asteroidImgs = [];
+for (let i = 1; i <= 3; i++) {
+  const img = new Image();
+  img.src = `assets/asteroids/asteroid${i}.png`;
+  asteroidImgs.push(img);
+}
+
 
 
 // --- Input (keyboard) ---
