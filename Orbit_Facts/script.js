@@ -44,21 +44,23 @@ scene.add(sideLight);
 function initThreeSize() {
     // Measure the dashed orbit element itself
     const orbitElem = document.querySelector('.orbit');
-    const rect = orbitElem.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
+    const orbitRect = orbitElem.getBoundingClientRect();
+    const width = orbitRect.width;
+    const height = orbitRect.height;
 
     // Match the renderer to the orbit circle
     renderer.setSize(width, height);
     renderer.setPixelRatio(window.devicePixelRatio || 1);
 
+    const padding = 150;
+
     // Create or update an orthographic camera that matches the orbit dimensions
     if (!camera) {
         camera = new THREE.OrthographicCamera(
-            width / -2,
-            width / 2,
-            height / 2,
-            height / -2,
+            width / -2 - padding,
+            width / 2 + padding,
+            height / 2 + padding,
+            height / -2 - padding,
             0.1,
             2000
         );
@@ -72,9 +74,15 @@ function initThreeSize() {
         camera.updateProjectionMatrix();
     }
 
-    // Radius right on the dashed circle (minus a tiny margin if needed)
-    const circleRadius = Math.min(width, height) / 2;
-    const margin = 2; // adjust to taste
+    // Inner dashed circle: used for actual orbit radius
+    const circleElem = document.querySelector('.orbit-circle');
+    const circleRect = circleElem.getBoundingClientRect();
+    const circleWidth = circleRect.width;
+    const circleHeight = circleRect.height;
+
+    const circleRadius = Math.min(circleWidth, circleHeight) / 1.32 ;
+
+    const margin = 0; // start with 0; adjust by a few px if needed
     radius = circleRadius - margin;
 }
 
@@ -173,10 +181,10 @@ viewToggle.addEventListener('click', () => {
     if (psycheModel) {
         if (isRealisticView) {
             // "Realistic" (exaggerated) view for demonstration
-            psycheModel.scale.set(15, 15, 15);
+            psycheModel.scale.set(1, 1, 1);
         } else {
             // Normal view - easier to see
-            psycheModel.scale.set(5, 5, 5);
+            psycheModel.scale.set(8, 8, 8);
         }
 
         const currentAngle = parseFloat(slider.value);

@@ -31,12 +31,19 @@ body {
     position: relative;
     width: min(70vmin, 90vw);
     height: min(70vmin, 90vw);
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 0;
+}
+
+.orbit-circle {
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    pointer-events: none;
 }
 
 /* Three.js canvas fills the orbit container */
@@ -51,7 +58,6 @@ body {
 }
 
 /* Info + controls */
-
 .controls {
     position: absolute;
     bottom: 20px;
@@ -81,7 +87,6 @@ body {
 }
 
 /* View toggle */
-
 .view-toggle {
     position: absolute;
     top: 20px;
