@@ -31,17 +31,11 @@ player.init(W, H);
 
 // Keep updated when window resizes
 window.addEventListener('resize', () => {
+  resizeCanvas();
   W = canvas.width;
   H = canvas.height;
 });
 
-// --- Load Asteroid Images ---
-const asteroidImgs = [];
-for (let i = 1; i <= 3; i++) {
-  const img = new Image();
-  img.src = `assets/asteroids/asteroid${i}.png`;
-  asteroidImgs.push(img);
-}
 
 
 
@@ -102,6 +96,7 @@ function startGame() {
   difficulty = 1;
   resetAsteroids();
   resetPowerUps();
+  effects.reset();
  
   // reset player position each run
   player.x = W / 2 - player.w / 2;

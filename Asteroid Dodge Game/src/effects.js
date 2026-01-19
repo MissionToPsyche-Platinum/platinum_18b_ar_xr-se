@@ -118,6 +118,14 @@ powerGlows: [],
       ctx.fillStyle = `rgba(255,255,255,${this.flashAlpha})`;
       ctx.fillRect(0, 0, W, H);
     }
-    
-  }
+  ctx.restore();  
+  },
+
+  reset() {
+  this.powerGlows = [];
+  this.explosions = [];
+  this.flashAlpha = 0;
+  this.shakeTimer = 0;
+}
+
 };
