@@ -1,5 +1,3 @@
-// src/constants.js
-
 export const CONSTANTS = {
   ASTEROIDS: {
     SPAWN_INTERVAL: 0.8,
