@@ -1,14 +1,18 @@
+import { CONSTANTS } from "./constants.js";
+
 // player.js
 export const player = {
-  w: 40,
-  h: 40,
+  w: CONSTANTS.PLAYER.WIDTH,
+  h: CONSTANTS.PLAYER.HEIGHT,
   x: 0,
   y: 0,
-  speed: 300,
+  speed: CONSTANTS.PLAYER.SPEED,
+
 
   init(W, H) {
     this.x = W / 2 - this.w / 2;
-    this.y = H - this.h - 20;
+    this.y = H - this.h - CONSTANTS.PLAYER.BOTTOM_PADDING;
+
 
     // Loads the space shuttle pic
     this.sprite = new Image();
