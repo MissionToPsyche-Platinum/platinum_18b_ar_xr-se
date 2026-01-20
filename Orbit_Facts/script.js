@@ -4,7 +4,7 @@ const container = document.getElementById('three-container');
 const viewToggle = document.getElementById('viewToggle');
 
 let radius = 0;           // Will be set based on container size
-let isRealisticView = false; // Start with normal view
+let isRealisticView = false; // Start with To Scale view
 
 // Three.js setup
 const scene = new THREE.Scene();
@@ -183,7 +183,7 @@ viewToggle.addEventListener('click', () => {
             // "Realistic" (exaggerated) view for demonstration
             psycheModel.scale.set(1, 1, 1);
         } else {
-            // Normal view - easier to see
+            // To Scale view - easier to see
             psycheModel.scale.set(8, 8, 8);
         }
 
