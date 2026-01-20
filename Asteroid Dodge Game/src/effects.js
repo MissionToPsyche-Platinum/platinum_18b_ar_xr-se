@@ -1,16 +1,18 @@
-import { activePowerUps } from './powerups.js'; 
-
 // effects.js
+import { activePowerUps } from './powerups.js';
+import { CONSTANTS } from "./constants.js";
+const { EFFECTS } = CONSTANTS;
+
 export const effects = {
 powerGlows: [],
   explosions: [],
   flashAlpha: 0,
   shakeTimer: 0,
-  shakeIntensity: 6,
+  shakeIntensity: EFFECTS.SHAKE_INTENSITY,
 
   // --- Explosion setup ---
   triggerExplosion(x, y) {
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < EFFECTS.EXPLOSION_PARTICLES; i++) {
       this.explosions.push({
         x,
         y,
@@ -18,17 +20,17 @@ powerGlows: [],
         color: `hsl(${Math.random() * 30}, 100%, 60%)`, // orange/yellow tone
         vx: (Math.random() - 0.5) * 250,
         vy: (Math.random() - 0.5) * 250,
-        life: 1.2 + Math.random() * 0.5
+        life: EFFECTS.EXPLOSION_LIFE_MIN + Math.random() * EFFECTS.EXPLOSION_LIFE_VARIANCE
       });
     }
   },
 
   triggerFlash() {
-    this.flashAlpha = 1;
-  },
+  this.flashAlpha = 1;
+},
 
   triggerShake() {
-    this.shakeTimer = 0.6; // 0.6 seconds of shake
+    this.shakeTimer = EFFECTS.SHAKE_DURATION;
   },
 
   update(dt) {
@@ -64,13 +66,13 @@ powerGlows: [],
     y: player.y + player.h / 2,
     r: player.w,
     color,
-    life: 0.6
+    life: EFFECTS.POWER_GLOW_LIFE
   });
 },
 
   updatePowerGlows(dt) {
     this.powerGlows.forEach(g => {
-      g.r += 60 * dt;   // expand
+      g.r += EFFECTS.POWER_GLOW_EXPAND_SPEED * dt;   // expand
       g.life -= dt;     // fade
     });
     this.powerGlows = this.powerGlows.filter(g => g.life > 0);
@@ -118,6 +120,14 @@ powerGlows: [],
       ctx.fillStyle = `rgba(255,255,255,${this.flashAlpha})`;
       ctx.fillRect(0, 0, W, H);
     }
-    
-  }
+  ctx.restore();  
+  },
+
+  reset() {
+  this.powerGlows = [];
+  this.explosions = [];
+  this.flashAlpha = 0;
+  this.shakeTimer = 0;
+}
+
 };

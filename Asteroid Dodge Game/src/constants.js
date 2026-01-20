@@ -1,0 +1,54 @@
+export const CONSTANTS = {
+  PLAYER: {
+    WIDTH: 40,
+    HEIGHT: 40,
+    SPEED: 300,
+    BOTTOM_PADDING: 20,     
+    GAME_BOTTOM_OFFSET: 60  
+  },
+
+  ASTEROIDS: {
+    SPAWN_INTERVAL: 0.8,
+    SIZE: 40,
+    BASE_SPEED: 100,
+    SPEED_VARIANCE: 150,
+    ROT_SPEED_VARIANCE: 0.05
+  },
+
+  POWERUPS: {
+    SPAWN_INTERVAL: 10,
+    DURATION: 5,
+    SIZE: 30,
+    BASE_SPEED: 100,
+    SPEED_VARIANCE: 50
+  },
+
+  STARS: {
+    COUNT: 300,
+    SPEED_FACTOR: 0.8
+  },
+
+  EFFECTS: {
+    EXPLOSION_PARTICLES: 25,
+    EXPLOSION_LIFE_MIN: 1.2,
+    EXPLOSION_LIFE_VARIANCE: 0.5,
+    FLASH_FADE_MULTIPLIER: 1.2,
+    SHAKE_DURATION: 0.6,
+    SHAKE_INTENSITY: 6,
+    POWER_GLOW_LIFE: 0.6,
+    POWER_GLOW_EXPAND_SPEED: 60
+  },
+
+  SCORING: {
+    DIFFICULTY_RAMP_TIME: 10,
+    DIFFICULTY_CAP: 4,
+    SCORE_BOOST_MULTIPLIER: 2
+  },
+
+  UI: {
+    HUD_FONT: "24px monospace",
+    GAMEOVER_TITLE_FONT: "bold 60px sans-serif",
+    GAMEOVER_STATS_FONT: "28px monospace",
+    GAMEOVER_HINT_FONT: "22px sans-serif"
+  }
+};

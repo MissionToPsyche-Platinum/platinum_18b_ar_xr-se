@@ -2,13 +2,14 @@
 import { isColliding } from './utils.js';
 import { sounds } from './audio.js';
 import { effects } from './effects.js';
+import { CONSTANTS } from "./constants.js";
 
-
-
+const { POWERUPS } = CONSTANTS;
 export const powerUps = [];
-const powerUpInterval = 10;
+const powerUpInterval = POWERUPS.SPAWN_INTERVAL;
 let powerUpTimer = 0;
-const powerUpDuration = 5;
+const powerUpDuration = POWERUPS.DURATION;
+
 
 // Load Power-Up Images
 const powerUpImgs = {
@@ -27,14 +28,15 @@ export function updatePowerUps(dt, player, W, H) {
   if (powerUpTimer > powerUpInterval) {
     powerUpTimer = 0;
     const type = Math.random() < 0.5 ? 'shield' : 'scoreBoost';
-    powerUps.push({
+   powerUps.push({
       type,
-      w: 30,
-      h: 30,
-      x: Math.random() * (W - 30),   // ← use W
-      y: -30,
-      speed: 100 + Math.random() * 50
+      w: POWERUPS.SIZE,
+      h: POWERUPS.SIZE,
+      x: Math.random() * (W - POWERUPS.SIZE),
+      y: -POWERUPS.SIZE,
+      speed: POWERUPS.BASE_SPEED + Math.random() * POWERUPS.SPEED_VARIANCE
     });
+
   }
 
 
