@@ -1,7 +1,11 @@
 // stars.js
+import { CONSTANTS } from "./constants.js";
+const { STARS } = CONSTANTS;
+
 export let stars = [];
-const numStars = 300;
-const speed = 0.8;
+const numStars = STARS.COUNT;
+const speed = STARS.SPEED_FACTOR;
+
 
 export function initStars(canvas) {
   stars = [];
