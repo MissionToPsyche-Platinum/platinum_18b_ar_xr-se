@@ -6,10 +6,10 @@ import { updatePowerUps, drawPowerUps, activePowerUps, resetPowerUps } from './p
 import { initStars, updateStars, drawStars } from './stars.js';
 import { startMenu } from './start.js';
 import { effects } from './effects.js';
+import { CONSTANTS } from "./constants.js";
 export let gameState = "start";
 
-
-
+const { SCORING, UI, PLAYER } = CONSTANTS;
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -100,7 +100,7 @@ function startGame() {
  
   // reset player position each run
   player.x = W / 2 - player.w / 2;
-  player.y = H - 60;
+  player.y = H - PLAYER.GAME_BOTTOM_OFFSET;
 
   sounds.start.currentTime = 0;
   sounds.start.play();
@@ -137,8 +137,8 @@ function update(dt) {
   // world + score
   updateStars(canvas);
   elapsedTime += dt;
-  score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? 2 : 1));
-  difficulty = 1 + Math.min(elapsedTime / 10, 4);
+  score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? SCORING.SCORE_BOOST_MULTIPLIER : 1));
+  difficulty = 1 + Math.min(elapsedTime / SCORING.DIFFICULTY_RAMP_TIME, SCORING.DIFFICULTY_CAP);
 
   // player movement
   player.update(dt, keys, W);
@@ -190,7 +190,7 @@ function draw() {
   if (gameState === "playing") {
     // in-game HUD
     ctx.fillStyle = "white";
-    ctx.font = "24px monospace";
+    ctx.font = UI.HUD_FONT;
     ctx.textAlign = "left";
     ctx.fillText(`Score: ${score}`, 20, 40);
 
@@ -215,18 +215,19 @@ function draw() {
     ctx.fillStyle = "rgba(0,0,0,0.85)";
     ctx.fillRect(0, 0, W, H);
     ctx.textAlign = "center";
-    ctx.font = "bold 60px sans-serif";
+    
+    ctx.font = UI.GAMEOVER_TITLE_FONT;   
     ctx.fillStyle = "red";
     ctx.fillText("GAME OVER", W / 2, H / 2 - 80);
 
-    ctx.font = "28px monospace";
+    ctx.font = UI.GAMEOVER_STATS_FONT;         
     ctx.fillStyle = "gold";
     ctx.fillText(`🏆 High Score: ${highScore}`, W / 2, H / 2);
 
     ctx.fillStyle = "white";
     ctx.fillText(`💫 Your Score: ${score}`, W / 2, H / 2 + 40);
 
-    ctx.font = "22px sans-serif";
+    ctx.font = UI.GAMEOVER_HINT_FONT;        
     ctx.fillStyle = "lightgray";
     ctx.fillText("Tap to Restart", W / 2, H / 2 + 100);
   }
