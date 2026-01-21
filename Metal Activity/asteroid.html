@@ -508,7 +508,7 @@
           return cacheData.metals;
         }
       }
-      const r=await fetch(`${BASE_URL}?api_key=${API_KEY}&currency=USD`);
+      const r = await fetch(`${BASE_URL}?api_key=${API_KEY}&currency=USD&unit=toz`);
       const d=await r.json();
       if(!d.metals) throw new Error("Invalid API response");
       lastApiTime=new Date();
