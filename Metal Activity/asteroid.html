@@ -589,44 +589,41 @@ const EARTH_CIRCUM_M = 40075e3;
 const WIRE_RADIUS = 0.005;
 const WIRE_AREA = Math.PI * WIRE_RADIUS * WIRE_RADIUS;
 
-const wireParts = [];
+// Sum total selected metal volume (based on sliders)
+let totalMetalVolM3 = 0;
 metalsList.forEach(m => {
-  const pct = parseInt(document.getElementById(`${m}-slider`).value);
-  if (pct > 0) {
-    const volM3 = VOLUME_M3 * (pct / 100);
-    const length = volM3 / WIRE_AREA;
-    const wraps = Math.floor(length / EARTH_CIRCUM_M);
-    wireParts.push(`enough ${m} wire to wrap around Earth ${formatLarge(wraps)} times`);
-  }
+  const pct = parseInt(document.getElementById(`${m}-slider`).value, 10) || 0;
+  if (pct > 0) totalMetalVolM3 += VOLUME_M3 * (pct / 100);
 });
 
-let wireSentence =
-  wireParts.length === 1 ? wireParts[0] :
-  wireParts.length === 2 ? wireParts.join(" and ") :
-  wireParts.slice(0, -1).join(", ") + ", and " + wireParts.at(-1);
+// Convert total volume -> wire length -> wraps around Earth
+const totalWireLengthM = totalMetalVolM3 / WIRE_AREA;
+const wraps = Math.floor(totalWireLengthM / EARTH_CIRCUM_M);
 
-const wireFact = `💡 Fun fact: That’s ${wireSentence}!`;
+const wireFact = `That’s enough metal wire to wrap around Earth ${formatLarge(wraps)} times!`;
+
 
 const ARMOR_VOLUME_M3 = 0.1;
 const suits = highestMetalVol / ARMOR_VOLUME_M3;
 
 const armorFact =
-  `💡 Fun fact: Enough ${highestMetal} to outfit ${formatLarge(Math.floor(suits))} knights in armor!`;
+  `That's enough ${highestMetal} to outfit ${formatLarge(Math.floor(suits))} knights in armor!`;
 
 let funFacts = [
-  `💡 Enough $100 bills (by volume) to fill ${formatLarge(pools)} Olympic pools!`,
-  `💡 Stacked $100 bills would reach ${formatLarge(totalHeightMiles.toFixed(2))} miles high!`,
-  `💡 Enough ${highestMetal} to pave ${formatLarge(blocks)} city blocks!`,
+  `That would earn enough $100 bills to fill ${formatLarge(pools)} Olympic swimming pools!`,
+  `Stacked up as $100 bills, that would reach ${formatLarge(totalHeightMiles.toFixed(2))} miles high!`,
+  `That's enough ${highestMetal} to pave ${formatLarge(blocks)} city blocks!`,
   wireFact,
   armorFact
 ];
 
 let zeroCompositionFacts = [
-  "💡 Psyche orbits between Mars and Jupiter.",
-  "💡 The Psyche spacecraft is about the size of a tennis court.",
-  "💡 It will take ~6 years to reach the asteroid Psyche.",
-  "💡 Psyche is named after the Greek goddess of the soul.",
-  "💡 Psyche was discovered in 1852 by Annibale de Gasparis."
+  "Psyche orbits between Mars and Jupiter.",
+  "The Psyche spacecraft is about the size of a tennis court.",
+  "It will take roughly 6 years for the spacecraft NASA launched to reach Psyche.",
+  "Psyche is named after the Greek goddess of the soul.",
+  "Psyche was discovered in 1852 by Annibale de Gasparis.",
+  "The satellite that was sent to Psyche will use Mars as a gravitational push to accelerate."
 ];
 
 const allZero = metalsList.every(m => {
