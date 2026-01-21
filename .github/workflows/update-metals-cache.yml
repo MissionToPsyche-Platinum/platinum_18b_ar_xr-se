@@ -1,0 +1,37 @@
+name: Update metals cache (monthly)
+
+on:
+  schedule:
+    - cron: "50 20 21 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update-gh-pages-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Update cachedMetals.json in gh-pages
+        env:
+          METALS_API_KEY: ${{ secrets.METALS_API_KEY }}
+        run: node scripts/update-metals-cache.mjs
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add cachedMetals.json
+          git diff --staged --quiet && echo "No changes" && exit 0
+          git commit -m "Update metals cache (monthly)"
+          git push
