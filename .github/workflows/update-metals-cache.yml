@@ -2,7 +2,7 @@ name: Update metals cache (monthly)
 
 on:
   schedule:
-    - cron: "50 20 21 * *"
+    - cron: "01 21 21 * *"
   workflow_dispatch: {}
 
 permissions:
