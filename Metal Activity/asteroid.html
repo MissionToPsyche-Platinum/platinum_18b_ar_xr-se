@@ -367,6 +367,7 @@
   const BASE_URL="https://api.metals.dev/v1/latest";
 
   const VOLUME_M3=5.75e15;
+  const BULK_DENSITY_KG_M3 = 3500;
 
   const DENSITY={
     gold:19300,silver:10490,platinum:21450,palladium:12000,
@@ -521,65 +522,54 @@
     }
   }
 
-  async function calculate(){
-    try{
-      const use1852=document.getElementById("priceToggle").checked;
-      const rates=use1852 ? HISTORIC_1852_PRICES : await getRates();
+  async function calculate() {
+  try {
+    const use1852 = document.getElementById("priceToggle").checked;
+    const rates = use1852 ? HISTORIC_1852_PRICES : await getRates();
 
-      const tbody=document.querySelector("#resultsTable tbody");
-      tbody.innerHTML="";
+    const tbody = document.querySelector("#resultsTable tbody");
+    tbody.innerHTML = "";
 
-      let totalValue=0,totalMassKg=0;
-      const metalMasses={};
+    // Total asteroid mass from volume * bulk density (simple & consistent)
+    const totalMassKg = VOLUME_M3 * BULK_DENSITY_KG_M3;
+    const totalLbs = totalMassKg * 2.20462;
+    const totalTroyOunces = lbsToTroyOunces(totalLbs);
 
-      metalsList.forEach(m=>{
-        const percent=parseInt(document.getElementById(`${m}-slider`).value);
-        const volFrac=percent/100;
-        const volM3=VOLUME_M3*volFrac;
-        const massKg=volM3*DENSITY[m];
-        metalMasses[m]=massKg;
-        totalMassKg+=massKg;
-      });
+    let totalValue = 0;
 
-      const RegolithPercent=
-        Math.max(0,100-metalsList.reduce((a,m)=>a+parseInt(document.getElementById(`${m}-slider`).value),0));
+    metalsList.forEach(m => {
+      const percent = parseInt(document.getElementById(`${m}-slider`).value, 10);
+      const rate = rates[m];
 
-      totalMassKg+=VOLUME_M3*(RegolithPercent/100)*DENSITY.Regolith;
+      if (percent > 0 && typeof rate === "number" && isFinite(rate)) {
+        const frac = percent / 100;
+        const metalOunces = totalTroyOunces * frac;
+        const value = metalOunces * rate;
 
-      const totalLbs=totalMassKg*2.20462;
-      const totalTroyOunces=lbsToTroyOunces(totalLbs);
+        totalValue += value;
 
-      metalsList.forEach(m=>{
-        const percent=parseInt(document.getElementById(`${m}-slider`).value);
-        if(percent>0 && rates[m]){
-          const frac=metalMasses[m]/totalMassKg;
-          const metalOunces=totalTroyOunces*frac;
-          const rate=rates[m];
-          const value=metalOunces*rate;
-          totalValue+=value;
-          tbody.innerHTML+=
-            `<tr>
-              <td>${m.charAt(0).toUpperCase()+m.slice(1)}</td>
-              <td>${percent}%</td>
-              <td>$${rate.toFixed(2)}</td>
-              <td>$${formatLarge(value)}</td>
-            </tr>`;
-        }
-      });
+        tbody.innerHTML += `
+          <tr>
+            <td>${m.charAt(0).toUpperCase() + m.slice(1)}</td>
+            <td>${percent}%</td>
+            <td>$${rate.toFixed(2)}</td>
+            <td>$${formatLarge(value)}</td>
+          </tr>`;
+      }
+    });
 
-      tbody.innerHTML+=
-        `<tr style="font-weight:bold;background:#222;">
-          <td colspan="3">TOTAL</td>
-          <td>$${formatLarge(totalValue)}</td>
-        </tr>`;
+    tbody.innerHTML += `
+      <tr style="font-weight:bold;background:#222;">
+        <td colspan="3">TOTAL</td>
+        <td>$${formatLarge(totalValue)}</td>
+      </tr>`;
 
-      document.getElementById("lastUpdated").textContent =
-        use1852
-          ? "📜 Using Historical Metal Prices from 1852"
-          : lastApiTime
-            ? `Last metal price update: ${lastApiTime.toLocaleString()}`
-            : `Using fallback prices (no recent API data)`;
-
+    document.getElementById("lastUpdated").textContent =
+      use1852
+        ? "📜 Using Historical Metal Prices from 1852"
+        : lastApiTime
+          ? `Last metal price update: ${lastApiTime.toLocaleString()}`
+          : `Using fallback prices (no recent API data)`;
 /* -----------------------------------------
    FUN FACTS
 ----------------------------------------- */
