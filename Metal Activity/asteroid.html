@@ -494,33 +494,25 @@
 
   let lastApiTime=null;
 
-  async function getRates(){
-    const CACHE_FILE="cachedMetals.json";
-    const CACHE_DURATION_MS=2*24*60*60*1000;
+async function getRates(){
+  try{
+    const cacheResp = await fetch("cachedMetals.json", { cache: "no-store" });
+    if(!cacheResp.ok) throw new Error("cache missing");
+    const cacheData = await cacheResp.json();
+    if(!cacheData.metals || !cacheData.timestamp) throw new Error("bad cache");
 
-    try{
-      const cacheResp=await fetch(CACHE_FILE);
-      if(cacheResp.ok){
-        const cacheData=await cacheResp.json();
-        const age=Date.now()-cacheData.timestamp;
-        if(age<CACHE_DURATION_MS){
-          lastApiTime=new Date(cacheData.timestamp);
-          return cacheData.metals;
-        }
-      }
-      const r = await fetch(`${BASE_URL}?api_key=${API_KEY}&currency=USD&unit=toz`);
-      const d=await r.json();
-      if(!d.metals) throw new Error("Invalid API response");
-      lastApiTime=new Date();
-      return d.metals;
-
-    }catch(err){
-      return{
-        gold:3937.615,silver:47.242,platinum:1539.112,palladium:1398.277,
-        copper:0.3419,nickel:0.4677,aluminum:0.0888,lead:0.0626
-      };
-    }
+    lastApiTime = new Date(cacheData.timestamp);
+    return cacheData.metals;
+  }catch(err){
+    lastApiTime = null;
+    return {
+      gold:3937.615,silver:47.242,platinum:1539.112,palladium:1398.277,
+      copper:0.3419,nickel:0.4677,aluminum:0.0888,lead:0.0626
+    };
   }
+}
+
+
 
   async function calculate() {
   try {
