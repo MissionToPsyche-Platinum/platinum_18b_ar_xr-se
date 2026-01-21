@@ -496,7 +496,7 @@
 
 async function getRates(){
   try{
-    const cacheResp = await fetch("cachedMetals.json", { cache: "no-store" });
+    const cacheResp = await fetch("/platinum_18b_ar_xr-se/cachedMetals.json?v=" + Date.now(), { cache: "no-store" });
     if(!cacheResp.ok) throw new Error("cache missing");
     const cacheData = await cacheResp.json();
     if(!cacheData.metals || !cacheData.timestamp) throw new Error("bad cache");
