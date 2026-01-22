@@ -103,6 +103,17 @@
       z-index: 999; padding: 20px;
       color: #f9a000;
     }
+
+    /* Fade intro text in/out */
+#introText {
+  opacity: 1;
+  transition: opacity 0.6s ease-in-out;
+}
+
+#introText.fade-out {
+  opacity: 0;
+}
+
     #disclaimer p {
       font-size: 18px;
       max-width: 700px;
@@ -274,14 +285,12 @@
 
 <body>
   <div id="disclaimer" class="page active">
-    <p>
-      Hey there! This activity is meant for fun and to spark imagination! <br><br>
-      NASA has sent a satellite to check out an asteroid that was discovered in 1852, called Psyche. The interesting thing about this asteroid is that it is mostly metal!<br><br>
-      There are no plans to to take metal from this asteroid, and current market values for metal wouldn't make sense on an asteroid made up of so much metal.<br><br>
-      Just for fun, use the sliders in this activity to learn what the "value" of the different metals would be if Psyche had different metal compositions.
-    </p>
-    <button id="continueBtn">Continue</button>
-  </div>
+  <p id="introText"></p>
+
+  <button id="nextIntroBtn">Next</button>
+  <button id="continueBtn" style="display:none;">Continue</button>
+</div>
+
 
   <div id="mainPage" class="page">
     <h1>Psyche Asteroid Value Calculator</h1>
@@ -293,7 +302,7 @@
 
     <div class="photo-button-wrapper">
       <label for="imageInput" class="photo-button">
-        <span>📸 Take Photo</span>
+        <span>📸 Try it with your own photo of Psyche!</span>
       </label>
     </div>
 
@@ -353,10 +362,52 @@
         mainPage=document.getElementById("mainPage"),
         resultsPage=document.getElementById("resultsPage");
 
-  document.getElementById("continueBtn").onclick=()=>{
-    disclaimer.style.display="none";
-    mainPage.classList.add("active");
-  };
+        // ----- Click-through intro slides -----
+const introSlides = [
+  "In 2023, NASA launched a spacecraft to visit an asteroid called Psyche.",
+  "Psyche is the largest known metal-rich asteroid and was discovered in 1852.",
+  "NASA's spacecraft will orbit Psyche and gather information about what kinds of metal it has.",
+  "Use the following activity to theorize for yourself what kinds of metal Psyche might have and how much value that would be.",
+  "Remember, this is just theoretical, NASA won't learn more about Psyche's metals until the satellite reaches it in 2029 and the market values would be meaningless on a metal world. Have fun!"
+];
+
+let introIndex = 0;
+
+const introText = document.getElementById("introText");
+const nextIntroBtn = document.getElementById("nextIntroBtn");
+const continueBtn = document.getElementById("continueBtn");
+
+introText.textContent = introSlides[introIndex];
+
+nextIntroBtn.onclick = () => {
+  // fade OUT
+  introText.classList.add("fade-out");
+
+  setTimeout(() => {
+    introIndex++;
+
+    // update text (if still within range)
+    if (introIndex < introSlides.length) {
+      introText.textContent = introSlides[introIndex];
+    }
+
+    // fade IN
+    introText.classList.remove("fade-out");
+
+    // last slide -> show Continue, hide Next
+    if (introIndex === introSlides.length - 1) {
+      nextIntroBtn.style.display = "none";
+      continueBtn.style.display = "inline-block";
+    }
+  }, 600); // must match CSS transition time
+};
+
+
+  continueBtn.onclick = () => {
+  disclaimer.style.display = "none";
+  mainPage.classList.add("active");
+};
+
 
   document.getElementById("backBtn").onclick=()=>{
     resultsPage.classList.remove("active");
