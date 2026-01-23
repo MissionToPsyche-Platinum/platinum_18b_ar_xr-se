@@ -57,4 +57,73 @@ future expansion and easier debugging.
 
 ---
 
-## File Structure (Simplified)
+## File Structure
++---docs
+|   |   ReadMeAsteroidDodge.md
+|   |
+|   \---sprint1
+|       \---UML Diagrams
+|               ActivityDiagram.pdf
+|               AsteroidDodgeUseCase.pdf
+|               ClassDiagram.pdf
+|
++---sounds
+|       game-over.mp3
+|       game-start.mp3
+|       powerup_scoreboost.mp3
+|       powerup_shield.mp3
+|       spaceship.mp3
+|
+\---src
+    |   asteroid.js
+    |   audio.js
+    |   constants.js
+    |   effects.js
+    |   main.js
+    |   player.js
+    |   powerups.js
+    |   stars.js
+    |   start.js
+    |   startAsteroids.js
+    |   utils.js
+    |
+    \---assets
+            doubleScore.png
+            meteor1.png
+            meteor2.png
+            shield.png
+
+
+---
+
+## Deployment
+Asteroid Dodge is hosted via **GitHub Pages** and is accessed through a QR code that links
+directly to the module’s `index.html`.
+
+No server-side components are required.
+
+---
+
+## Known Limitations
+- Audio performance may vary on older mobile devices
+- Designed for short play sessions rather than extended gameplay
+- No persistent score storage (intentional for privacy and simplicity)
+
+---
+
+## Future Enhancements
+- Pause menu with disclaimer and credits
+- Additional asteroid types and visual variety
+- Difficulty scaling options for younger users
+- Integration with a central project hub page
+
+---
+
+## Course & Project Context
+This module is part of the **SER 401** course at **Arizona State University** and contributes
+to the overall Platinum AR/XR Project deliverables, including:
+- Functional prototype
+- Modular design artifacts
+- Testing documentation
+- Sponsor presentation materials
+
