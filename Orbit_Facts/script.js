@@ -89,20 +89,36 @@ function initThreeSize() {
 // Fun facts about seasons on 16 Psyche
 const facts = [
     {
-        range: [0, 90],
+        range: [0, 45],
         text: "Psyche's axial tilt of ~98° causes extreme seasons, where poles face the Sun directly during parts of the orbit."
     },
     {
-        range: [90, 180],
+        range: [45, 90],
+        text: "Unlike Earth where the equator is warmest, Psyche's sideways rotation means the poles receive the most intense seasonal heating."
+    },
+    {
+        range: [90, 135],
         text: "Due to the high tilt, one pole experiences continuous sunlight for about 2.5 Earth years, mimicking a 2.5 year long summer day."
     },
     {
-        range: [180, 270],
+        range: [135, 180],
+        text: "Temperature swings of 240°F can occur on Psyche between its sunlit and shadowed poles during different seasons."
+    },
+    {
+        range: [180, 225],
         text: "The opposite pole endures darkness for the same duration, resulting in a long 'winter' night."
     },
     {
-        range: [270, 360],
+        range: [225, 270],
+        text: "Psyche's elliptical orbit brings it as close as 235 million miles to the Sun and as far as 309 million miles away."
+    },
+    {
+        range: [270, 315],
         text: "The rapid 4.2-hour rotation means the asteroid rotates over 10,000 times per orbit."
+    },
+    {
+        range: [315, 360],
+        text: "At the warmest, Psyche's surface reaches only -100°F (-70°C). At the poles during winter, temperatures plunge to -340°F (-200°C)."
     }
 ];
 
