@@ -7,6 +7,8 @@ import { initStars, updateStars, drawStars } from './stars.js';
 import { startMenu } from './start.js';
 import { effects } from './effects.js';
 import { CONSTANTS } from "./constants.js";
+import { facts } from "./facts.js";
+
 export let gameState = "start";
 
 const { SCORING, UI, PLAYER } = CONSTANTS;
@@ -29,6 +31,10 @@ let H = canvas.height;
 // --- Initialize Player ---
 player.init(W, H);
 
+// --- Initialize Facts --- //
+facts.init();
+
+
 // Keep updated when window resizes
 window.addEventListener('resize', () => {
   resizeCanvas();
@@ -48,7 +54,14 @@ window.addEventListener('keydown', e => {
     if (gameState === "start") startGame();
     else if (gameState === "gameover") restartGame();
   }
+
+   // Toggle educational facts
+  if (e.code === 'KeyF') {
+    facts.toggle();
+  }
+  
 });
+
 window.addEventListener('keyup', e => {
   if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
   if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
@@ -97,6 +110,8 @@ function startGame() {
   resetAsteroids();
   resetPowerUps();
   effects.reset();
+  facts.reset();
+
  
   // reset player position each run
   player.x = W / 2 - player.w / 2;
@@ -134,11 +149,13 @@ function update(dt) {
 
   if (gameState !== "playing") return;
 
-  // world + score
+  // world + score and facts update
   updateStars(canvas);
   elapsedTime += dt;
   score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? SCORING.SCORE_BOOST_MULTIPLIER : 1));
   difficulty = 1 + Math.min(elapsedTime / SCORING.DIFFICULTY_RAMP_TIME, SCORING.DIFFICULTY_CAP);
+  facts.update(dt, elapsedTime, score);
+
 
   // player movement
   player.update(dt, keys, W);
@@ -205,6 +222,10 @@ function draw() {
       ctx.fillStyle = "gold";
       ctx.fillText("💫 Score x2", 20, y);
     }
+
+    // draw facts
+    facts.draw(ctx, W);
+
   }
 
   // --- Draw effects on top of everything ---

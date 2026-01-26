@@ -50,5 +50,16 @@ export const CONSTANTS = {
     GAMEOVER_TITLE_FONT: "bold 60px sans-serif",
     GAMEOVER_STATS_FONT: "28px monospace",
     GAMEOVER_HINT_FONT: "22px sans-serif"
+  },
+
+  FACTS: {
+  TIME_INTERVAL: 15,       // show a fact every 15 seconds
+  SCORE_INTERVAL: 300,     // show a factevery 300 score
+  DISPLAY_SECONDS: 4.0,    // stays fully visible
+  FADE_SPEED: 1.2,         // fade rate after timer ends
+  TOP_OFFSET: 16,
+  MAX_WIDTH: 900,
+  FONT: "18px sans-serif"
   }
+
 };
