@@ -5,29 +5,15 @@ const viewToggle = document.getElementById('viewToggle');
 
 let radius = 0;           // Will be set based on container size
 let isRealisticView = false; // Start with To Scale view
+let psycheModel = null;   // Will hold the loaded 3D model
 
 // Three.js setup
 const scene = new THREE.Scene();
 
 let camera = null;
-// const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 2000);
-// camera.position.z = 1000;
 
 const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 container.appendChild(renderer.domElement);
-
-// Create a cube to represent Psyche (placeholder)
-let psycheModel = null;
-
-const geometry = new THREE.BoxGeometry(30, 30, 30);
-const material = new THREE.MeshPhongMaterial({
-    color: 0x888888,
-    shininess: 30
-});
-const cube = new THREE.Mesh(geometry, material);
-// Optional: add placeholder so there's *something* if GLTF fails
-psycheModel = cube;
-scene.add(cube);
 
 // Add lighting
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -67,23 +53,28 @@ function initThreeSize() {
         camera.position.set(0, 0, 1000);
         camera.lookAt(0, 0, 0);
     } else {
-        camera.left = width / -2;
-        camera.right = width / 2;
-        camera.top = height / 2;
-        camera.bottom = height / -2;
+        camera.left = width / -2 - padding;
+        camera.right = width / 2 + padding;
+        camera.top = height / 2 + padding;
+        camera.bottom = height / -2 - padding;
         camera.updateProjectionMatrix();
     }
 
     // Inner dashed circle: used for actual orbit radius
     const circleElem = document.querySelector('.orbit-circle');
-    const circleRect = circleElem.getBoundingClientRect();
-    const circleWidth = circleRect.width;
-    const circleHeight = circleRect.height;
-
-    const circleRadius = Math.min(circleWidth, circleHeight) / 1.32 ;
-
-    const margin = 0; // start with 0; adjust by a few px if needed
-    radius = circleRadius - margin;
+    if (circleElem) {
+        const circleRect = circleElem.getBoundingClientRect();
+        const circleWidth = circleRect.width;
+        const circleHeight = circleRect.height;
+        const circleRadius = Math.min(circleWidth, circleHeight) / 1.32;
+        const margin = 0;
+        radius = circleRadius - margin;
+    } else {
+        // Fallback if .orbit-circle doesn't exist
+        const circleRadius = Math.min(width, height) / 2;
+        const margin = 50;
+        radius = circleRadius - margin;
+    }
 }
 
 // Fun facts about seasons on 16 Psyche
@@ -153,22 +144,49 @@ function updatePosition(angle) {
     }
     infoBox.textContent = `Fun Fact: ${currentFact}`;
 
-    renderer.render(scene, camera);
+    if (camera) {
+        renderer.render(scene, camera);
+    }
 }
 
-// Load GLTF model to replace placeholder cube
+// Load GLTF model
 const loader = new THREE.GLTFLoader();
 loader.load(
     './models/psyche/scene.glb',
     function (gltf) {
         const model = gltf.scene;
-        model.scale.set(5, 5, 5);
-        // Remove placeholder cube if it exists
-        if (psycheModel && psycheModel !== model) {
-            scene.remove(psycheModel);
-        }
+        model.scale.set(8, 8, 8); // Start with "To Scale" view
+
+        // Disable frustum culling to prevent clipping
+        model.traverse((child) => {
+            if (child.isMesh) {
+                child.frustumCulled = false;
+            }
+        });
+
+        // Add pole markers (spheres at top and bottom)
+        const poleGeometry = new THREE.SphereGeometry(1, 16, 16); // Smaller dots
+        const northPoleMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red for north
+        const southPoleMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }); // Blue for south
+
+        const northPole = new THREE.Mesh(poleGeometry, northPoleMaterial);
+        const southPole = new THREE.Mesh(poleGeometry, southPoleMaterial);
+
+        // Position poles (adjust Y values based on your model's size)
+        northPole.position.set(6, 0, 0); // Moved closer to center
+        southPole.position.set(-6, 0, 0); // Moved closer to center
+
+        // Add poles to the model so they rotate with it
+        model.add(northPole);
+        model.add(southPole);
+
         psycheModel = model;
         scene.add(model);
+
+        // Ensure everything is initialized before first render
+        if (!radius || !camera) {
+            initThreeSize();
+        }
 
         const currentAngle = parseFloat(slider.value);
         updatePosition(currentAngle);
@@ -196,7 +214,7 @@ viewToggle.addEventListener('click', () => {
 
     if (psycheModel) {
         if (isRealisticView) {
-            // "Realistic" (exaggerated) view for demonstration
+            // "Realistic" (smaller) view
             psycheModel.scale.set(1, 1, 1);
         } else {
             // To Scale view - easier to see
