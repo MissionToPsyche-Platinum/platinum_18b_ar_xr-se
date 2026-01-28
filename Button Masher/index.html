@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Button Masher</title>
+
   <style>
     :root {
       --bg: #0b1020;
@@ -16,21 +17,19 @@
 
     * { box-sizing: border-box; }
     html, body { height: 100%; }
+
     body {
       margin: 0;
       background: radial-gradient(1200px 700px at 50% 10%, #1b2b5a 0%, var(--bg) 55%, #070914 100%);
       color: var(--text);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation; /* reduces delays & accidental gestures on mobile */
       user-select: none;
+      touch-action: manipulation;
     }
 
     .wrap {
       height: 100%;
       padding: 16px;
-      padding-top: calc(16px + env(safe-area-inset-top));
-      padding-bottom: calc(16px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
       gap: 14px;
@@ -42,9 +41,8 @@
       background: var(--panel);
       border: 1px solid rgba(255,255,255,0.10);
       border-radius: var(--radius);
-      padding: 14px 14px;
+      padding: 14px;
       text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
     }
 
     .label {
@@ -58,7 +56,6 @@
     .count {
       font-size: clamp(42px, 8vw, 72px);
       font-weight: 800;
-      line-height: 1.05;
       font-variant-numeric: tabular-nums;
     }
 
@@ -66,72 +63,87 @@
       flex: 1;
       border: 0;
       border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
       border: 1px solid rgba(255,255,255,0.14);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
       color: var(--text);
-      font-size: clamp(24px, 5vw, 40px);
+      font-size: clamp(22px, 5vw, 36px);
       font-weight: 800;
       display: grid;
       place-items: center;
-      padding: 18px;
-      position: relative;
-      overflow: hidden;
-      transform: translateZ(0);
-      transition: transform 60ms ease, background 120ms ease;
+      transition: transform 60ms ease, background 120ms ease, opacity 200ms ease;
     }
 
-    /* quick “pressed” feel */
     .btn:active {
       transform: scale(0.985);
-      background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%);
     }
 
-    /* subtle shine */
-    .btn::before {
-      content: "";
-      position: absolute;
-      inset: -30%;
-      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.20), transparent 55%);
+    .btn.disabled {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.4);
       pointer-events: none;
-      transform: rotate(10deg);
+      opacity: 0.6;
     }
 
     .hint {
       text-align: center;
       color: var(--muted);
       font-size: 14px;
-      margin-top: -4px;
     }
   </style>
 </head>
+
 <body>
   <main class="wrap">
     <section class="header" aria-live="polite">
       <div class="label">Presses</div>
       <div id="count" class="count">0</div>
+      <div class="label">Time Left</div>
+      <div id="time" class="count">15</div>
     </section>
 
     <button id="mashBtn" class="btn" type="button">
-      TAP!
+      PRESS THE BUTTON TO START
     </button>
 
     <div class="hint">Mash as fast as you can 🚀</div>
   </main>
 
   <script>
-    // Keep it simple + responsive
     const countEl = document.getElementById("count");
+    const timeEl = document.getElementById("time");
     const btn = document.getElementById("mashBtn");
 
     let count = 0;
+    let timeLeft = 15;
+    let timerStarted = false;
+    let timerId = null;
 
-    // Use pointer events for consistent mobile/desktop behavior
+    function startTimer() {
+      timerId = setInterval(() => {
+        timeLeft--;
+        timeEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          btn.classList.add("disabled");
+          btn.textContent = "TIME UP!";
+        }
+      }, 1000);
+    }
+
     btn.addEventListener("pointerdown", (e) => {
-      // prevent double-triggering on some mobile browsers
       e.preventDefault();
-      count++;
-      countEl.textContent = count;
+
+      if (!timerStarted) {
+        timerStarted = true;
+        btn.textContent = "TAP!";
+        startTimer();
+      }
+
+      if (timeLeft > 0) {
+        count++;
+        countEl.textContent = count;
+      }
     }, { passive: false });
   </script>
 </body>
