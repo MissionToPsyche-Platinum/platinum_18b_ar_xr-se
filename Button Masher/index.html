@@ -83,6 +83,13 @@
       pointer-events: none;
       opacity: 0.6;
     }
+    .reset {
+      flex: 0;
+      padding: 10px 18px;
+      font-size: 14px;
+      width: auto;
+      align-self: center;
+    }
 
     .hint {
       text-align: center;
@@ -98,11 +105,15 @@
       <div class="label">Presses</div>
       <div id="count" class="count">0</div>
       <div class="label">Time Left</div>
-      <div id="time" class="count">15</div>
+      <div id="time" class="count">5</div>
     </section>
 
     <button id="mashBtn" class="btn" type="button">
       PRESS THE BUTTON TO START
+    </button>
+
+    <button id="resetBtn" class="btn reset" type="button">
+      RESET
     </button>
 
     <div class="hint">Mash as fast as you can 🚀</div>
@@ -112,11 +123,29 @@
     const countEl = document.getElementById("count");
     const timeEl = document.getElementById("time");
     const btn = document.getElementById("mashBtn");
+    const resetBtn = document.getElementById("resetBtn");
 
     let count = 0;
-    let timeLeft = 15;
+    let timeLeft = 5;
     let timerStarted = false;
     let timerId = null;
+
+    function resetGame() {
+  if (timerId !== null) {
+    clearInterval(timerId);
+    timerId = null;
+  }
+
+  count = 0;
+  timeLeft = 5;
+  timerStarted = false;
+
+  countEl.textContent = count;
+  timeEl.textContent = timeLeft;
+
+  btn.classList.remove("disabled");
+  btn.textContent = "PRESS THE BUTTON TO START";
+}
 
     function startTimer() {
       timerId = setInterval(() => {
@@ -145,6 +174,10 @@
         countEl.textContent = count;
       }
     }, { passive: false });
+    resetBtn.addEventListener("click", () => {
+  resetGame();
+});
+
   </script>
 </body>
 </html>
