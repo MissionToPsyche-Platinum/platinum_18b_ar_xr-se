@@ -164,7 +164,7 @@ function draw() {
   // background stars on all screens
   drawStars(ctx);
 
-  if (gameState === "start" || (isMenuVisible && prevState === "start")) {
+  if (gameState === "start" || (isMenuVisible() && prevState === "start")) {
     ctx.fillStyle = "white";
     ctx.font = "48px sans-serif";
     ctx.textAlign = "center";
@@ -173,7 +173,8 @@ function draw() {
     ctx.fillText("Press SPACE to Start", W / 2, H / 2 + 20);
     ctx.font = "16px sans-serif";
     ctx.fillText(disclaimer, W / 2, H - 100);
-    if(isMenuVisible) {
+    if(isMenuVisible()) {
+      console.log("")
       drawMenuOverlay(ctx);
     }
     return;
@@ -184,7 +185,7 @@ function draw() {
   drawPowerUps(ctx);
   player.draw(ctx);
 
-  if (gameState === "playing" || (isMenuVisible && prevState === "playing")) {
+  if (gameState === "playing" || (isMenuVisible() && prevState === "playing")) {
     // in-game HUD
     ctx.fillStyle = "white";
     ctx.font = "24px monospace";
@@ -204,7 +205,7 @@ function draw() {
     }
   }
 
-  if (gameState === "gameover" || (isMenuVisible && prevState === "gameover")) {
+  if (gameState === "gameover" || (isMenuVisible() && prevState === "gameover")) {
     // blackout overlay
     ctx.fillStyle = "rgba(0,0,0,0.85)";
     ctx.fillRect(0, 0, W, H);
@@ -224,7 +225,7 @@ function draw() {
     ctx.fillStyle = "lightgray";
     ctx.fillText("Press SPACE to Restart", W / 2, H / 2 + 100);
   }
-  if(isMenuVisible) {
+  if(isMenuVisible()) {
     drawMenuOverlay(ctx);
   }
 }

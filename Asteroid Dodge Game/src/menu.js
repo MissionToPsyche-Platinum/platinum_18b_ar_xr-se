@@ -47,6 +47,7 @@ export function toggleMenu() {
     showMenu = !showMenu;
     let menu = document.getElementById("game-overlay");
     if (menu) {
+        renderMainMenu();
         menu.classList.toggle("hidden", !showMenu);
     } else if (showMenu) {
         const newMenu = buildMenuDOM();
@@ -140,7 +141,7 @@ function renderMainMenu() {
     });
 
     container.querySelector("#credits-btn").addEventListener("click", () => {
-        alert("Open credits page");
+        renderCreditsMenu();
     });
 
     container.querySelector("#exit-btn").addEventListener("click", () => {
@@ -152,13 +153,15 @@ function renderMainMenu() {
 }
 
 function renderCreditsMenu() {
-    const container = decodeURIComponent.createElement("div");
+    const container = document.createElement("div");
     container.className = "credits-container";
     container.innerHTML = `
     <h2>Credits</h2>
     <div class="credits-layout">
         <p>
-            <!-- Placeholder for future credits -->
+            Developers
+            John Sullins
+            Brayden Brown
         </p>
     <div class="credits-disclaimer"> 
         <p>
@@ -174,6 +177,8 @@ function renderCreditsMenu() {
     container.querySelector("#cr-return-btn").addEventListener("click", () => {
         renderMainMenu();
     })
+    
+    updateMenuContent(container);
 }
 
 function updateMenuContent(newContent) {
