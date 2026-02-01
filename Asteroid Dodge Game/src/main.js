@@ -16,6 +16,7 @@ const { SCORING, UI, PLAYER } = CONSTANTS;
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 let gameOverFade = 0;
+let isPaused = false; 
 effects.playerRef = player;
 
 
@@ -59,7 +60,14 @@ window.addEventListener('keydown', e => {
   if (e.code === 'KeyF') {
     facts.toggle();
   }
-  
+
+  if ((e.code === "KeyP" || e.code === "Escape") && gameState === "playing") {
+    isPaused = !isPaused;
+    // Stop movement if a key was held during pause
+    keys.left = false;
+    keys.right = false;
+  }
+
 });
 
 window.addEventListener('keyup', e => {
@@ -107,6 +115,8 @@ function startGame() {
   score = 0;
   elapsedTime = 0;
   difficulty = 1;
+  isPaused = false;
+
   resetAsteroids();
   resetPowerUps();
   effects.reset();
@@ -148,6 +158,14 @@ function update(dt) {
   }
 
   if (gameState !== "playing") return;
+    if (isPaused) {
+    // Keep background alive
+    updateStars(canvas);
+    // Keep effects from animating while paused
+     effects.update(dt);
+    return;
+  }
+
 
   // world + score and facts update
   updateStars(canvas);
@@ -225,8 +243,22 @@ function draw() {
 
     // draw facts
     facts.draw(ctx, W);
-
   }
+
+  //freeze frame when paused
+    if (isPaused) {
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.textAlign = "center";
+      ctx.fillStyle = "white";
+      ctx.font = "bold 60px sans-serif";
+      ctx.fillText("PAUSED", W / 2, H / 2 - 40);
+
+      ctx.font = "22px sans-serif";
+      ctx.fillStyle = "lightgray";
+      ctx.fillText("Press P or Esc to Resume", W / 2, H / 2 + 20);
+    }
 
   // --- Draw effects on top of everything ---
   effects.draw(ctx, W, H);
