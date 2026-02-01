@@ -10,6 +10,38 @@ const DEFAULT_FACTS = [
   "Studying Psyche may help scientists understand how planets formed."
 ];
 
+//helper method for drawing wrapped text
+function wrapText(ctx, text, maxWidth, maxLines) {
+  const words = text.split(" ");
+  const lines = [];
+  let line = "";
+
+  for (const word of words) {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width <= maxWidth) {
+      line = test;
+    } else {
+      lines.push(line);
+      line = word;
+      if (lines.length === maxLines - 1) break;
+    }
+  }
+
+  if (line) lines.push(line);
+
+  // If we hit max lines and still have words left, add ellipsis to last line
+  if (lines.length === maxLines && words.length > 0) {
+    let last = lines[maxLines - 1];
+    while (last.length > 0 && ctx.measureText(last + "…").width > maxWidth) {
+      last = last.slice(0, -1);
+    }
+    lines[maxLines - 1] = last + "…";
+  }
+
+  return lines.slice(0, maxLines);
+}
+
+
 export const facts = {
   enabled: true,
 
@@ -18,7 +50,11 @@ export const facts = {
   alpha: 0,
   timer: 0,
 
-  // milestone tracking (prevents spam)
+  phase: "hidden", 
+  phaseTime: 0,
+
+
+  // milestone tracking
   nextTimeMilestone: 10,   // seconds
   nextScoreMilestone: 250, // points/score units
 
@@ -33,14 +69,17 @@ export const facts = {
   },
 
   reset() {
-    this.current = "";
-    this.alpha = 0;
-    this.timer = 0;
-    this.factIndex = 0;
+  this.current = "";
+  this.alpha = 0;
+  this.timer = 0;
 
-    this.nextTimeMilestone = CONSTANTS.FACTS.TIME_INTERVAL;
-    this.nextScoreMilestone = CONSTANTS.FACTS.SCORE_INTERVAL;
-  },
+  this.phase = "hidden";
+  this.phaseTime = 0;
+
+  this.factIndex = 0;
+  this.nextTimeMilestone = CONSTANTS.FACTS.TIME_INTERVAL;
+  this.nextScoreMilestone = CONSTANTS.FACTS.SCORE_INTERVAL;
+},
 
   toggle() {
     this.enabled = !this.enabled;
@@ -49,84 +88,104 @@ export const facts = {
   },
 
   showNextFact() {
-    if (!this.enabled) return;
+  if (!this.enabled) return;
 
-    this.current = this.factList[this.factIndex % this.factList.length];
-    this.factIndex++;
+  this.current = this.factList[this.factIndex % this.factList.length];
+  this.factIndex++;
 
-    this.timer = CONSTANTS.FACTS.DISPLAY_SECONDS;
-    this.alpha = 1;
-  },
+  this.phase = "fadein";
+  this.phaseTime = 0;
+  this.alpha = 0;
+},
+
 
   update(dt, elapsedTime, score) {
-    if (!this.enabled) return;
+  if (!this.enabled) return;
 
-    let shown = false;
-    // Trigger on time milestone
-    if (elapsedTime >= this.nextTimeMilestone && !shown) {
-      this.showNextFact();
-      this.nextTimeMilestone += CONSTANTS.FACTS.TIME_INTERVAL;
-      shown = true;
+  // --- Trigger logic (keep your shown guard if you added it) ---
+  let shown = false;
+
+  if (elapsedTime >= this.nextTimeMilestone && !shown) {
+    this.showNextFact();
+    this.nextTimeMilestone += CONSTANTS.FACTS.TIME_INTERVAL;
+    shown = true;
+  }
+
+  if (score >= this.nextScoreMilestone && !shown) {
+    this.showNextFact();
+    this.nextScoreMilestone += CONSTANTS.FACTS.SCORE_INTERVAL;
+  }
+
+  // --- Phase animation logic ---
+  if (this.phase === "hidden") return;
+
+  this.phaseTime += dt;
+
+  if (this.phase === "fadein") {
+    const t = Math.min(1, this.phaseTime / CONSTANTS.FACTS.FADE_IN_SECONDS);
+    this.alpha = t;
+
+    if (t >= 1) {
+      this.phase = "hold";
+      this.phaseTime = 0;
+      this.alpha = 1;
     }
+  } else if (this.phase === "hold") {
+    this.alpha = 1;
 
-    // Trigger on score milestone
-    if (score >= this.nextScoreMilestone && !shown) {
-      this.showNextFact();
-  this.nextScoreMilestone += CONSTANTS.FACTS.SCORE_INTERVAL;
-}
-
-
-    // Fade out logic
-    if (this.timer > 0) {
-      this.timer -= dt;
-      if (this.timer <= 0) {
-        this.timer = 0;
-      }
-    } else if (this.alpha > 0) {
-      this.alpha -= dt * CONSTANTS.FACTS.FADE_SPEED;
-      if (this.alpha < 0) this.alpha = 0;
+    if (this.phaseTime >= CONSTANTS.FACTS.DISPLAY_SECONDS) {
+      this.phase = "fadeout";
+      this.phaseTime = 0;
     }
-  },
+  } else if (this.phase === "fadeout") {
+    const t = Math.min(1, this.phaseTime / CONSTANTS.FACTS.FADE_OUT_SECONDS);
+    this.alpha = 1 - t;
+
+    if (t >= 1) {
+      this.phase = "hidden";
+      this.phaseTime = 0;
+      this.alpha = 0;
+      this.current = "";
+    }
+  }
+},
+
+
 
   draw(ctx, W) {
-    if (!this.enabled) return;
-    if (!this.current || this.alpha <= 0) return;
+  if (!this.enabled) return;
+  if (!this.current || this.alpha <= 0) return;
 
-    ctx.save();
-    ctx.globalAlpha = this.alpha;
+  const F = CONSTANTS.FACTS;
 
-    ctx.font = CONSTANTS.FACTS.FONT;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "top";
+  ctx.save();
+  ctx.globalAlpha = this.alpha;
 
-    // Background pill
-    const paddingX = 18;
-    const paddingY = 10;
-    const maxWidth = Math.min(CONSTANTS.FACTS.MAX_WIDTH, W - 40);
+  ctx.font = F.FONT;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
 
-    // Basic single-line clamp (simple + safe)
-    let text = this.current;
-    if (ctx.measureText(text).width > maxWidth) {
-      // crude trim with ellipsis
-      while (text.length > 0 && ctx.measureText(text + "…").width > maxWidth) {
-        text = text.slice(0, -1);
-      }
-      text = text + "…";
-    }
+  const maxWidth = Math.min(F.MAX_WIDTH, W - F.SIDE_MARGIN * 2) - F.PADDING_X * 2;
 
-    const textWidth = ctx.measureText(text).width;
-    const boxW = textWidth + paddingX * 2;
-    const boxH = 24 + paddingY * 2;
+  const lines = wrapText(ctx, this.current, maxWidth, F.MAX_LINES);
 
-    const x = W / 2 - boxW / 2;
-    const y = CONSTANTS.FACTS.TOP_OFFSET;
+  const textWidths = lines.map(l => ctx.measureText(l).width);
+  const widest = Math.max(...textWidths, 0);
 
-    ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
-    ctx.fillRect(x, y, boxW, boxH);
+  const boxW = widest + F.PADDING_X * 2;
+  const boxH = lines.length * F.LINE_HEIGHT + F.PADDING_Y * 2;
 
-    ctx.fillStyle = "#fff";
-    ctx.fillText(text, W / 2, y + paddingY);
+  const x = W / 2 - boxW / 2;
+  const y = F.TOP_OFFSET;
 
-    ctx.restore();
+  ctx.fillStyle = F.BG_COLOR;
+  ctx.fillRect(x, y, boxW, boxH);
+
+  ctx.fillStyle = F.TEXT_COLOR;
+  for (let i = 0; i < lines.length; i++) {
+    ctx.fillText(lines[i], W / 2, y + F.PADDING_Y + i * F.LINE_HEIGHT);
   }
+
+  ctx.restore();
+}
 };
