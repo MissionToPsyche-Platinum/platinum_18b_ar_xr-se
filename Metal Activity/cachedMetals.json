@@ -1,0 +1,33 @@
+{
+  "timestamp": 1762285668570,
+  "metals": {
+    "gold": 3937.615,
+    "silver": 47.242,
+    "platinum": 1539.112,
+    "palladium": 1398.277,
+    "lbma_gold_am": 4013.2,
+    "lbma_gold_pm": 4011.5,
+    "lbma_silver": 48.96,
+    "lbma_platinum_am": 1594,
+    "lbma_platinum_pm": 1589,
+    "lbma_palladium_am": 1445,
+    "lbma_palladium_pm": 1465,
+    "mcx_gold": 4198.4727,
+    "mcx_gold_am": 4270.928,
+    "mcx_gold_pm": 4222.1689,
+    "mcx_silver": 51.0183,
+    "mcx_silver_am": 51.7646,
+    "mcx_silver_pm": 52.1239,
+    "ibja_gold": 4221.1243,
+    "copper": 0.3419,
+    "aluminum": 0.0888,
+    "lead": 0.0626,
+    "nickel": 0.4677,
+    "zinc": 0.0951,
+    "lme_copper": 0.3387,
+    "lme_aluminum": 0.0904,
+    "lme_lead": 0.0631,
+    "lme_nickel": 0.4722,
+    "lme_zinc": 0.096
+  }
+}

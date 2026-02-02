@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Psyche 16 Orbit Simulation</title>
+
+    <!-- Three.js and GLTFLoader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="view-toggle">
+    <span class="toggle-label">Normal View</span>
+    <div class="toggle-switch" id="viewToggle">
+        <div class="toggle-slider"></div>
+    </div>
+    <span class="toggle-label">Realistic View</span>
+</div>
+
+<div class="space">
+    <div class="sun"></div>
+    <div class="orbit">
+        <div class="orbit-circle"></div>
+        <div id="three-container"></div>
+    </div>
+</div>
+
+<div class="info-box" id="infoBox">
+    Fun Fact: Psyche has an axial tilt of approximately 98°, leading to extreme seasonal variations!
+</div>
+
+<div class="controls">
+    <input type="range" id="orbitSlider" min="0" max="360" value="0" step="1">
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -4,25 +4,58 @@ import { sounds } from './audio.js';
 import { updateAsteroids, drawAsteroids, resetAsteroids } from './asteroid.js';
 import { updatePowerUps, drawPowerUps, activePowerUps, resetPowerUps } from './powerups.js';
 import { initStars, updateStars, drawStars } from './stars.js';
+<<<<<<< HEAD
 import { drawMenuOverlay, toggleMenu, isMenuVisible, handleClick } from "./menu.js";
 
+=======
+import { startMenu } from './start.js';
+import { effects } from './effects.js';
+import { CONSTANTS } from "./constants.js";
+import { facts } from "./facts.js";
+>>>>>>> main
 
 export let gameState = "start";
 let prevState;
 
+const { SCORING, UI, PLAYER } = CONSTANTS;
+
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+<<<<<<< HEAD
 const disclaimer = "This is not an accurate representation of the Mission to Psyche." +
                   "The Mission to Psyche will not travel through the asteroid belt and will not be dodging asteroids/meteoroids.";
+=======
+let gameOverFade = 0;
+let isPaused = false; 
+effects.playerRef = player;
+>>>>>>> main
 
-// Fit to screen once for mobile devices
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
 
-const W = canvas.width;
-const H = canvas.height;
+//fit to screen for mobile/web
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+let W = canvas.width;
+let H = canvas.height;
 
+// --- Initialize Player ---
 player.init(W, H);
+
+// --- Initialize Facts --- //
+facts.init();
+
+
+// Keep updated when window resizes
+window.addEventListener('resize', () => {
+  resizeCanvas();
+  W = canvas.width;
+  H = canvas.height;
+});
+
+
+
 
 // --- Input (keyboard) ---
 let keys = { left: false, right: false };
@@ -33,6 +66,7 @@ window.addEventListener('keydown', e => {
     if (gameState === "start") startGame();
     else if (gameState === "gameover") restartGame();
   }
+<<<<<<< HEAD
   if (e.code === 'Escape') {
     toggleMenu();
     if(isMenuVisible()) {
@@ -42,7 +76,23 @@ window.addEventListener('keydown', e => {
       gameState = prevState;
     }
   }
+=======
+
+   // Toggle educational facts
+  if (e.code === 'KeyF') {
+    facts.toggle();
+  }
+
+  if ((e.code === "KeyP" || e.code === "Escape") && gameState === "playing") {
+    isPaused = !isPaused;
+    // Stop movement if a key was held during pause
+    keys.left = false;
+    keys.right = false;
+  }
+
+>>>>>>> main
 });
+
 window.addEventListener('keyup', e => {
   if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
   if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
@@ -93,18 +143,25 @@ function updateHighScore() {
   }
 }
 
+startMenu.init(canvas);
+
 // --- Game flow ---
 function startGame() {
   gameState = "playing";
   score = 0;
   elapsedTime = 0;
   difficulty = 1;
+  isPaused = false;
+
   resetAsteroids();
   resetPowerUps();
+  effects.reset();
+  facts.reset();
+
  
   // reset player position each run
   player.x = W / 2 - player.w / 2;
-  player.y = H - 60;
+  player.y = H - PLAYER.GAME_BOTTOM_OFFSET;
 
   sounds.start.currentTime = 0;
   sounds.start.play();
@@ -130,40 +187,68 @@ function loop(now) {
 
 // --- Update ---
 function update(dt) {
-  if (gameState !== "playing") return;
+  if (gameState === "start") {
+    startMenu.update(dt, canvas);
+    updateStars(canvas);
+    return;
+  }
 
-  // world + score
+  if (gameState !== "playing") return;
+    if (isPaused) {
+    // Keep background alive
+    updateStars(canvas);
+    // Keep effects from animating while paused
+     effects.update(dt);
+    return;
+  }
+
+
+  // world + score and facts update
   updateStars(canvas);
   elapsedTime += dt;
-  score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? 2 : 1));
-  difficulty = 1 + Math.min(elapsedTime / 10, 4);
+  score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? SCORING.SCORE_BOOST_MULTIPLIER : 1));
+  difficulty = 1 + Math.min(elapsedTime / SCORING.DIFFICULTY_RAMP_TIME, SCORING.DIFFICULTY_CAP);
+  facts.update(dt, elapsedTime, score);
 
-  // player movement (keyboard)
+
+  // player movement
   player.update(dt, keys, W);
 
-  // asteroids
+  // --- Collision check + asteroid update ---
   updateAsteroids(dt, player, W, H, difficulty, activePowerUps, () => {
-  if (gameState !== "gameover") {
-    gameState = "gameover";
-    sounds.bg.pause();
-    updateHighScore();   
-  }
-});
+    if (gameState !== "gameover") {
+      //  Trigger collision visuals
+      effects.triggerExplosion(player.x + player.w / 2, player.y + player.h / 2);
+      effects.triggerFlash();
+      effects.triggerShake();
+
+      sounds.bg.pause();
+      updateHighScore();
+
+      // brief delay for animation before game over
+      setTimeout(() => {
+        gameState = "gameover";
+      }, 1300);
+    }
+  });
 
   // power-ups
- updatePowerUps(dt, player, W, H);
+  updatePowerUps(dt, player, W, H);
 
+  // effects update
+  effects.update(dt);
 }
 
-// --- Draw ---
+// --Draw ---
 function draw() {
   ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = 'midnightblue';
   ctx.fillRect(0, 0, W, H);
 
-  // background stars on all screens
+  // background stars
   drawStars(ctx);
 
+<<<<<<< HEAD
   if (gameState === "start" || (isMenuVisible() && prevState === "start")) {
     ctx.fillStyle = "white";
     ctx.font = "48px sans-serif";
@@ -177,10 +262,14 @@ function draw() {
       console.log("")
       drawMenuOverlay(ctx);
     }
+=======
+  if (gameState === "start") {
+    startMenu.draw(ctx, W, H);
+>>>>>>> main
     return;
   }
 
-  // game play layer
+  // --- Gameplay visuals ---
   drawAsteroids(ctx);
   drawPowerUps(ctx);
   player.draw(ctx);
@@ -188,7 +277,7 @@ function draw() {
   if (gameState === "playing" || (isMenuVisible() && prevState === "playing")) {
     // in-game HUD
     ctx.fillStyle = "white";
-    ctx.font = "24px monospace";
+    ctx.font = UI.HUD_FONT;
     ctx.textAlign = "left";
     ctx.fillText(`Score: ${score}`, 20, 40);
 
@@ -203,27 +292,53 @@ function draw() {
       ctx.fillStyle = "gold";
       ctx.fillText("💫 Score x2", 20, y);
     }
+
+    // draw facts
+    facts.draw(ctx, W);
   }
 
+<<<<<<< HEAD
   if (gameState === "gameover" || (isMenuVisible() && prevState === "gameover")) {
+=======
+  //freeze frame when paused
+    if (isPaused) {
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.textAlign = "center";
+      ctx.fillStyle = "white";
+      ctx.font = "bold 60px sans-serif";
+      ctx.fillText("PAUSED", W / 2, H / 2 - 40);
+
+      ctx.font = "22px sans-serif";
+      ctx.fillStyle = "lightgray";
+      ctx.fillText("Press P or Esc to Resume", W / 2, H / 2 + 20);
+    }
+
+  // --- Draw effects on top of everything ---
+  effects.draw(ctx, W, H);
+
+  if (gameState === "gameover") {
+>>>>>>> main
     // blackout overlay
     ctx.fillStyle = "rgba(0,0,0,0.85)";
     ctx.fillRect(0, 0, W, H);
     ctx.textAlign = "center";
-    ctx.font = "bold 60px sans-serif";
+    
+    ctx.font = UI.GAMEOVER_TITLE_FONT;   
     ctx.fillStyle = "red";
     ctx.fillText("GAME OVER", W / 2, H / 2 - 80);
 
-    ctx.font = "28px monospace";
+    ctx.font = UI.GAMEOVER_STATS_FONT;         
     ctx.fillStyle = "gold";
     ctx.fillText(`🏆 High Score: ${highScore}`, W / 2, H / 2);
 
     ctx.fillStyle = "white";
     ctx.fillText(`💫 Your Score: ${score}`, W / 2, H / 2 + 40);
 
-    ctx.font = "22px sans-serif";
+    ctx.font = UI.GAMEOVER_HINT_FONT;        
     ctx.fillStyle = "lightgray";
-    ctx.fillText("Press SPACE to Restart", W / 2, H / 2 + 100);
+    ctx.fillText("Tap to Restart", W / 2, H / 2 + 100);
   }
   if(isMenuVisible()) {
     drawMenuOverlay(ctx);
