@@ -200,17 +200,9 @@
       margin-bottom: 5px;
     }
     input[type=range] { width: 100%; }
-<<<<<<< HEAD
-    #dirt, #error { margin-top: 10px; font-weight: bold; }
-    #dirt { color: #0ff; }
-    #error { color: red; }
-
-    /* Results */
-=======
     #Regolith, #error { margin-top: 10px; font-weight: bold; }
     #Regolith { color: #f9a000; }
     #error { color: #ffffff; }
->>>>>>> main
     table {
       margin: 20px auto;
       border-collapse: collapse;
@@ -321,12 +313,8 @@
 
     <h2 class="composition-header">Composition</h2>
     <div class="slider-grid" id="sliders"></div>
-<<<<<<< HEAD
-    <p id="dirt">dirt: 100%</p>
-=======
 
     <p id="Regolith">Regolith: 100%</p>
->>>>>>> main
     <p id="error"></p>
 
     <label style="color:#f9a000; margin-top:10px; display:block;">
@@ -498,62 +486,6 @@ nextIntroBtn.onclick = () => {
       b+=c.b*(p/60);
       t+=p;
     }
-<<<<<<< HEAD
-    function hexToRgb(hex) {
-      const bigint = parseInt(hex.slice(1), 16);
-      return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
-    }
-    function mixColors(metalValues) {
-      let total = 0, r = 0, g = 0, b = 0;
-      for (const [metal, percent] of Object.entries(metalValues)) {
-        const c = hexToRgb(metalColors[metal]);
-        r += c.r * (percent / 100); g += c.g * (percent / 100); b += c.b * (percent / 100);
-        total += percent;
-      }
-      if (total === 0) return "rgba(0,0,0,0)";
-      r = Math.min(255, Math.round(r)); g = Math.min(255, Math.round(g)); b = Math.min(255, Math.round(b));
-      const opacity = Math.min(1, total / 100);
-      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-    }
-    function updateOverlay() {
-      const metalValues = {};
-      metalsList.forEach(metal => metalValues[metal] = parseInt(document.getElementById(`${metal}-slider`).value));
-      document.getElementById("color-overlay").style.backgroundColor = mixColors(metalValues);
-    }
-    function buildSliders() {
-      const container = document.getElementById("sliders"); container.innerHTML = "";
-      metalsList.forEach(metal => {
-        const div = document.createElement("div");
-        div.classList.add("slider-container");
-        div.innerHTML = `
-          <div class="slider-label">
-            <span>${metal.charAt(0).toUpperCase() + metal.slice(1)}</span>
-            <span id="${metal}-val">0%</span>
-          </div>
-          <input type="range" min="0" max="100" value="0" id="${metal}-slider"
-                 oninput="updatePercent('${metal}')">
-        `;
-        container.appendChild(div);
-      });
-    }
-    function updatePercent(metal) {
-      const slider = document.getElementById(`${metal}-slider`);
-      document.getElementById(`${metal}-val`).textContent = slider.value + "%";
-      validateTotal(); updateOverlay();
-    }
-    function validateTotal() {
-      let total = 0; metalsList.forEach(m => total += parseInt(document.getElementById(`${m}-slider`).value));
-      const errorEl = document.getElementById("error");
-      const calcBtn = document.getElementById("calcBtn");
-      const dirtEl = document.getElementById("dirt");
-      if (total > 60) {
-          errorEl.innerHTML = "❌ Total metal composition exceeds 60%.<br>The Psyche Asteroid is thought to be between 30% and 60% metal.<br>Please adjust the sliders to have dirt be above 40%.";
-
-        calcBtn.disabled = true; dirtEl.textContent = `Dirt: ${100 - total}%`;
-      } else {
-        errorEl.textContent = ""; calcBtn.disabled = false; dirtEl.textContent = `Dirt: ${100 - total}%`;
-      }
-=======
     if(t===0) return "rgba(0,0,0,0)";
     return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${Math.min(1,t/100)})`;
   }
@@ -598,7 +530,6 @@ nextIntroBtn.onclick = () => {
     } else {
       e.textContent="";
       b.disabled=false;
->>>>>>> main
     }
 
     d.textContent=`Regolith: ${100-total}%`;

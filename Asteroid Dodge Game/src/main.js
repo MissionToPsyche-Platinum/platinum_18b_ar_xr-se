@@ -66,7 +66,12 @@ window.addEventListener('keydown', e => {
     if (gameState === "start") startGame();
     else if (gameState === "gameover") restartGame();
   }
-<<<<<<< HEAD
+
+   // Toggle educational facts
+  if (e.code === 'KeyF') {
+    facts.toggle();
+  }
+
   if (e.code === 'Escape') {
     toggleMenu();
     if(isMenuVisible()) {
@@ -76,12 +81,6 @@ window.addEventListener('keydown', e => {
       gameState = prevState;
     }
   }
-=======
-
-   // Toggle educational facts
-  if (e.code === 'KeyF') {
-    facts.toggle();
-  }
 
   if ((e.code === "KeyP" || e.code === "Escape") && gameState === "playing") {
     isPaused = !isPaused;
@@ -90,7 +89,6 @@ window.addEventListener('keydown', e => {
     keys.right = false;
   }
 
->>>>>>> main
 });
 
 window.addEventListener('keyup', e => {
@@ -248,24 +246,12 @@ function draw() {
   // background stars
   drawStars(ctx);
 
-<<<<<<< HEAD
-  if (gameState === "start" || (isMenuVisible() && prevState === "start")) {
-    ctx.fillStyle = "white";
-    ctx.font = "48px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("ASTEROID DODGE", W / 2, H / 2 - 40);
-    ctx.font = "24px sans-serif";
-    ctx.fillText("Press SPACE to Start", W / 2, H / 2 + 20);
-    ctx.font = "16px sans-serif";
-    ctx.fillText(disclaimer, W / 2, H - 100);
+  if (gameState === "start" || (isMenuVisible && prevState === "start")) {
+    startMenu.draw(ctx, W, H);
     if(isMenuVisible()) {
-      console.log("")
+      console.log("");
       drawMenuOverlay(ctx);
     }
-=======
-  if (gameState === "start") {
-    startMenu.draw(ctx, W, H);
->>>>>>> main
     return;
   }
 
@@ -297,9 +283,6 @@ function draw() {
     facts.draw(ctx, W);
   }
 
-<<<<<<< HEAD
-  if (gameState === "gameover" || (isMenuVisible() && prevState === "gameover")) {
-=======
   //freeze frame when paused
     if (isPaused) {
       ctx.fillStyle = "rgba(0,0,0,0.55)";
@@ -318,8 +301,7 @@ function draw() {
   // --- Draw effects on top of everything ---
   effects.draw(ctx, W, H);
 
-  if (gameState === "gameover") {
->>>>>>> main
+  if (gameState === "gameover" || (isMenuVisible() && prevState === "gameover")) {
     // blackout overlay
     ctx.fillStyle = "rgba(0,0,0,0.85)";
     ctx.fillRect(0, 0, W, H);

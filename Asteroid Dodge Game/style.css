@@ -8,7 +8,6 @@ html, body {
 }
 
 canvas {
-<<<<<<< HEAD
     border: 2px solid white;
     display: block;
     margin: auto;
@@ -262,7 +261,3 @@ canvas {
     background: #555;
     transform: scale(1.05);
 }
-=======
-  display: block;
-}
->>>>>>> main
