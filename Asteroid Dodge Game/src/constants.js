@@ -53,13 +53,28 @@ export const CONSTANTS = {
   },
 
   FACTS: {
-  TIME_INTERVAL: 15,       // show a fact every 15 seconds
-  SCORE_INTERVAL: 300,     // show a factevery 300 score
-  DISPLAY_SECONDS: 4.0,    // stays fully visible
-  FADE_SPEED: 1.2,         // fade rate after timer ends
-  TOP_OFFSET: 16,
+  TIME_INTERVAL: 15,
+  SCORE_INTERVAL: 300,
+
+  // Timing
+  FADE_IN_SECONDS: 0.25,
+  DISPLAY_SECONDS: 4.0,
+  FADE_OUT_SECONDS: 0.6,
+
+  // Layout
+  TOP_OFFSET: 70,          
   MAX_WIDTH: 900,
-  FONT: "18px sans-serif"
-  }
+  SIDE_MARGIN: 20,
+  PADDING_X: 18,
+  PADDING_Y: 10,
+  RADIUS: 12,              
+  LINE_HEIGHT: 22,
+  MAX_LINES: 3,
+
+  // Style
+  FONT: "18px sans-serif",
+  TEXT_COLOR: "#fff",
+  BG_COLOR: "rgba(0,0,0,0.60)"
+},
 
 };
