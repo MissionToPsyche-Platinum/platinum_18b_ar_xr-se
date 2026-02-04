@@ -1,10 +1,15 @@
 // asteroid.js
 import { isColliding } from './utils.js';
 import { sounds } from './audio.js';
+import { CONSTANTS } from "./constants.js";
+
+const { ASTEROIDS } = CONSTANTS;
+
 
 export const asteroids = [];
 let spawnTimer = 0;
-const spawnInterval = 0.8;
+const spawnInterval = ASTEROIDS.SPAWN_INTERVAL;
+
 
 // --- Load Asteroid Images ---
 const asteroidImgs = [];
@@ -18,14 +23,14 @@ export function updateAsteroids(dt, player, W, H, difficulty, activePowerUps, on
   spawnTimer += dt;
   if (spawnTimer > spawnInterval / difficulty) {
     spawnTimer = 0;
-    asteroids.push({
-      w: 40,
-      h: 40,
-      x: Math.random() * (W - 40),
-      y: -40,
-      speed: (100 + Math.random() * 150) * difficulty,
+   asteroids.push({
+      w: ASTEROIDS.SIZE,
+      h: ASTEROIDS.SIZE,
+      x: Math.random() * (W - ASTEROIDS.SIZE),
+      y: -ASTEROIDS.SIZE,
+      speed: (ASTEROIDS.BASE_SPEED + Math.random() * ASTEROIDS.SPEED_VARIANCE) * difficulty,
       rot: Math.random() * Math.PI * 2,
-      rotSpeed: (Math.random() - 0.5) * 0.05,
+      rotSpeed: (Math.random() - 0.5) * ASTEROIDS.ROT_SPEED_VARIANCE,
       img: asteroidImgs[Math.floor(Math.random() * asteroidImgs.length)]
     });
   }

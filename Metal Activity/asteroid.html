@@ -103,6 +103,17 @@
       z-index: 999; padding: 20px;
       color: #f9a000;
     }
+
+    /* Fade intro text in/out */
+#introText {
+  opacity: 1;
+  transition: opacity 0.6s ease-in-out;
+}
+
+#introText.fade-out {
+  opacity: 0;
+}
+
     #disclaimer p {
       font-size: 18px;
       max-width: 700px;
@@ -274,14 +285,12 @@
 
 <body>
   <div id="disclaimer" class="page active">
-    <p>
-      Hey there! This activity is meant for fun and to spark imagination! <br><br>
-      NASA has sent a satellite to check out an asteroid that was discovered in 1852, called Psyche. The interesting thing about this asteroid is that it is mostly metal!<br><br>
-      There are no plans to to take metal from this asteroid, and current market values for metal wouldn't make sense on an asteroid made up of so much metal.<br><br>
-      Just for fun, use the sliders in this activity to learn what the "value" of the different metals would be if Psyche had different metal compositions.
-    </p>
-    <button id="continueBtn">Continue</button>
-  </div>
+  <p id="introText"></p>
+
+  <button id="nextIntroBtn">Next</button>
+  <button id="continueBtn" style="display:none;">Continue</button>
+</div>
+
 
   <div id="mainPage" class="page">
     <h1>Psyche Asteroid Value Calculator</h1>
@@ -293,7 +302,7 @@
 
     <div class="photo-button-wrapper">
       <label for="imageInput" class="photo-button">
-        <span>📸 Take Photo</span>
+        <span>📸 Try it with your own photo of Psyche!</span>
       </label>
     </div>
 
@@ -353,10 +362,52 @@
         mainPage=document.getElementById("mainPage"),
         resultsPage=document.getElementById("resultsPage");
 
-  document.getElementById("continueBtn").onclick=()=>{
-    disclaimer.style.display="none";
-    mainPage.classList.add("active");
-  };
+        // ----- Click-through intro slides -----
+const introSlides = [
+  "In 2023, NASA launched a spacecraft to visit an asteroid called Psyche.",
+  "Psyche is the largest known metal-rich asteroid and was discovered in 1852.",
+  "NASA's spacecraft will orbit Psyche and gather information about what kinds of metal it has.",
+  "Use the following activity to theorize how much and what kinds of metal Psyche might have.",
+  "This activity is designed as a fun thought experiment, not an actual prediction of Psyche's value."
+];
+
+let introIndex = 0;
+
+const introText = document.getElementById("introText");
+const nextIntroBtn = document.getElementById("nextIntroBtn");
+const continueBtn = document.getElementById("continueBtn");
+
+introText.textContent = introSlides[introIndex];
+
+nextIntroBtn.onclick = () => {
+  // fade OUT
+  introText.classList.add("fade-out");
+
+  setTimeout(() => {
+    introIndex++;
+
+    // update text (if still within range)
+    if (introIndex < introSlides.length) {
+      introText.textContent = introSlides[introIndex];
+    }
+
+    // fade IN
+    introText.classList.remove("fade-out");
+
+    // last slide -> show Continue, hide Next
+    if (introIndex === introSlides.length - 1) {
+      nextIntroBtn.style.display = "none";
+      continueBtn.style.display = "inline-block";
+    }
+  }, 600); // must match CSS transition time
+};
+
+
+  continueBtn.onclick = () => {
+  disclaimer.style.display = "none";
+  mainPage.classList.add("active");
+};
+
 
   document.getElementById("backBtn").onclick=()=>{
     resultsPage.classList.remove("active");
@@ -367,6 +418,7 @@
   const BASE_URL="https://api.metals.dev/v1/latest";
 
   const VOLUME_M3=5.75e15;
+  const BULK_DENSITY_KG_M3 = 3500;
 
   const DENSITY={
     gold:19300,silver:10490,platinum:21450,palladium:12000,
@@ -493,93 +545,74 @@
 
   let lastApiTime=null;
 
-  async function getRates(){
-    const CACHE_FILE="cachedMetals.json";
-    const CACHE_DURATION_MS=2*24*60*60*1000;
+async function getRates(){
+  try{
+    const cacheResp = await fetch("/platinum_18b_ar_xr-se/cachedMetals.json?v=" + Date.now(), { cache: "no-store" });
+    if(!cacheResp.ok) throw new Error("cache missing");
+    const cacheData = await cacheResp.json();
+    if(!cacheData.metals || !cacheData.timestamp) throw new Error("bad cache");
 
-    try{
-      const cacheResp=await fetch(CACHE_FILE);
-      if(cacheResp.ok){
-        const cacheData=await cacheResp.json();
-        const age=Date.now()-cacheData.timestamp;
-        if(age<CACHE_DURATION_MS){
-          lastApiTime=new Date(cacheData.timestamp);
-          return cacheData.metals;
-        }
-      }
-      const r=await fetch(`${BASE_URL}?api_key=${API_KEY}&currency=USD`);
-      const d=await r.json();
-      if(!d.metals) throw new Error("Invalid API response");
-      lastApiTime=new Date();
-      return d.metals;
-
-    }catch(err){
-      return{
-        gold:3937.615,silver:47.242,platinum:1539.112,palladium:1398.277,
-        copper:0.3419,nickel:0.4677,aluminum:0.0888,lead:0.0626
-      };
-    }
+    lastApiTime = new Date(cacheData.timestamp);
+    return cacheData.metals;
+  }catch(err){
+    lastApiTime = null;
+    return {
+      gold:3937.615,silver:47.242,platinum:1539.112,palladium:1398.277,
+      copper:0.3419,nickel:0.4677,aluminum:0.0888,lead:0.0626
+    };
   }
+}
 
-  async function calculate(){
-    try{
-      const use1852=document.getElementById("priceToggle").checked;
-      const rates=use1852 ? HISTORIC_1852_PRICES : await getRates();
 
-      const tbody=document.querySelector("#resultsTable tbody");
-      tbody.innerHTML="";
 
-      let totalValue=0,totalMassKg=0;
-      const metalMasses={};
+  async function calculate() {
+  try {
+    const use1852 = document.getElementById("priceToggle").checked;
+    const rates = use1852 ? HISTORIC_1852_PRICES : await getRates();
 
-      metalsList.forEach(m=>{
-        const percent=parseInt(document.getElementById(`${m}-slider`).value);
-        const volFrac=percent/100;
-        const volM3=VOLUME_M3*volFrac;
-        const massKg=volM3*DENSITY[m];
-        metalMasses[m]=massKg;
-        totalMassKg+=massKg;
-      });
+    const tbody = document.querySelector("#resultsTable tbody");
+    tbody.innerHTML = "";
 
-      const RegolithPercent=
-        Math.max(0,100-metalsList.reduce((a,m)=>a+parseInt(document.getElementById(`${m}-slider`).value),0));
+    // Total asteroid mass from volume * bulk density (simple & consistent)
+    const totalMassKg = VOLUME_M3 * BULK_DENSITY_KG_M3;
+    const totalLbs = totalMassKg * 2.20462;
+    const totalTroyOunces = lbsToTroyOunces(totalLbs);
 
-      totalMassKg+=VOLUME_M3*(RegolithPercent/100)*DENSITY.Regolith;
+    let totalValue = 0;
 
-      const totalLbs=totalMassKg*2.20462;
-      const totalTroyOunces=lbsToTroyOunces(totalLbs);
+    metalsList.forEach(m => {
+      const percent = parseInt(document.getElementById(`${m}-slider`).value, 10);
+      const rate = rates[m];
 
-      metalsList.forEach(m=>{
-        const percent=parseInt(document.getElementById(`${m}-slider`).value);
-        if(percent>0 && rates[m]){
-          const frac=metalMasses[m]/totalMassKg;
-          const metalOunces=totalTroyOunces*frac;
-          const rate=rates[m];
-          const value=metalOunces*rate;
-          totalValue+=value;
-          tbody.innerHTML+=
-            `<tr>
-              <td>${m.charAt(0).toUpperCase()+m.slice(1)}</td>
-              <td>${percent}%</td>
-              <td>$${rate.toFixed(2)}</td>
-              <td>$${formatLarge(value)}</td>
-            </tr>`;
-        }
-      });
+      if (percent > 0 && typeof rate === "number" && isFinite(rate)) {
+        const frac = percent / 100;
+        const metalOunces = totalTroyOunces * frac;
+        const value = metalOunces * rate;
 
-      tbody.innerHTML+=
-        `<tr style="font-weight:bold;background:#222;">
-          <td colspan="3">TOTAL</td>
-          <td>$${formatLarge(totalValue)}</td>
-        </tr>`;
+        totalValue += value;
 
-      document.getElementById("lastUpdated").textContent =
-        use1852
-          ? "📜 Using Historical Metal Prices from 1852"
-          : lastApiTime
-            ? `Last metal price update: ${lastApiTime.toLocaleString()}`
-            : `Using fallback prices (no recent API data)`;
+        tbody.innerHTML += `
+          <tr>
+            <td>${m.charAt(0).toUpperCase() + m.slice(1)}</td>
+            <td>${percent}%</td>
+            <td>$${rate.toFixed(2)}</td>
+            <td>$${formatLarge(value)}</td>
+          </tr>`;
+      }
+    });
 
+    tbody.innerHTML += `
+      <tr style="font-weight:bold;background:#222;">
+        <td colspan="3">TOTAL</td>
+        <td>$${formatLarge(totalValue)}</td>
+      </tr>`;
+
+    document.getElementById("lastUpdated").textContent =
+      use1852
+        ? "📜 Using Historical Metal Prices from 1852"
+        : lastApiTime
+          ? `Last metal price update: ${lastApiTime.toLocaleString()}`
+          : `Using fallback prices (no recent API data)`;
 /* -----------------------------------------
    FUN FACTS
 ----------------------------------------- */
@@ -607,44 +640,41 @@ const EARTH_CIRCUM_M = 40075e3;
 const WIRE_RADIUS = 0.005;
 const WIRE_AREA = Math.PI * WIRE_RADIUS * WIRE_RADIUS;
 
-const wireParts = [];
+// Sum total selected metal volume (based on sliders)
+let totalMetalVolM3 = 0;
 metalsList.forEach(m => {
-  const pct = parseInt(document.getElementById(`${m}-slider`).value);
-  if (pct > 0) {
-    const volM3 = VOLUME_M3 * (pct / 100);
-    const length = volM3 / WIRE_AREA;
-    const wraps = Math.floor(length / EARTH_CIRCUM_M);
-    wireParts.push(`enough ${m} wire to wrap around Earth ${formatLarge(wraps)} times`);
-  }
+  const pct = parseInt(document.getElementById(`${m}-slider`).value, 10) || 0;
+  if (pct > 0) totalMetalVolM3 += VOLUME_M3 * (pct / 100);
 });
 
-let wireSentence =
-  wireParts.length === 1 ? wireParts[0] :
-  wireParts.length === 2 ? wireParts.join(" and ") :
-  wireParts.slice(0, -1).join(", ") + ", and " + wireParts.at(-1);
+// Convert total volume -> wire length -> wraps around Earth
+const totalWireLengthM = totalMetalVolM3 / WIRE_AREA;
+const wraps = Math.floor(totalWireLengthM / EARTH_CIRCUM_M);
 
-const wireFact = `💡 Fun fact: That’s ${wireSentence}!`;
+const wireFact = `That’s enough metal wire to wrap around Earth ${formatLarge(wraps)} times!`;
+
 
 const ARMOR_VOLUME_M3 = 0.1;
 const suits = highestMetalVol / ARMOR_VOLUME_M3;
 
 const armorFact =
-  `💡 Fun fact: Enough ${highestMetal} to outfit ${formatLarge(Math.floor(suits))} knights in armor!`;
+  `That's enough ${highestMetal} to outfit ${formatLarge(Math.floor(suits))} knights in armor!`;
 
 let funFacts = [
-  `💡 Enough $100 bills (by volume) to fill ${formatLarge(pools)} Olympic pools!`,
-  `💡 Stacked $100 bills would reach ${formatLarge(totalHeightMiles.toFixed(2))} miles high!`,
-  `💡 Enough ${highestMetal} to pave ${formatLarge(blocks)} city blocks!`,
+  `That would earn enough $100 bills to fill ${formatLarge(pools)} Olympic swimming pools!`,
+  `Stacked up as $100 bills, that would reach ${formatLarge(totalHeightMiles.toFixed(2))} miles high!`,
+  `That's enough ${highestMetal} to pave ${formatLarge(blocks)} city blocks!`,
   wireFact,
   armorFact
 ];
 
 let zeroCompositionFacts = [
-  "💡 Psyche orbits between Mars and Jupiter.",
-  "💡 The Psyche spacecraft is about the size of a tennis court.",
-  "💡 It will take ~6 years to reach the asteroid Psyche.",
-  "💡 Psyche is named after the Greek goddess of the soul.",
-  "💡 Psyche was discovered in 1852 by Annibale de Gasparis."
+  "Psyche orbits between Mars and Jupiter.",
+  "The Psyche spacecraft is about the size of a tennis court.",
+  "It will take roughly 6 years for the spacecraft NASA launched to reach Psyche.",
+  "Psyche is named after the Greek goddess of the soul.",
+  "Psyche was discovered in 1852 by Annibale de Gasparis.",
+  "The satellite that was sent to Psyche will use Mars as a gravitational push to accelerate."
 ];
 
 const allZero = metalsList.every(m => {
@@ -702,7 +732,7 @@ function showFact() {
 showFact();
 
 // auto-rotate every 8s
-let factInterval = setInterval(nextFact, 8000);
+// let factInterval = setInterval(nextFact, 8000);
 
 // NEW FACT button
 document.getElementById("newFactBtn").onclick = () => {
