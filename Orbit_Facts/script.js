@@ -16,16 +16,12 @@ const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 container.appendChild(renderer.domElement);
 
 // Add lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Increased ambient light
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-directionalLight.position.set(0, 0, 1000);
-scene.add(directionalLight);
-
-const sideLight = new THREE.DirectionalLight(0xffffff, 1);
-sideLight.position.set(500, 500, 500);
-scene.add(sideLight);
+const sunLight = new THREE.DirectionalLight(0xffffff, 3); // Increased sunlight intensity
+sunLight.position.set(0, 0, 100);
+scene.add(sunLight);
 
 function initThreeSize() {
     // Measure the dashed orbit element itself
@@ -128,6 +124,10 @@ function updatePosition(angle) {
         psycheModel.position.x = x;
         psycheModel.position.y = -y;
 
+        // Update sunlight to point from sun (at origin) to Psyche
+        sunLight.position.set(-x, -y, 100);
+        sunLight.target = psycheModel;
+
         //calculate spins
         const spinx = angle * (10446 / 360) / 10;
 
@@ -136,6 +136,9 @@ function updatePosition(angle) {
 
         //used to spin model in y direction
         psycheModel.rotation.y = 0;
+
+        // Add 8 degree tilt for 98 degree total axial tilt
+        psycheModel.rotation.z = 8 * Math.PI / 180;
     }
 
     // Update fun fact based on angle
