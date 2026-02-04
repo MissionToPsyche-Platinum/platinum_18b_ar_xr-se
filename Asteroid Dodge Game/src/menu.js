@@ -1,4 +1,5 @@
 import { toggleMute } from "./audio.js";
+import { audioState } from "./audio.js";
 
 let showMenu = false;
 
@@ -79,6 +80,10 @@ function buildMenuDOM() {
     return menu;
 }
 
+function percentage(value) {
+    return `${Math.round(value * 100)}%`
+}
+
 function renderControlsMenu() {
     const container = document.createElement("div");
     container.className = "controls-container";
@@ -110,18 +115,18 @@ function renderControlsMenu() {
     <div class="audio-layout">
         <div class="audio-row">
             <label for="master-vol">Master</label>
-            <input id="master-vol" type="range" min="0" max="100" value="${masterVol}">
-            <span id="master-val" class="audio-val">${masterVol}%</span>
+            <input id="master-vol" type="range" min="0" max="100" value="${Math.round(audioState.master * 100)}">
+            <span id="master-val" class="audio-val">${percentage(audioState.master)}</span>
         </div>
         <div class="audio-row">
             <label for="music-vol">Music</label>
-            <input id="music-vol" type="range" min="0" max="100" value="${musicVol}">
-            <span id="music-val" class="audio-val">${musicVol}%</span>
+            <input id="music-vol" type="range" min="0" max="100" value="${Math.round(audioState.music * 100)}">
+            <span id="music-val" class="audio-val">${percentage(audioState.music)}</span>
         </div>
         <div class="audio-row">
             <label for="sfx-vol">SFX</label>
-            <input id="sfx-vol" type="range" min="0" max="100" value="${sfxVol}">
-            <span id = "sfx-val" class="audio-val">${sfxVol}%</span>
+            <input id="sfx-vol" type="range" min="0" max="100" value="${Math.round(audioState.sfx * 100)}">
+            <span id = "sfx-val" class="audio-val">${percentage(audioState.sfx)}</span>
     </div>
     <div class="controls-footer">
         <button id="c-return-btn" class="c-return-btn">Return</button>
@@ -141,18 +146,21 @@ function renderControlsMenu() {
     const sfxVal = container.querySelector("#sfx-val");
 
     master.addEventListener("input", () => {
-        masterVol = Number(master.value);
-        masterVal.textContent = masterVol + "%";
+        audioState.master = Number(master.value) / 100;
+        masterVal.textContent = percentage(audioState.master);
+        audioState.applyAudio();
     });
 
     music.addEventListener("input", () => {
-        musicVol = Number(music.value);
-        musicVal.textContent = musicVol + "%";
+        audioState.music = Number(music.value) / 100;
+        musicVal.textContent = percentage(audioState.music);
+        audioState.applyAudio();
     });
 
     sfx.addEventListener("input", () => {
-        sfxVol = Number(sfx.value);
-        sfxVal.textContent = sfxVol + "%";
+        audioState.sfx = Number(sfx.value) / 100;
+        sfxVal.textContent = percentage(audioState.sfx);
+        audioState.applyAudio();
     });
 
     updateMenuContent(container);

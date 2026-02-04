@@ -261,3 +261,32 @@ canvas {
     background: #555;
     transform: scale(1.05);
 }
+
+.audio-layout {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 6px;
+}
+
+.audio-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 60px;
+    align-items: center;
+    gap: 12px;
+}
+
+.audio-row label {
+    text-align: left;
+    color: #ddd;
+}
+
+.audio-row input[type="range"] {
+    width: 100%;
+}
+
+.audio-val {
+    text-align: right;
+    color: #ccc;
+}
