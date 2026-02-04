@@ -13,6 +13,10 @@ const unmuteIcon = new Image();
 let muteButtonBounds;
 let creditsButtonBounds;
 
+let masterVol = 100;
+let musicVol = 100;
+let sfxVol = 100;
+
 const MUTE_ICON_SIZE = 48;
 const MUTE_ICON_PADDING = 20;
 
@@ -102,6 +106,23 @@ function renderControlsMenu() {
             <p>WIP</p>
         </div>
     </div>
+    <h2>Audio</h2>
+    <div class="audio-layout">
+        <div class="audio-row">
+            <label for="master-vol">Master</label>
+            <input id="master-vol" type="range" min="0" max="100" value="${masterVol}">
+            <span id="master-val" class="audio-val">${masterVol}%</span>
+        </div>
+        <div class="audio-row">
+            <label for="music-vol">Music</label>
+            <input id="music-vol" type="range" min="0" max="100" value="${musicVol}">
+            <span id="music-val" class="audio-val">${musicVol}%</span>
+        </div>
+        <div class="audio-row">
+            <label for="sfx-vol">SFX</label>
+            <input id="sfx-vol" type="range" min="0" max="100" value="${sfxVol}">
+            <span id = "sfx-val" class="audio-val">${sfxVol}%</span>
+    </div>
     <div class="controls-footer">
         <button id="c-return-btn" class="c-return-btn">Return</button>
     </div>
@@ -109,6 +130,29 @@ function renderControlsMenu() {
 
     container.querySelector("#c-return-btn").addEventListener("click", () => {
         renderMainMenu();
+    });
+
+    const master = container.querySelector("#master-vol");
+    const music = container.querySelector("#music-vol");
+    const sfx = container.querySelector("#sfx-vol");
+
+    const masterVal = container.querySelector("#master-val");
+    const musicVal = container.querySelector("#music-val");
+    const sfxVal = container.querySelector("#sfx-val");
+
+    master.addEventListener("input", () => {
+        masterVol = Number(master.value);
+        masterVal.textContent = masterVol + "%";
+    });
+
+    music.addEventListener("input", () => {
+        musicVol = Number(music.value);
+        musicVal.textContent = musicVol + "%";
+    });
+
+    sfx.addEventListener("input", () => {
+        sfxVol = Number(sfx.value);
+        sfxVal.textContent = sfxVol + "%";
     });
 
     updateMenuContent(container);

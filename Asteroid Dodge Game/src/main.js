@@ -4,15 +4,12 @@ import { sounds } from './audio.js';
 import { updateAsteroids, drawAsteroids, resetAsteroids } from './asteroid.js';
 import { updatePowerUps, drawPowerUps, activePowerUps, resetPowerUps } from './powerups.js';
 import { initStars, updateStars, drawStars } from './stars.js';
-<<<<<<< HEAD
 import { drawMenuOverlay, toggleMenu, isMenuVisible, handleClick } from "./menu.js";
 
-=======
 import { startMenu } from './start.js';
 import { effects } from './effects.js';
 import { CONSTANTS } from "./constants.js";
 import { facts } from "./facts.js";
->>>>>>> main
 
 export let gameState = "start";
 let prevState;
@@ -21,14 +18,11 @@ const { SCORING, UI, PLAYER } = CONSTANTS;
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
-<<<<<<< HEAD
 const disclaimer = "This is not an accurate representation of the Mission to Psyche." +
                   "The Mission to Psyche will not travel through the asteroid belt and will not be dodging asteroids/meteoroids.";
-=======
 let gameOverFade = 0;
 let isPaused = false; 
 effects.playerRef = player;
->>>>>>> main
 
 
 //fit to screen for mobile/web
