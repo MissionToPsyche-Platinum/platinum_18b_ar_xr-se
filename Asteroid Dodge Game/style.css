@@ -118,30 +118,28 @@ canvas {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 18px;
 }
 
-.controls-layout {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    width: 100%;
-    gap: 30px;
-}
-
-.controls-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    text-align: center;
+.panel-title {
+    margin: 0;
+    margin-top: 6px;
 }
 
 .control-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+}
+
+.control-label {
+    font-weight: 700;
+    color: #fff;
 }
 
 .keys {
@@ -152,19 +150,7 @@ canvas {
 .keys img {
     width: 40px;
     height: 40px;
-}
-
-.powerups-section {
-    flex: 1;
-    text-align: left;
-}
-
-.powerups-section h3 {
-    margin-bottom: 10px;
-}
-
-.powerups-section p {
-    font-size: 1.1rem;
+    object-fit: contain;
 }
 
 .controls-footer {
@@ -254,7 +240,7 @@ canvas {
     border: 1px solid #555;
     border-radius: 6px;
     cursor: pointer;
-    transition: background 0.2s ease, tranform 0.2s ease;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .cr-return-btn:hover {
@@ -263,7 +249,7 @@ canvas {
 }
 
 .audio-layout {
-    width: 80%;
+    width: 90%;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -279,7 +265,7 @@ canvas {
 
 .audio-row label {
     text-align: left;
-    color: #ddd;
+    color: #fff;
 }
 
 .audio-row input[type="range"] {
@@ -288,5 +274,62 @@ canvas {
 
 .audio-val {
     text-align: right;
+    color: #fff;
+}
+
+.powerups-section {
+    flex: 1;
+    text-align: left;
+}
+
+.powerups-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.powerup-card {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 10px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 10px;
+    height: 100%;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.powerup-icon {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    image-rendering: auto;
+}
+
+.powerup-name {
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.powerup-desc {
+    font-size: 0.9rem;
     color: #ccc;
+    line-height: 1.2;
+}
+
+.powerup-meta {
+    min-width: 0;
+}
+
+.two-col {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 18px;
+    align-items: start;
 }

@@ -1,5 +1,6 @@
 import { toggleMute } from "./audio.js";
 import { audioState } from "./audio.js";
+import { powerUpDescriptions } from "./powerups.js";
 
 let showMenu = false;
 
@@ -13,10 +14,6 @@ const unmuteIcon = new Image();
 
 let muteButtonBounds;
 let creditsButtonBounds;
-
-let masterVol = 100;
-let musicVol = 100;
-let sfxVol = 100;
 
 const MUTE_ICON_SIZE = 48;
 const MUTE_ICON_PADDING = 20;
@@ -88,30 +85,7 @@ function renderControlsMenu() {
     const container = document.createElement("div");
     container.className = "controls-container";
     container.innerHTML = `
-    <h2>Controls</h2>
-    <div class="controls-layout">
-        <div class="controls-section">
-            <div class="control-item">
-                <span>Move Left</span>
-                <div class="keys">
-                    <img id="left-key" class="left-key" src="./resources/leftkey.svg" alt="Left Arrow Key" />
-                    <img id="a-key" class="a-key" src="./resources/a_key.svg" alt="A Key" />
-                </div>
-            </div>
-            <div class="control-item">
-                <span>Move Right</span>
-                <div class="keys">
-                    <img id="right-key" class="right-key" src="./resources/rightkey.svg" alt="Right Arrow Key" />
-                    <img id="d-key" class="d-key" src="./resources/d_key.svg" alt="D Key" />
-                </div>
-            </div>
-        </div>
-        <div class="powerups-section">
-            <h3>Powerups</h3>
-            <p>WIP</p>
-        </div>
-    </div>
-    <h2>Audio</h2>
+    <h2 class="panel-title">Audio</h2>
     <div class="audio-layout">
         <div class="audio-row">
             <label for="master-vol">Master</label>
@@ -127,7 +101,31 @@ function renderControlsMenu() {
             <label for="sfx-vol">SFX</label>
             <input id="sfx-vol" type="range" min="0" max="100" value="${Math.round(audioState.sfx * 100)}">
             <span id = "sfx-val" class="audio-val">${percentage(audioState.sfx)}</span>
+        </div>
     </div>
+
+    <h2 class="panel-title">Controls</h2>
+    <div class="two-col">
+        <div class="control-item">
+            <span class="control-label">Move Left</span>
+            <div class="keys">
+                <img id="left-key" class="key-img" src="./resources/leftkey.svg" alt="Left Arrow Key" />
+                <img id="a-key" class="key-img" src="./resources/a_key.svg" alt="A Key" />
+            </div>
+        </div>
+
+        <div class="control-item">
+            <span class="control-label">Move Right</span>
+            <div class="keys">
+                <img id="right-key" class="key-img" src="./resources/rightkey.svg" alt="Right Arrow Key" />
+                <img id="d-key" class="key-img" src="./resources/d_key.svg" alt="D Key" />
+            </div>
+        </div>
+    </div>
+
+    <h2 class="panel-title">Powerups</h2>
+    ${powerupsHTML(powerUpDescriptions)}
+
     <div class="controls-footer">
         <button id="c-return-btn" class="c-return-btn">Return</button>
     </div>
@@ -238,4 +236,20 @@ function updateMenuContent(newContent) {
     menuContent.innerHTML = '';
     menuContent.appendChild(newContent);
     console.log("Updating Menu Content");
+}
+
+function powerupsHTML(items) {
+    return `
+    <div class="powerups-grid">
+        ${items.map(p => `
+            <div class="powerup-card" data-powerup="${p.id}">
+                <img class="powerup-icon" src="${p.img}" alt="${p.name}" />
+                <div class="powerup-meta">
+                    <div class="powerup-name">${p.name}</div>
+                    <div class="powerup-desc">${p.desc}</div>
+                </div>
+            </div>
+        `).join("")}
+    </div>
+    `;
 }
