@@ -6,23 +6,46 @@
   <title>Button Masher</title>
 
   <style>
+
+/* Psyche Black        rgba(18, 3, 29, 1)
+   Dark Purple         rgba(48, 33, 68, 1)
+   Purple              rgba(89, 38, 81, 1)
+   Magenta             rgba(165, 63, 91, 1)
+   Coral               rgba(239, 89, 102, 1)
+   Gold                rgba(244, 124, 51, 1)
+   Mustard             rgba(249, 160, 0, 1) */
+
     :root {
-      --bg: #0b1020;
-      --panel: rgba(255, 255, 255, 0.06);
-      --panel-2: rgba(255, 255, 255, 0.10);
-      --text: rgba(255, 255, 255, 0.92);
-      --muted: rgba(255, 255, 255, 0.65);
-      --radius: 22px;
-    }
+      --border-soft: rgba(255,255,255,0.12);
+      --glow: 0 18px 42px rgba(0,0,0,0.35);
+
+  /* Psyche palette */
+  --psyche-black: #12031d;
+  --psyche-dark-purple: #302144;
+  --psyche-purple: #592651;
+  --psyche-magenta: #a53f5b;
+  --psyche-coral: #ef5966;
+  --psyche-gold: #f47c33;
+  --psyche-mustard: #f9a000;
+
+  --bg: #0b1020;
+  --panel: rgba(255, 255, 255, 0.06);
+  --panel-2: rgba(255, 255, 255, 0.10);
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.65);
+  --radius: 22px;
+}
 
     * { box-sizing: border-box; }
     html, body { height: 100%; }
 
     body {
       margin: 0;
-      background: radial-gradient(1200px 700px at 50% 10%, #1b2b5a 0%, var(--bg) 55%, #070914 100%);
+background:
+  radial-gradient(900px 500px at 50% 15%, rgba(239, 89, 102, 0.18) 0%, rgba(239, 89, 102, 0.00) 60%),
+  linear-gradient(135deg, var(--psyche-dark-purple) 0%, var(--psyche-black) 50%);
       color: var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: "Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       user-select: none;
       touch-action: manipulation;
     }
@@ -38,26 +61,48 @@
     }
 
     .header {
-      background: var(--panel);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: var(--radius);
-      padding: 14px;
-      text-align: center;
-    }
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 14px;
 
-    .label {
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
+  padding: 18px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(249,160,0,0.35);
 
-    .count {
-      font-size: clamp(42px, 8vw, 72px);
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-    }
+  background: linear-gradient(135deg, rgba(48, 33, 68, 1) 0%, rgba(18,3,29,0.55) 100%);
+  box-shadow: var(--glow);
+  backdrop-filter: blur(10px);
+
+  position: relative;
+  overflow: hidden;
+
+}
+
+.stat { text-align: center; }
+
+.divider {
+  width: 1px;
+  height: 80%;
+  background: rgba(249,160,0,0.35);
+  border-radius: 2px;
+}
+
+.label {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.70);
+  margin-bottom: 8px;
+}
+
+.count {
+  font-size: clamp(44px, 7vw, 70px);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
 
     .btn {
       flex: 1;
@@ -75,18 +120,29 @@
 
     #mashBtn {
   white-space: pre-line;
+  background: linear-gradient(135deg, var(--psyche-purple) 0%, var(--psyche-dark-purple) 80%);
+  border: 1px solid rgba(249,160,0,0.55);
 }
+
+    #resetBtn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: var(--text);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 
     .btn:active {
       transform: scale(0.985);
     }
 
-    .btn.disabled {
+    /*.btn.disabled {
       background: rgba(255,255,255,0.08);
-      /*color: rgba(255,255,255,0.4);
+      color: rgba(255,255,255,0.4);
       pointer-events: none;
-      opacity: 0.6;*/
-    }
+      opacity: 0.6;
+    }*/
     .reset {
       flex: 0;
       padding: 10px 18px;
@@ -105,16 +161,24 @@
 
 <body>
   <main class="wrap">
-    <section class="header" aria-live="polite">
-      <div class="label">Presses</div>
-      <div id="count" class="count">0</div>
-      <div class="label">Time Left</div>
-      <div id="time" class="count">5</div>
-    </section>
+<section class="header" aria-live="polite">
+  <div class="stat">
+    <div class="label">Time Left</div>
+    <div id="time" class="count">5</div>
+  </div>
 
-    <button id="mashBtn" class="btn" type="button">
-      PRESS THE BUTTON TO START
-    </button>
+  <div class="divider" aria-hidden="true"></div>
+
+  
+  <div class="stat">
+    <div class="label">Presses</div>
+    <div id="count" class="count">0</div>
+  </div>
+</section>
+
+
+    <button id="mashBtn" class="btn" type="button">PRESS THE BUTTON TO START</button>
+
 
     <button id="resetBtn" class="btn reset" type="button">
       RESET
@@ -150,15 +214,13 @@
   btn.classList.remove("disabled");
   btn.textContent = "PRESS THE BUTTON TO START";
 
-  
-
 }
 function getEndMessage(score) {
-  if (score < 2) return "You scanned 3% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 3) return "You scanned 6% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 4) return "You scanned 9% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 5) return "You scanned 12% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 6) return "You scanned 15% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+  if (score < 2) return "You scanned 3% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
+  if (score < 3) return "You scanned 6% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
+  if (score < 4) return "You scanned 9% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered";
+  if (score < 5) return "You scanned 12% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered";
+  if (score < 6) return "You scanned 15% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered";
   if (score < 7) return "You scanned 18% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
   if (score < 8) return "You scanned 21% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
   if (score < 9) return "You scanned 24% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
@@ -222,3 +284,5 @@ function getEndMessage(score) {
   </script>
 </body>
 </html>
+
+
