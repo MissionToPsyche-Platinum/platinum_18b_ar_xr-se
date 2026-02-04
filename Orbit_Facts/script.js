@@ -119,7 +119,7 @@ function updatePosition(angle) {
         initThreeSize();
     }
 
-    const rad = angle * Math.PI / 180;
+    const rad = angle * Math.PI / 1800;
     const x = Math.cos(rad) * radius;
     const y = Math.sin(rad) * radius;
 
@@ -128,10 +128,14 @@ function updatePosition(angle) {
         psycheModel.position.x = x;
         psycheModel.position.y = -y;
 
+        //calculate spins
+        const spinx = angle * (10446 / 360) / 10;
+
         // Rotate the model (spin tied to slider)
-        const spin = angle * 4;
-        psycheModel.rotation.x = spin * Math.PI / 180;
-        psycheModel.rotation.y = spin * Math.PI / 180;
+        psycheModel.rotation.x = spinx;
+
+        //used to spin model in y direction
+        psycheModel.rotation.y = 0;
     }
 
     // Update fun fact based on angle
