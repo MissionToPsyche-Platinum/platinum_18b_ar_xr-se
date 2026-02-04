@@ -25,9 +25,9 @@
      inkscape:document-units="mm"
      inkscape:zoom="0.57373047"
      inkscape:cx="311.1217"
-     inkscape:cy="508.0783"
+     inkscape:cy="511.56425"
      inkscape:window-width="2560"
-     inkscape:window-height="1377"
+     inkscape:window-height="1369"
      inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -119,7 +119,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:#ffff00;stroke-width:0.264583"
+       style="fill:#333333;stroke-width:0.264583;fill-opacity:1"
        id="rect8"
        width="67.329819"
        height="74.247261"
@@ -144,7 +144,7 @@
        inkscape:transform-center-y="-12.681986" />
     <path
        sodipodi:type="star"
-       style="fill:#ffff00;stroke-width:0.264583"
+       style="fill:#333333;stroke-width:0.264583;fill-opacity:1"
        id="path10"
        inkscape:flatsided="false"
        sodipodi:sides="3"
@@ -161,19 +161,20 @@
        inkscape:transform-center-y="-0.70105154"
        transform="translate(28.592113,68.252142)" />
     <path
-       style="fill:none;stroke:#ff0000;stroke-width:2.64583"
+       style="fill:none;stroke:#ff0000;stroke-width:3.76912192;stroke-dasharray:none"
        d="m 136.04312,53.494922 c 13.52745,26.747461 27.0549,53.494918 27.51594,82.779098 0.46103,29.28417 -12.14384,61.1038 -24.74896,92.92404"
        id="path1"
        inkscape:path-effect="#path-effect1"
        inkscape:original-d="m 136.04312,53.494922 c 13.52745,26.747461 27.0549,53.494918 40.58235,80.242378 -12.60538,31.82089 -25.21025,63.64052 -37.81537,95.46076"
-       sodipodi:nodetypes="ccc" />
+       sodipodi:nodetypes="ccc"
+       transform="matrix(1.1422535,0,0,0.99935638,-13.953826,0.09093848)" />
     <path
-       style="fill:none;stroke:#ff0000;stroke-width:2.64583"
-       d="m 122.66939,35.048397 c 17.98536,32.896303 35.97072,65.792603 36.81602,99.919023 0.8453,34.12643 -15.4488,69.48157 -31.74322,104.83739"
+       style="fill:none;stroke:#ff0000;stroke-width:3.87421264;stroke-dasharray:none"
+       d="m 122.66939,35.048397 c 17.98536,32.896303 35.97072,65.792603 36.81602,99.919033 0.8453,34.12642 -15.4488,69.48156 -31.74322,104.83738"
        id="path1-1"
        inkscape:path-effect="#path-effect1-5"
        inkscape:original-d="M 122.66939,35.048397 C 140.65475,67.9447 158.64011,100.841 176.62547,133.7373 160.33071,169.09385 144.03661,204.44899 127.74219,239.80481"
        sodipodi:nodetypes="ccc"
-       transform="translate(21.793705,0.17709033)" />
+       transform="matrix(1.119956,0,0,0.9995119,19.864816,0.24414815)" />
   </g>
 </svg>
