@@ -12,11 +12,19 @@
 </head>
 <body>
 <div class="view-toggle">
-    <span class="toggle-label">To Scale</span>
+    <span class="toggle-label">Enlarged View</span>
     <div class="toggle-switch" id="viewToggle">
         <div class="toggle-slider"></div>
     </div>
-    <span class="toggle-label">Enlarged View</span>
+    <span class="toggle-label">To Scale</span>
+</div>
+
+<div class="autoplay-toggle">
+    <span class="toggle-label">Manual</span>
+    <div class="toggle-switch" id="autoplayToggle">
+        <div class="toggle-slider"></div>
+    </div>
+    <span class="toggle-label">Auto Play</span>
 </div>
 
 <div class="space">
@@ -32,7 +40,6 @@
 </div>
 
 <div class="controls">
-    <!-- changed max to 3600 to increase slider granularity and make rotations more clear -->
     <input type="range" id="orbitSlider" min="0" max="3600" value="0" step="1">
 </div>
 

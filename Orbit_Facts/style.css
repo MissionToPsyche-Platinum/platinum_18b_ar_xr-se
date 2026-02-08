@@ -98,6 +98,18 @@ body {
     gap: 10px;
 }
 
+/* Autoplay toggle */
+.autoplay-toggle {
+    position: absolute;
+    top: 55px;
+    left: 20px;
+    color: white;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .toggle-switch {
     position: relative;
     width: 50px;

@@ -2,10 +2,13 @@ const slider = document.querySelector('#orbitSlider');
 const infoBox = document.querySelector('#infoBox');
 const container = document.getElementById('three-container');
 const viewToggle = document.getElementById('viewToggle');
+const autoplayToggle = document.getElementById('autoplayToggle');
 
 let radius = 0;           // Will be set based on container size
 let isRealisticView = false; // Start with To Scale view
 let psycheModel = null;   // Will hold the loaded 3D model
+let isAutoplay = false;   // Autoplay state
+let animationId = null;   // Animation frame ID
 
 // Three.js setup
 const scene = new THREE.Scene();
@@ -19,7 +22,7 @@ container.appendChild(renderer.domElement);
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Increased ambient light
 scene.add(ambientLight);
 
-const sunLight = new THREE.DirectionalLight(0xffffff, 3); // Increased sunlight intensity
+const sunLight = new THREE.DirectionalLight(0xffffff, 10); // Increased sunlight intensity
 sunLight.position.set(0, 0, 100);
 scene.add(sunLight);
 
@@ -76,35 +79,35 @@ function initThreeSize() {
 // Fun facts about seasons on 16 Psyche
 const facts = [
     {
-        range: [0, 45],
+        range: [0, 450],
         text: "Psyche's axial tilt of ~98° causes extreme seasons, where poles face the Sun directly during parts of the orbit."
     },
     {
-        range: [45, 90],
+        range: [450, 900],
         text: "Unlike Earth where the equator is warmest, Psyche's sideways rotation means the poles receive the most intense seasonal heating."
     },
     {
-        range: [90, 135],
+        range: [900, 1350],
         text: "Due to the high tilt, one pole experiences continuous sunlight for about 2.5 Earth years, mimicking a 2.5 year long summer day."
     },
     {
-        range: [135, 180],
+        range: [1350, 1800],
         text: "Temperature swings of 240°F can occur on Psyche between its sunlit and shadowed poles during different seasons."
     },
     {
-        range: [180, 225],
+        range: [1800, 2250],
         text: "The opposite pole endures darkness for the same duration, resulting in a long 'winter' night."
     },
     {
-        range: [225, 270],
+        range: [2250, 2700],
         text: "Psyche's elliptical orbit brings it as close as 235 million miles to the Sun and as far as 309 million miles away."
     },
     {
-        range: [270, 315],
+        range: [2700, 3150],
         text: "The rapid 4.2-hour rotation means the asteroid rotates over 10,000 times per orbit."
     },
     {
-        range: [315, 360],
+        range: [3150, 3600],
         text: "At the warmest, Psyche's surface reaches only -100°F (-70°C). At the poles during winter, temperatures plunge to -340°F (-200°C)."
     }
 ];
@@ -125,7 +128,7 @@ function updatePosition(angle) {
         psycheModel.position.y = -y;
 
         // Update sunlight to point from sun (at origin) to Psyche
-        sunLight.position.set(-x, -y, 100);
+        sunLight.position.set(0, 0, 0);
         sunLight.target = psycheModel;
 
         //calculate spins
@@ -238,6 +241,46 @@ window.addEventListener('resize', () => {
     initThreeSize();
     const currentAngle = parseFloat(slider.value);
     updatePosition(currentAngle);
+});
+
+// Autoplay animation function (1 degree per second = 10 slider units per second with max 3600)
+let lastTime = Date.now();
+let currentValue = 0;
+
+function animate() {
+    if (isAutoplay) {
+        const currentTime = Date.now();
+        const deltaTime = (currentTime - lastTime) / 1000; // seconds elapsed
+        lastTime = currentTime;
+
+        currentValue += 50 * deltaTime; // 10 slider units = 1 degree, so 10 per second
+
+        if (currentValue >= 3600) {
+            currentValue = 0;
+        }
+
+        slider.value = Math.floor(currentValue);
+        updatePosition(Math.floor(currentValue));
+
+        animationId = requestAnimationFrame(animate);
+    }
+}
+
+// Autoplay toggle listener
+autoplayToggle.addEventListener('click', () => {
+    isAutoplay = !isAutoplay;
+    autoplayToggle.classList.toggle('active');
+
+    if (isAutoplay) {
+        currentValue = parseFloat(slider.value);
+        lastTime = Date.now();
+        animate();
+    } else {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+    }
 });
 
 // Initial sizing and render
