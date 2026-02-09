@@ -156,6 +156,34 @@ background:
       color: var(--muted);
       font-size: 14px;
     }
+   .satellite-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 6px 0 2px;
+}
+
+.satellite-gif {
+  width: 200px;
+  max-width: 40vw;
+  opacity: 0.95;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.45));
+}
+
+.asteroid-overlay {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  pointer-events: none;
+  left: 51%;
+  top: 50%;
+  transform: translate(-50%, -40%);
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.45));
+}
+
+
   </style>
 </head>
 
@@ -175,6 +203,20 @@ background:
     <div id="count" class="count">0</div>
   </div>
 </section>
+
+<div class="satellite-wrap">
+  <img
+    src="assets/satellite.gif"
+    alt="Satellite orbiting an asteroid"
+    class="satellite-gif"
+  />
+  <img
+    src="assets/asteroid.png"
+    alt=""
+    class="asteroid-overlay"
+  />
+</div>
+
 
 
     <button id="mashBtn" class="btn" type="button">PRESS THE BUTTON TO START</button>
