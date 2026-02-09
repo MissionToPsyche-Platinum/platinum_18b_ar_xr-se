@@ -33,6 +33,22 @@ powerGlows: [],
     this.shakeTimer = EFFECTS.SHAKE_DURATION;
   },
 
+    triggerNearMiss(player) {
+    // small shake (lighter than game over)
+    this.shakeTimer = Math.max(this.shakeTimer, 0.12);
+    this.shakeIntensity = 2.5;
+
+    // quick pulse around the player (reuse the glow system)
+    this.powerGlows.push({
+      x: player.x + player.w / 2,
+      y: player.y + player.h / 2,
+      r: player.w * 0.9,
+      color: "rgba(255,255,255,0.9)",
+      life: 0.25
+    });
+  },
+
+
   update(dt) {
   // existing explosion, flash, shake logic…
   this.updatePowerGlows(dt);
@@ -114,6 +130,20 @@ powerGlows: [],
   ctx.stroke();
   ctx.restore();
 }
+
+    // draw powerGlows (pulse rings)
+    this.powerGlows.forEach(g => {
+      const alpha = Math.max(0, g.life / 0.6); 
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(g.x, g.y, g.r, 0, Math.PI * 2);
+      ctx.strokeStyle = g.color;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.restore();
+    });
+
 
     // white flash overlay
     if (this.flashAlpha > 0) {

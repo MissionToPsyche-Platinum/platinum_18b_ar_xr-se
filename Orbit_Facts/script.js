@@ -4,42 +4,24 @@ const container = document.getElementById('three-container');
 const viewToggle = document.getElementById('viewToggle');
 
 let radius = 0;           // Will be set based on container size
-let isRealisticView = false; // Start with normal view
+let isRealisticView = false; // Start with To Scale view
+let psycheModel = null;   // Will hold the loaded 3D model
 
 // Three.js setup
 const scene = new THREE.Scene();
 
 let camera = null;
-// const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 2000);
-// camera.position.z = 1000;
 
 const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 container.appendChild(renderer.domElement);
 
-// Create a cube to represent Psyche (placeholder)
-let psycheModel = null;
-
-const geometry = new THREE.BoxGeometry(30, 30, 30);
-const material = new THREE.MeshPhongMaterial({
-    color: 0x888888,
-    shininess: 30
-});
-const cube = new THREE.Mesh(geometry, material);
-// Optional: add placeholder so there's *something* if GLTF fails
-psycheModel = cube;
-scene.add(cube);
-
 // Add lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Increased ambient light
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-directionalLight.position.set(0, 0, 1000);
-scene.add(directionalLight);
-
-const sideLight = new THREE.DirectionalLight(0xffffff, 1);
-sideLight.position.set(500, 500, 500);
-scene.add(sideLight);
+const sunLight = new THREE.DirectionalLight(0xffffff, 3); // Increased sunlight intensity
+sunLight.position.set(0, 0, 100);
+scene.add(sunLight);
 
 function initThreeSize() {
     // Measure the dashed orbit element itself
@@ -67,42 +49,63 @@ function initThreeSize() {
         camera.position.set(0, 0, 1000);
         camera.lookAt(0, 0, 0);
     } else {
-        camera.left = width / -2;
-        camera.right = width / 2;
-        camera.top = height / 2;
-        camera.bottom = height / -2;
+        camera.left = width / -2 - padding;
+        camera.right = width / 2 + padding;
+        camera.top = height / 2 + padding;
+        camera.bottom = height / -2 - padding;
         camera.updateProjectionMatrix();
     }
 
     // Inner dashed circle: used for actual orbit radius
     const circleElem = document.querySelector('.orbit-circle');
-    const circleRect = circleElem.getBoundingClientRect();
-    const circleWidth = circleRect.width;
-    const circleHeight = circleRect.height;
-
-    const circleRadius = Math.min(circleWidth, circleHeight) / 1.32 ;
-
-    const margin = 0; // start with 0; adjust by a few px if needed
-    radius = circleRadius - margin;
+    if (circleElem) {
+        const circleRect = circleElem.getBoundingClientRect();
+        const circleWidth = circleRect.width;
+        const circleHeight = circleRect.height;
+        const circleRadius = Math.min(circleWidth, circleHeight) / 1.32;
+        const margin = 0;
+        radius = circleRadius - margin;
+    } else {
+        // Fallback if .orbit-circle doesn't exist
+        const circleRadius = Math.min(width, height) / 2;
+        const margin = 50;
+        radius = circleRadius - margin;
+    }
 }
 
 // Fun facts about seasons on 16 Psyche
 const facts = [
     {
-        range: [0, 90],
+        range: [0, 45],
         text: "Psyche's axial tilt of ~98° causes extreme seasons, where poles face the Sun directly during parts of the orbit."
     },
     {
-        range: [90, 180],
+        range: [45, 90],
+        text: "Unlike Earth where the equator is warmest, Psyche's sideways rotation means the poles receive the most intense seasonal heating."
+    },
+    {
+        range: [90, 135],
         text: "Due to the high tilt, one pole experiences continuous sunlight for about 2.5 Earth years, mimicking a 2.5 year long summer day."
     },
     {
-        range: [180, 270],
+        range: [135, 180],
+        text: "Temperature swings of 240°F can occur on Psyche between its sunlit and shadowed poles during different seasons."
+    },
+    {
+        range: [180, 225],
         text: "The opposite pole endures darkness for the same duration, resulting in a long 'winter' night."
     },
     {
-        range: [270, 360],
+        range: [225, 270],
+        text: "Psyche's elliptical orbit brings it as close as 235 million miles to the Sun and as far as 309 million miles away."
+    },
+    {
+        range: [270, 315],
         text: "The rapid 4.2-hour rotation means the asteroid rotates over 10,000 times per orbit."
+    },
+    {
+        range: [315, 360],
+        text: "At the warmest, Psyche's surface reaches only -100°F (-70°C). At the poles during winter, temperatures plunge to -340°F (-200°C)."
     }
 ];
 
@@ -112,7 +115,7 @@ function updatePosition(angle) {
         initThreeSize();
     }
 
-    const rad = angle * Math.PI / 180;
+    const rad = angle * Math.PI / 1800;
     const x = Math.cos(rad) * radius;
     const y = Math.sin(rad) * radius;
 
@@ -121,10 +124,21 @@ function updatePosition(angle) {
         psycheModel.position.x = x;
         psycheModel.position.y = -y;
 
+        // Update sunlight to point from sun (at origin) to Psyche
+        sunLight.position.set(-x, -y, 100);
+        sunLight.target = psycheModel;
+
+        //calculate spins
+        const spinx = angle * (10446 / 360) / 10;
+
         // Rotate the model (spin tied to slider)
-        const spin = angle * 4;
-        psycheModel.rotation.x = spin * Math.PI / 180;
-        psycheModel.rotation.y = spin * Math.PI / 180;
+        psycheModel.rotation.x = spinx;
+
+        //used to spin model in y direction
+        psycheModel.rotation.y = 0;
+
+        // Add 8 degree tilt for 98 degree total axial tilt
+        psycheModel.rotation.z = 8 * Math.PI / 180;
     }
 
     // Update fun fact based on angle
@@ -137,22 +151,49 @@ function updatePosition(angle) {
     }
     infoBox.textContent = `Fun Fact: ${currentFact}`;
 
-    renderer.render(scene, camera);
+    if (camera) {
+        renderer.render(scene, camera);
+    }
 }
 
-// Load GLTF model to replace placeholder cube
+// Load GLTF model
 const loader = new THREE.GLTFLoader();
 loader.load(
     './models/psyche/scene.glb',
     function (gltf) {
         const model = gltf.scene;
-        model.scale.set(5, 5, 5);
-        // Remove placeholder cube if it exists
-        if (psycheModel && psycheModel !== model) {
-            scene.remove(psycheModel);
-        }
+        model.scale.set(8, 8, 8); // Start with "To Scale" view
+
+        // Disable frustum culling to prevent clipping
+        model.traverse((child) => {
+            if (child.isMesh) {
+                child.frustumCulled = false;
+            }
+        });
+
+        // Add pole markers (spheres at top and bottom)
+        const poleGeometry = new THREE.SphereGeometry(1, 16, 16); // Smaller dots
+        const northPoleMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red for north
+        const southPoleMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }); // Blue for south
+
+        const northPole = new THREE.Mesh(poleGeometry, northPoleMaterial);
+        const southPole = new THREE.Mesh(poleGeometry, southPoleMaterial);
+
+        // Position poles (adjust Y values based on your model's size)
+        northPole.position.set(6, 0, 0); // Moved closer to center
+        southPole.position.set(-6, 0, 0); // Moved closer to center
+
+        // Add poles to the model so they rotate with it
+        model.add(northPole);
+        model.add(southPole);
+
         psycheModel = model;
         scene.add(model);
+
+        // Ensure everything is initialized before first render
+        if (!radius || !camera) {
+            initThreeSize();
+        }
 
         const currentAngle = parseFloat(slider.value);
         updatePosition(currentAngle);
@@ -180,10 +221,10 @@ viewToggle.addEventListener('click', () => {
 
     if (psycheModel) {
         if (isRealisticView) {
-            // "Realistic" (exaggerated) view for demonstration
+            // "Realistic" (smaller) view
             psycheModel.scale.set(1, 1, 1);
         } else {
-            // Normal view - easier to see
+            // To Scale view - easier to see
             psycheModel.scale.set(8, 8, 8);
         }
 
