@@ -10,6 +10,25 @@ export const asteroids = [];
 let spawnTimer = 0;
 const spawnInterval = ASTEROIDS.SPAWN_INTERVAL;
 
+function isAABBColliding(a, b) {
+  return (
+    a.x < b.x + b.w &&
+    a.x + a.w > b.x &&
+    a.y < b.y + b.h &&
+    a.y + a.h > b.y
+  );
+}
+
+function expandedBox(rect, margin) {
+  return {
+    x: rect.x - margin,
+    y: rect.y - margin,
+    w: rect.w + margin * 2,
+    h: rect.h + margin * 2
+  };
+}
+
+
 
 // --- Load Asteroid Images ---
 const asteroidImgs = [];
@@ -19,7 +38,8 @@ for (let i = 1; i <= 2; i++) {
   asteroidImgs.push(img);
 }
 
-export function updateAsteroids(dt, player, W, H, difficulty, activePowerUps, onGameOver) {
+export function updateAsteroids(dt, player, W, H, difficulty, activePowerUps, onGameOver, onNearMiss)
+ {
   spawnTimer += dt;
   if (spawnTimer > spawnInterval / difficulty) {
     spawnTimer = 0;
@@ -39,6 +59,18 @@ export function updateAsteroids(dt, player, W, H, difficulty, activePowerUps, on
     const a = asteroids[i];
     a.y += a.speed * dt;
     a.rot += a.rotSpeed;
+
+    // Near-miss detection...Triggers once per asteroid.
+    if (!a.nearMissed && typeof onNearMiss === "function") {
+      const margin = 14; // adjust 10-18 for feel
+      const nearZone = expandedBox(player, margin);
+
+      // "near miss" = overlaps nearZone
+      if (isAABBColliding(a, nearZone) && !isColliding(a, player)) {
+        a.nearMissed = true;
+        onNearMiss();
+      }
+    }
 
     // Collision detection
     if (isColliding(a, player)) {

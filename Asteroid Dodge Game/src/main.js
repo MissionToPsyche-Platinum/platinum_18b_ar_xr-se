@@ -149,6 +149,14 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
+// --- Difficulty easing --- (starts slow, ramps, then smooths out)
+function easedDifficulty(elapsed, rampTime, cap) {
+  const t = Math.max(0, Math.min(1, elapsed / rampTime)); 
+  const eased = t * t * (3 - 2 * t); 
+  return 1 + eased * cap; 
+}
+
+
 // --- Update ---
 function update(dt) {
   if (gameState === "start") {
@@ -171,7 +179,7 @@ function update(dt) {
   updateStars(canvas);
   elapsedTime += dt;
   score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? SCORING.SCORE_BOOST_MULTIPLIER : 1));
-  difficulty = 1 + Math.min(elapsedTime / SCORING.DIFFICULTY_RAMP_TIME, SCORING.DIFFICULTY_CAP);
+  difficulty = easedDifficulty(elapsedTime, SCORING.DIFFICULTY_RAMP_TIME, SCORING.DIFFICULTY_CAP);
   facts.update(dt, elapsedTime, score);
 
 
@@ -181,7 +189,6 @@ function update(dt) {
   // --- Collision check + asteroid update ---
   updateAsteroids(dt, player, W, H, difficulty, activePowerUps, () => {
     if (gameState !== "gameover") {
-      //  Trigger collision visuals
       effects.triggerExplosion(player.x + player.w / 2, player.y + player.h / 2);
       effects.triggerFlash();
       effects.triggerShake();
@@ -189,12 +196,17 @@ function update(dt) {
       sounds.bg.pause();
       updateHighScore();
 
-      // brief delay for animation before game over
       setTimeout(() => {
         gameState = "gameover";
       }, 1300);
     }
-  });
+  },
+  () => {
+    // Near-miss feedback
+    effects.triggerNearMiss(player);
+  }
+);
+
 
   // power-ups
   updatePowerUps(dt, player, W, H);
