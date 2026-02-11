@@ -75,24 +75,70 @@ window.addEventListener('keyup', e => {
   if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
 });
 
-// --- Touch -- Mobile only ---
+// --- Touch (Mobile) ---
+// Supports BOTH:
+// 1) Tap/hold left-right zones for movement
+// 2) Swipe/drag to reposition the ship
 let touchStartX = null;
-canvas.addEventListener('touchstart', e => {
-  touchStartX = e.touches[0].clientX;
-});
-canvas.addEventListener('touchmove', e => {
-  const currentX = e.touches[0].clientX;
-  const delta = currentX - touchStartX;
-  touchStartX = currentX;
-  player.x += delta;
+let touchMoved = false;
 
-  // keep player in bounds
-  if (player.x < 0) player.x = 0;
-  if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
-});
-canvas.addEventListener('touchend', () => {
-  touchStartX = null;
-});
+canvas.addEventListener(
+  "touchstart",
+  (e) => {
+    e.preventDefault();
+    const x = e.touches[0].clientX;
+
+    touchStartX = x;
+    touchMoved = false;
+
+    // Tap zones: left half = left, right half = right
+    keys.left = x < W / 2;
+    keys.right = x >= W / 2;
+  },
+  { passive: false }
+);
+
+canvas.addEventListener(
+  "touchmove",
+  (e) => {
+    e.preventDefault();
+    const x = e.touches[0].clientX;
+
+    if (touchStartX === null) touchStartX = x;
+
+    const delta = x - touchStartX;
+    touchStartX = x;
+
+    // If the finger actually moves, treat it as swipe control
+    if (Math.abs(delta) > 2) {
+      touchMoved = true;
+      keys.left = false;
+      keys.right = false;
+
+      player.x += delta;
+
+      // keep player in bounds
+      if (player.x < 0) player.x = 0;
+      if (player.x + player.w > W) player.x = W - player.w;
+    }
+  },
+  { passive: false }
+);
+
+canvas.addEventListener(
+  "touchend",
+  (e) => {
+    e.preventDefault();
+    touchStartX = null;
+    touchMoved = false;
+
+    // stop tap-zone movement when finger lifts
+    keys.left = false;
+    keys.right = false;
+  },
+  { passive: false }
+);
+
 
 // --- Scoring / difficulty ---
 let score = 0;
