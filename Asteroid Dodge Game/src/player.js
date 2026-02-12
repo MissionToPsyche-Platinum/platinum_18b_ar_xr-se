@@ -11,7 +11,8 @@ export const player = {
 
   init(W, H) {
     this.x = W / 2 - this.w / 2;
-    this.y = H - this.h - CONSTANTS.PLAYER.BOTTOM_PADDING;
+    this.y = H - CONSTANTS.PLAYER.GAME_BOTTOM_OFFSET;
+
 
 
     // Loads the space shuttle pic
