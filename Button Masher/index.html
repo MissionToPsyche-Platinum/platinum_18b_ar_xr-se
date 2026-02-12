@@ -253,7 +253,7 @@
       <p class="sub">Your presses: <span id="finalScore">0</span></p>
 
       <div id="animWrap" class="satellite-wrap" aria-hidden="true">
-        <img src="assets/satellite.gif" alt="Satellite orbiting an asteroid" class="satellite-gif" />
+        <img id="satGif" src="assets/satellite.gif" alt="Satellite orbiting an asteroid" class="satellite-gif" />
         <img src="assets/asteroid.png" alt="" class="asteroid-overlay" />
       </div>
 
@@ -279,11 +279,38 @@
     const funFactEl = document.getElementById("funFact");
     const playAgainBtn = document.getElementById("playAgainBtn");
 
+    const satGif = document.getElementById("satGif");
+
+
     let count = 0;
     let timeLeft = 5;
     let timerStarted = false;
     let timerId = null;
     let resultsTimeoutId = null;
+
+    function pickGifForScore(score) {
+
+  if (score <= 5)
+    return "assets/satellite-very-slow.gif";
+
+  if (score <= 10)
+    return "assets/satellite-slow.gif";
+
+  if (score <= 15)
+    return "assets/satellite.gif";
+
+  if (score <= 20)
+    return "assets/satellite-fast.gif";
+
+  if (score <= 25)
+    return "assets/satellite-very-fast.gif";
+
+  if (score <= 30)
+    return "assets/satellite-extremely-fast.gif";
+
+  return "assets/satellite-max-speed.gif";
+}
+
 
     function showPage(which) {
       pageGame.classList.toggle("active", which === "game");
@@ -361,6 +388,12 @@
 
       // go to results page
       finalScoreEl.textContent = String(count);
+      // select correct speed gif
+satGif.src = pickGifForScore(count);
+
+// force restart animation
+satGif.src = satGif.src.split("?")[0] + "?t=" + Date.now();
+
       showPage("results");
 
       // show gif for 5 seconds, then hide + show fun fact

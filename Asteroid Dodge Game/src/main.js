@@ -145,6 +145,8 @@ let score = 0;
 let highScore = parseInt(localStorage.getItem("highScore")) || 0;
 let elapsedTime = 0;
 let difficulty = 1;
+let startHintTimer = 0;
+let startHintAlpha = 0;
 
 function updateHighScore() {
   if (score > highScore) {
@@ -160,6 +162,8 @@ function startGame() {
   gameState = "playing";
   score = 0;
   elapsedTime = 0;
+  startHintTimer = 0;
+  startHintAlpha  = 1
   difficulty = 1;
   isPaused = false;
 
@@ -227,7 +231,20 @@ function update(dt) {
   score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? SCORING.SCORE_BOOST_MULTIPLIER : 1));
   difficulty = easedDifficulty(elapsedTime, SCORING.DIFFICULTY_RAMP_TIME, SCORING.DIFFICULTY_CAP);
   facts.update(dt, elapsedTime, score);
+  
+  // --- Start hint timing (shows once per run) ---
+  startHintTimer += dt;
+  const hintHold = UI.START_HINT_HOLD;
+  const hintFade = UI.START_HINT_FADE;
 
+  if (startHintTimer <= hintHold) {
+    startHintAlpha = 1;
+  } else if (startHintTimer <= hintHold + hintFade) {
+    const t = (startHintTimer - hintHold) / hintFade; // 0..1
+    startHintAlpha = 1 - t;
+  } else {
+    startHintAlpha = 0;
+  }
 
   // player movement
   player.update(dt, keys, W);
@@ -286,6 +303,36 @@ function draw() {
     ctx.font = UI.HUD_FONT;
     ctx.textAlign = "left";
     ctx.fillText(`Score: ${score}`, 20, 40);
+
+    // --- Start hint overlay ---
+    if (startHintAlpha > 0) {
+      ctx.save();
+      ctx.globalAlpha = startHintAlpha;
+
+      // background pill
+      const text = UI.START_HINT_TEXT;
+      ctx.font = UI.START_HINT_FONT;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const padX = 18;
+      const padY = 10;
+      const textW = ctx.measureText(text).width;
+      const boxW = textW + padX * 2;
+      const boxH = 22 + padY * 2;
+      const x = W / 2;
+      const y = UI.START_HINT_Y;
+
+      // rounded-ish rectangle 
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(x - boxW / 2, y - boxH / 2, boxW, boxH);
+
+      ctx.fillStyle = "white";
+      ctx.fillText(text, x, y);
+
+      ctx.restore();
+    }
+
 
     // power-up indicators
     let y = 70;
