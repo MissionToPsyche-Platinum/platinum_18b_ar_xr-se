@@ -76,7 +76,7 @@ window.addEventListener('keydown', e => {
     }
   }
 
-  if ((e.code === "KeyP" || e.code === "Escape") && gameState === "playing") {
+  if ((e.code === "KeyP") && gameState === "playing") {
     isPaused = !isPaused;
     // Stop movement if a key was held during pause
     keys.left = false;

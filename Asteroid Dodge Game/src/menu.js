@@ -72,7 +72,9 @@ function buildMenuDOM() {
     menu.className = "game-overlay";
     menu.innerHTML = `
     <div class="paused-label">Paused</div>
-    <div id="menu-content"></div>
+    <div class="overlay-center">
+        <div id="menu-content"></div>
+    </div>
     `;
     return menu;
 }
@@ -98,7 +100,7 @@ function renderControlsMenu() {
             <span id="music-val" class="audio-val">${percentage(audioState.music)}</span>
         </div>
         <div class="audio-row">
-            <label for="sfx-vol">SFX</label>
+            <label for="sfx-vol">Sound Effects</label>
             <input id="sfx-vol" type="range" min="0" max="100" value="${Math.round(audioState.sfx * 100)}">
             <span id = "sfx-val" class="audio-val">${percentage(audioState.sfx)}</span>
         </div>
@@ -169,7 +171,7 @@ function renderMainMenu() {
     container.className = "menu-container";
     container.innerHTML = `
     <div class="menu-buttons">
-        <button id="controls-btn">Controls</button>
+        <button id="controls-btn">Options</button>
         <button id="credits-btn">Credits</button>
         <button id="exit-btn">Exit</button>
     </div>
@@ -208,19 +210,30 @@ function renderCreditsMenu() {
     container.innerHTML = `
     <h2>Credits</h2>
     <div class="credits-layout">
-        <p>
-            Developers
-            John Sullins
-            Brayden Brown
-        </p>
-    <div class="credits-disclaimer"> 
-        <p>
-            This is not an accurate representation of the Mission to Psyche<br>
-            The Mission to Psyche will not travel through the asteroid belt and will not be dodging asteroids nor meteroids<br>
-            This game is simply for your enjoyment<br>
-        </p>
-    <div class="credits-footer">
-        <button id="cr-return-btn" class="cr-return-btn">Return</button>
+        <div class="credits-content">
+            <p>
+                Developers
+                John Sullins
+                Brayden Brown
+            </p>
+        </div>
+        <div class="credits-disclaimer"> 
+            <p>
+                This is not an accurate representation of the Mission to Psyche<br>
+                The Mission to Psyche will not travel through the asteroid belt and will not be dodging asteroids nor meteroids<br>
+                This game is simply for your enjoyment<br>
+            </p>
+            <p>
+                This work was created in partial fulfillment of Arizona State University Capstone Course SER 401/402.<br>
+                The work is a result of the Psyche Student Collaborations component of NASA’s Psyche Mission (https://psyche.ssl.berkeley.edu). “Psyche: A Journey to a Metal World” [Contract number NNM16AA09C] <br>
+                is part of the NASA Discovery Program mission to solar system targets. Trade names and trademarks of ASU and NASA are used in this work for identification only. <br>
+                Their usage does not constitute an official endorsement, either expressed or implied, by Arizona State University or National Aeronautics and Space Administration. <br>
+                The content is solely the responsibility of the authors and does not necessarily represent the official views of ASU or NASA.
+            </p>
+        </div>
+        <div class="credits-footer">
+            <button id="cr-return-btn" class="cr-return-btn">Return</button>
+        </div>
     </div>
     `;
 
