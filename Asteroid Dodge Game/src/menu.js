@@ -25,7 +25,11 @@ controlDKey.src = './resources/d_key.svg';
 muteIcon.src = './resources/mute.svg';
 unmuteIcon.src = './resources/unmute.svg';
 
-let isMuted = false;
+let isMuted = {
+    master: false,
+    music: false,
+    sfx: false
+};
 
 export function handleClick(mouseX, mouseY) {
     console.log("Mouse X: ", mouseX, "Mouse Y", mouseY);
@@ -91,16 +95,25 @@ function renderControlsMenu() {
     <div class="audio-layout">
         <div class="audio-row">
             <label for="master-vol">Master</label>
+            <div class="mute-container">
+                <img id="mute-master" src="./resources/mute.svg" alt = "Mute toggle" />
+            </div>
             <input id="master-vol" type="range" min="0" max="100" value="${Math.round(audioState.master * 100)}">
             <span id="master-val" class="audio-val">${percentage(audioState.master)}</span>
         </div>
         <div class="audio-row">
             <label for="music-vol">Music</label>
+            <div class="mute-container">
+                <img id="mute-music" src="./resources/mute.svg" alt = "Mute toggle" />
+            </div>
             <input id="music-vol" type="range" min="0" max="100" value="${Math.round(audioState.music * 100)}">
             <span id="music-val" class="audio-val">${percentage(audioState.music)}</span>
         </div>
         <div class="audio-row">
             <label for="sfx-vol">Sound Effects</label>
+            <div class="mute-container">
+                <img id="mute-sfx" src="./resources/mute.svg" alt = "Mute toggle" />
+            </div>
             <input id="sfx-vol" type="range" min="0" max="100" value="${Math.round(audioState.sfx * 100)}">
             <span id = "sfx-val" class="audio-val">${percentage(audioState.sfx)}</span>
         </div>
@@ -145,6 +158,10 @@ function renderControlsMenu() {
     const musicVal = container.querySelector("#music-val");
     const sfxVal = container.querySelector("#sfx-val");
 
+    const master_mute = container.querySelector("#mute-master");
+    const music_mute = container.querySelector("#mute-music");
+    const sfx_mute = container.querySelector("#mute-sfx");
+
     master.addEventListener("input", () => {
         audioState.master = Number(master.value) / 100;
         masterVal.textContent = percentage(audioState.master);
@@ -163,6 +180,24 @@ function renderControlsMenu() {
         audioState.applyAudio();
     });
 
+    master_mute.addEventListener("click", () => {
+        isMuted.master = !isMuted.master;
+        master_mute.src = isMuted.master ? './resources/unmute.svg' : './resources/mute.svg';
+
+    });
+
+    music_mute.addEventListener("click", () => {
+        isMuted.music = !isMuted.music;
+        music_mute.src = isMuted.music ? './resources/unmute.svg' : './resources/mute.svg';
+
+    });
+
+    sfx_mute.addEventListener("click", () => {
+        isMuted.sfx = !isMuted.sfx;
+        sfx_mute.src = isMuted.sfx ? './resources/unmute.svg' : './resources/mute.svg';
+
+    })
+
     updateMenuContent(container);
 }
 
@@ -175,18 +210,7 @@ function renderMainMenu() {
         <button id="credits-btn">Credits</button>
         <button id="exit-btn">Exit</button>
     </div>
-    <div class="mute-container">
-        <img id="mute-icon" src="./resources/mute.svg" alt = "Mute toggle" />
-    </div>
     `;
-
-    
-    const muteIcon = container.querySelector("#mute-icon");
-    muteIcon.addEventListener("click", () => {
-        isMuted = !isMuted
-        toggleMute();
-        muteIcon.src = isMuted ? "./resources/unmute.svg" : "./resources/mute.svg";
-    });
 
     container.querySelector("#controls-btn").addEventListener("click", () => {
         renderControlsMenu();
