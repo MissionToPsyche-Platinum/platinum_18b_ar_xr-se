@@ -75,30 +75,78 @@ window.addEventListener('keyup', e => {
   if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
 });
 
-// --- Touch -- Mobile only ---
+// --- Touch (Mobile) ---
+// Supports BOTH:
+// 1) Tap/hold left-right zones for movement
+// 2) Swipe/drag to reposition the ship
 let touchStartX = null;
-canvas.addEventListener('touchstart', e => {
-  touchStartX = e.touches[0].clientX;
-});
-canvas.addEventListener('touchmove', e => {
-  const currentX = e.touches[0].clientX;
-  const delta = currentX - touchStartX;
-  touchStartX = currentX;
-  player.x += delta;
+let touchMoved = false;
 
-  // keep player in bounds
-  if (player.x < 0) player.x = 0;
-  if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
-});
-canvas.addEventListener('touchend', () => {
-  touchStartX = null;
-});
+canvas.addEventListener(
+  "touchstart",
+  (e) => {
+    e.preventDefault();
+    const x = e.touches[0].clientX;
+
+    touchStartX = x;
+    touchMoved = false;
+
+    // Tap zones: left half = left, right half = right
+    keys.left = x < W / 2;
+    keys.right = x >= W / 2;
+  },
+  { passive: false }
+);
+
+canvas.addEventListener(
+  "touchmove",
+  (e) => {
+    e.preventDefault();
+    const x = e.touches[0].clientX;
+
+    if (touchStartX === null) touchStartX = x;
+
+    const delta = x - touchStartX;
+    touchStartX = x;
+
+    // If the finger actually moves, treat it as swipe control
+    if (Math.abs(delta) > 2) {
+      touchMoved = true;
+      keys.left = false;
+      keys.right = false;
+
+      player.x += delta;
+
+      // keep player in bounds
+      if (player.x < 0) player.x = 0;
+      if (player.x + player.w > W) player.x = W - player.w;
+    }
+  },
+  { passive: false }
+);
+
+canvas.addEventListener(
+  "touchend",
+  (e) => {
+    e.preventDefault();
+    touchStartX = null;
+    touchMoved = false;
+
+    // stop tap-zone movement when finger lifts
+    keys.left = false;
+    keys.right = false;
+  },
+  { passive: false }
+);
+
 
 // --- Scoring / difficulty ---
 let score = 0;
 let highScore = parseInt(localStorage.getItem("highScore")) || 0;
 let elapsedTime = 0;
 let difficulty = 1;
+let startHintTimer = 0;
+let startHintAlpha = 0;
 
 function updateHighScore() {
   if (score > highScore) {
@@ -114,6 +162,8 @@ function startGame() {
   gameState = "playing";
   score = 0;
   elapsedTime = 0;
+  startHintTimer = 0;
+  startHintAlpha  = 1
   difficulty = 1;
   isPaused = false;
 
@@ -149,6 +199,14 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
+// --- Difficulty easing --- (starts slow, ramps, then smooths out)
+function easedDifficulty(elapsed, rampTime, cap) {
+  const t = Math.max(0, Math.min(1, elapsed / rampTime)); 
+  const eased = t * t * (3 - 2 * t); 
+  return 1 + eased * cap; 
+}
+
+
 // --- Update ---
 function update(dt) {
   if (gameState === "start") {
@@ -171,9 +229,22 @@ function update(dt) {
   updateStars(canvas);
   elapsedTime += dt;
   score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? SCORING.SCORE_BOOST_MULTIPLIER : 1));
-  difficulty = 1 + Math.min(elapsedTime / SCORING.DIFFICULTY_RAMP_TIME, SCORING.DIFFICULTY_CAP);
+  difficulty = easedDifficulty(elapsedTime, SCORING.DIFFICULTY_RAMP_TIME, SCORING.DIFFICULTY_CAP);
   facts.update(dt, elapsedTime, score);
+  
+  // --- Start hint timing (shows once per run) ---
+  startHintTimer += dt;
+  const hintHold = UI.START_HINT_HOLD;
+  const hintFade = UI.START_HINT_FADE;
 
+  if (startHintTimer <= hintHold) {
+    startHintAlpha = 1;
+  } else if (startHintTimer <= hintHold + hintFade) {
+    const t = (startHintTimer - hintHold) / hintFade; // 0..1
+    startHintAlpha = 1 - t;
+  } else {
+    startHintAlpha = 0;
+  }
 
   // player movement
   player.update(dt, keys, W);
@@ -181,7 +252,6 @@ function update(dt) {
   // --- Collision check + asteroid update ---
   updateAsteroids(dt, player, W, H, difficulty, activePowerUps, () => {
     if (gameState !== "gameover") {
-      //  Trigger collision visuals
       effects.triggerExplosion(player.x + player.w / 2, player.y + player.h / 2);
       effects.triggerFlash();
       effects.triggerShake();
@@ -189,12 +259,17 @@ function update(dt) {
       sounds.bg.pause();
       updateHighScore();
 
-      // brief delay for animation before game over
       setTimeout(() => {
         gameState = "gameover";
       }, 1300);
     }
-  });
+  },
+  () => {
+    // Near-miss feedback
+    effects.triggerNearMiss(player);
+  }
+);
+
 
   // power-ups
   updatePowerUps(dt, player, W, H);
@@ -228,6 +303,36 @@ function draw() {
     ctx.font = UI.HUD_FONT;
     ctx.textAlign = "left";
     ctx.fillText(`Score: ${score}`, 20, 40);
+
+    // --- Start hint overlay ---
+    if (startHintAlpha > 0) {
+      ctx.save();
+      ctx.globalAlpha = startHintAlpha;
+
+      // background pill
+      const text = UI.START_HINT_TEXT;
+      ctx.font = UI.START_HINT_FONT;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const padX = 18;
+      const padY = 10;
+      const textW = ctx.measureText(text).width;
+      const boxW = textW + padX * 2;
+      const boxH = 22 + padY * 2;
+      const x = W / 2;
+      const y = UI.START_HINT_Y;
+
+      // rounded-ish rectangle 
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(x - boxW / 2, y - boxH / 2, boxW, boxH);
+
+      ctx.fillStyle = "white";
+      ctx.fillText(text, x, y);
+
+      ctx.restore();
+    }
+
 
     // power-up indicators
     let y = 70;

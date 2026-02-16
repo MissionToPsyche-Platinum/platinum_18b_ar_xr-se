@@ -4,7 +4,7 @@ export const CONSTANTS = {
     HEIGHT: 40,
     SPEED: 300,
     BOTTOM_PADDING: 20,     
-    GAME_BOTTOM_OFFSET: 60  
+    GAME_BOTTOM_OFFSET: 140  
   },
 
   ASTEROIDS: {
@@ -49,7 +49,12 @@ export const CONSTANTS = {
     HUD_FONT: "24px monospace",
     GAMEOVER_TITLE_FONT: "bold 60px sans-serif",
     GAMEOVER_STATS_FONT: "28px monospace",
-    GAMEOVER_HINT_FONT: "22px sans-serif"
+    GAMEOVER_HINT_FONT: "22px sans-serif",
+    START_HINT_TEXT: "Tap or swipe left/right to move • Avoid asteroids and collect power-ups!!",
+    START_HINT_HOLD: 2.2,     // seconds fully visible
+    START_HINT_FADE: 0.8,     // seconds fade out
+    START_HINT_FONT: "clamp(16px, 4vw, 22px) sans-serif",
+    START_HINT_Y: 110         // y-position in px 
   },
 
   FACTS: {
