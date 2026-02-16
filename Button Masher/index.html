@@ -223,6 +223,8 @@
 </head>
 
 <body>
+  <audio id="mashSfx" src="assets/mash-loop.mp3" preload="auto" loop></audio>
+
   <!-- PAGE 1: GAME -->
   <main id="pageGame" class="wrap page active">
     <section class="header" aria-live="polite">
@@ -281,6 +283,8 @@
 
     const satGif = document.getElementById("satGif");
 
+    const mashSfx = document.getElementById("mashSfx");
+
 
     let count = 0;
     let timeLeft = 5;
@@ -311,6 +315,20 @@
   return "assets/satellite-max-speed.gif";
 }
 
+function startMashAudio() {
+  if (!mashSfx) return;
+  mashSfx.currentTime = 0;
+  mashSfx.play().catch(() => {
+    // autoplay restrictions are normal; first user gesture usually unlocks it
+  });
+}
+
+function stopMashAudio() {
+  if (!mashSfx) return;
+  mashSfx.pause();
+  mashSfx.currentTime = 0;
+}
+
 
     function showPage(which) {
       pageGame.classList.toggle("active", which === "game");
@@ -318,6 +336,8 @@
     }
 
     function resetGame() {
+      stopMashAudio();
+
       if (timerId !== null) {
         clearInterval(timerId);
         timerId = null;
@@ -383,6 +403,8 @@
     }
 
     function endGame() {
+      stopMashAudio();
+
       // lock input
       btn.classList.add("disabled");
 
@@ -428,6 +450,7 @@ satGif.src = satGif.src.split("?")[0] + "?t=" + Date.now();
       if (!timerStarted) {
         timerStarted = true;
         btn.textContent = "TAP!";
+        startMashAudio();
         startTimer();
       }
 
