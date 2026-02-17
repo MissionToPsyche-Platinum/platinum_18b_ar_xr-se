@@ -225,6 +225,10 @@
 <body>
   <audio id="mashSfx" src="assets/mash-loop.mp3" preload="auto" loop></audio>
 
+  <audio id="cameraSound1" src="assets/camera sound 1.mp3" preload="auto"></audio>
+  <audio id="cameraSound2" src="assets/camera sound 2.mp3" preload="auto"></audio>
+
+
   <!-- PAGE 1: GAME -->
   <main id="pageGame" class="wrap page active">
     <section class="header" aria-live="polite">
@@ -284,8 +288,13 @@
     const satGif = document.getElementById("satGif");
 
     const mashSfx = document.getElementById("mashSfx");
+    const cameraSound1 = document.getElementById("cameraSound1");
+    const cameraSound2 = document.getElementById("cameraSound2");
 
 
+
+
+    let cameraSoundInterval = null;
     let count = 0;
     let timeLeft = 5;
     let timerStarted = false;
@@ -328,6 +337,33 @@ function stopMashAudio() {
   mashSfx.pause();
   mashSfx.currentTime = 0;
 }
+function startCameraSounds() {
+
+  stopCameraSounds();
+
+  cameraSoundInterval = setInterval(() => {
+
+    const sound = Math.random() < 0.5 ? cameraSound1 : cameraSound2;
+
+    sound.currentTime = 0;
+
+    sound.play().catch(() => {});
+
+  }, 400 + Math.random() * 600);
+
+}
+
+function stopCameraSounds() {
+
+  if (cameraSoundInterval !== null) {
+    clearInterval(cameraSoundInterval);
+    cameraSoundInterval = null;
+  }
+
+  cameraSound1.pause();
+  cameraSound2.pause();
+
+}
 
 
     function showPage(which) {
@@ -337,6 +373,7 @@ function stopMashAudio() {
 
     function resetGame() {
       stopMashAudio();
+      stopCameraSounds();
 
       if (timerId !== null) {
         clearInterval(timerId);
@@ -417,6 +454,7 @@ satGif.src = pickGifForScore(count);
 satGif.src = satGif.src.split("?")[0] + "?t=" + Date.now();
 
       showPage("results");
+      startCameraSounds();
 
       // show gif for 5 seconds, then hide + show fun fact
       funFactEl.textContent = getEndMessage(count);
@@ -424,9 +462,14 @@ satGif.src = satGif.src.split("?")[0] + "?t=" + Date.now();
       animWrap.style.display = "flex";
 
       resultsTimeoutId = setTimeout(() => {
-        animWrap.style.display = "none";
-        funFactEl.style.display = "block";
-      }, 5000);
+
+  stopCameraSounds();
+
+  animWrap.style.display = "none";
+  funFactEl.style.display = "block";
+
+}, 5000);
+
     }
 
     function startTimer() {
