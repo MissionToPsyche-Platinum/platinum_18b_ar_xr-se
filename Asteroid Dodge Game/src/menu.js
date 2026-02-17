@@ -1,4 +1,4 @@
-import { audioState, toggleMaster, toggleMusic, toggleSfx } from "./audio.js";
+import { audioState, toggleMaster, toggleMusic, toggleSfx, isMuted } from "./audio.js";
 import { powerUpDescriptions } from "./powerups.js";
 
 let showMenu = false;
@@ -23,12 +23,6 @@ controlAKey.src = './resources/a_key.svg';
 controlDKey.src = './resources/d_key.svg';
 muteIcon.src = './resources/mute.svg';
 unmuteIcon.src = './resources/unmute.svg';
-
-let isMuted = {
-    master: false,
-    music: false,
-    sfx: false
-};
 
 /*
 
@@ -90,6 +84,11 @@ function percentage(value) {
 }
 
 function renderControlsMenu() {
+
+    const masterSrc = isMuted.master ? './resources/unmute.svg' : './resources/mute.svg';
+    const musicSrc = isMuted.music ? './resources/unmute.svg' : './resources/mute.svg';
+    const sfxSrc = isMuted.sfx ? './resources/unmute.svg' : './resources/mute.svg';
+
     const container = document.createElement("div");
     container.className = "controls-container";
     container.innerHTML = `
@@ -98,7 +97,7 @@ function renderControlsMenu() {
         <div class="audio-row">
             <label for="master-vol">Master</label>
             <div class="mute-container">
-                <img id="mute-master" src="./resources/mute.svg" alt = "Mute toggle" />
+                <img id="mute-master" src=${masterSrc} alt = "Mute toggle" />
             </div>
             <input id="master-vol" type="range" min="0" max="100" value="${Math.round(audioState.master * 100)}">
             <span id="master-val" class="audio-val">${percentage(audioState.master)}</span>
@@ -106,7 +105,7 @@ function renderControlsMenu() {
         <div class="audio-row">
             <label for="music-vol">Music</label>
             <div class="mute-container">
-                <img id="mute-music" src="./resources/mute.svg" alt = "Mute toggle" />
+                <img id="mute-music" src=${musicSrc} alt = "Mute toggle" />
             </div>
             <input id="music-vol" type="range" min="0" max="100" value="${Math.round(audioState.music * 100)}">
             <span id="music-val" class="audio-val">${percentage(audioState.music)}</span>
@@ -114,7 +113,7 @@ function renderControlsMenu() {
         <div class="audio-row">
             <label for="sfx-vol">Sound Effects</label>
             <div class="mute-container">
-                <img id="mute-sfx" src="./resources/mute.svg" alt = "Mute toggle" />
+                <img id="mute-sfx" src=${sfxSrc} alt = "Mute toggle" />
             </div>
             <input id="sfx-vol" type="range" min="0" max="100" value="${Math.round(audioState.sfx * 100)}">
             <span id = "sfx-val" class="audio-val">${percentage(audioState.sfx)}</span>
