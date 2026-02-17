@@ -51,7 +51,8 @@ export function updatePowerUps(dt, player, W, H) {
       activePowerUps[p.type] = true;
       powerUpTimers[p.type] = powerUpDuration;
       effects.triggerPowerGlow(p.type, player);
-        
+      if (navigator.vibrate) navigator.vibrate(25);
+      
       // Play power-up sound based on type
       if (p.type === 'shield' && sounds.powerupShield) {
         sounds.powerupShield.currentTime = 0;
