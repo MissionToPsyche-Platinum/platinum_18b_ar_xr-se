@@ -38,12 +38,8 @@ body {
 }
 
 .orbit-circle {
-    position: absolute;
-    width: 80%;
-    height: 80%;
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    pointer-events: none;
+    /* no longer used, moved to .js to calculate orbital lines */
+    display: none;
 }
 
 /* Three.js canvas fills the orbit container */

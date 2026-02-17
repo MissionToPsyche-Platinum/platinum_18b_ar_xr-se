@@ -42,38 +42,62 @@ function initThreeSize() {
     // Create or update an orthographic camera that matches the orbit dimensions
     if (!camera) {
         camera = new THREE.OrthographicCamera(
-            width / -2 - padding,
-            width / 2 + padding,
-            height / 2 + padding,
-            height / -2 - padding,
+            width / -4 - padding,
+            width / 4 + padding,
+            height / 4 + padding,
+            height / -4 - padding,
             0.1,
             2000
         );
         camera.position.set(0, 0, 1000);
         camera.lookAt(0, 0, 0);
     } else {
-        camera.left = width / -2 - padding;
-        camera.right = width / 2 + padding;
-        camera.top = height / 2 + padding;
-        camera.bottom = height / -2 - padding;
+        camera.left = width / -3 - padding;
+        camera.right = width / 3 + padding;
+        camera.top = height / 3 + padding;
+        camera.bottom = height / -3 - padding;
         camera.updateProjectionMatrix();
     }
 
-    // Inner dashed circle: used for actual orbit radius
-    const circleElem = document.querySelector('.orbit-circle');
-    if (circleElem) {
-        const circleRect = circleElem.getBoundingClientRect();
-        const circleWidth = circleRect.width;
-        const circleHeight = circleRect.height;
-        const circleRadius = Math.min(circleWidth, circleHeight) / 1.32;
-        const margin = 0;
-        radius = circleRadius - margin;
-    } else {
-        // Fallback if .orbit-circle doesn't exist
-        const circleRadius = Math.min(width, height) / 2;
-        const margin = 50;
-        radius = circleRadius - margin;
+    // Calculate radius from orbit container since orbit-circle is now hidden
+    const circleRadius = Math.min(width, height) / 1.32;
+    radius = circleRadius / 2;
+
+    // Draw the elliptical orbit line in Three.js using the same values as the asteroid path
+    drawOrbitLine();
+}
+
+let orbitLine = null;
+function drawOrbitLine() {
+    // Remove existing orbit line if present
+    if (orbitLine) {
+        scene.remove(orbitLine);
     }
+
+    const eccentricity = 0.14;
+    const semiMajorAxis = radius;
+    const semiMinorAxis = radius * Math.sqrt(1 - eccentricity * eccentricity);
+    const centerOffset = radius * eccentricity;
+
+    // EllipseCurve(x, y, xRadius, yRadius, startAngle, endAngle)
+    const curve = new THREE.EllipseCurve(
+        -centerOffset, 0,       // Center offset so Sun is at one focus
+        semiMajorAxis,          // X radius
+        semiMinorAxis,          // Y radius
+        0, 2 * Math.PI,         // Full ellipse
+        false                   // Clockwise
+    );
+
+    const points = curve.getPoints(128);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        opacity: 0.5,
+        transparent: true
+    });
+
+    orbitLine = new THREE.LineLoop(geometry, material);
+    scene.add(orbitLine);
 }
 
 // Fun facts about seasons on 16 Psyche
@@ -119,8 +143,18 @@ function updatePosition(angle) {
     }
 
     const rad = angle * Math.PI / 1800;
-    const x = Math.cos(rad) * radius;
-    const y = Math.sin(rad) * radius;
+
+    // Psyche's orbital eccentricity is ~0.14
+    // Semi-major axis (a) and semi-minor axis (b) relationship: b = a * sqrt(1 - e^2)
+    const eccentricity = 0.14;
+    const semiMajorAxis = radius;
+    const semiMinorAxis = radius * Math.sqrt(1 - eccentricity * eccentricity);
+
+    // Center offset to keep Sun at one focus (not center)
+    const centerOffset = radius * eccentricity;
+
+    const x = Math.cos(rad) * semiMajorAxis - centerOffset;
+    const y = Math.sin(rad) * semiMinorAxis;
 
     // Move the model along the orbit
     if (psycheModel) {
@@ -225,10 +259,10 @@ viewToggle.addEventListener('click', () => {
     if (psycheModel) {
         if (isRealisticView) {
             // "Realistic" (smaller) view
-            psycheModel.scale.set(1, 1, 1);
+            psycheModel.scale.set(.6, .6, .6);
         } else {
             // To Scale view - easier to see
-            psycheModel.scale.set(8, 8, 8);
+            psycheModel.scale.set(7, 7, 7);
         }
 
         const currentAngle = parseFloat(slider.value);
@@ -253,7 +287,7 @@ function animate() {
         const deltaTime = (currentTime - lastTime) / 1000; // seconds elapsed
         lastTime = currentTime;
 
-        currentValue += 50 * deltaTime; // 10 slider units = 1 degree, so 10 per second
+        currentValue += 10 * deltaTime; // 10 slider units = 1 degree, so 10 per second
 
         if (currentValue >= 3600) {
             currentValue = 0;
