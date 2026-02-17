@@ -6,8 +6,6 @@ powerupShield: new Audio('./sounds/powerup_shield.mp3'),
 powerupScore: new Audio('./sounds/powerup_scoreboost.mp3'),
 };
 
-let muted = false;
-
 export const audioState = {
     master: 1.0,
     music: 1.0,
@@ -15,16 +13,26 @@ export const audioState = {
 
     applyAudio() {
         // Temporary solution: Should categorize sounds in the sounds constant (SFX, Music)
-        sounds.bg.volume = this.master * this.music;
+        sounds.bg.volume = this.master * this.music * 0.4;
         sounds.gameover.volume = this.master * this.sfx;
         sounds.powerupScore.volume = this.master * this.sfx;
         sounds.powerupShield.volume = this.master * this.sfx;
     }
 }
 
-export function toggleMute() {
-    muted = !muted;
-    Object.values(sounds).forEach(s => s.muted = muted);
+export function toggleMaster(val) {
+    Object.values(sounds).forEach(s => s.muted = val);
+}
+
+export function toggleMusic(val) {
+    sounds.bg.muted = val;
+}
+
+export function toggleSfx(val) {
+    sounds.gameover.muted = val;
+    sounds.powerupShield.muted = val;
+    sounds.powerupScore.muted = val;
+    sounds.start.muted = val;
 }
 
 Object.values(sounds).forEach(s => s.load());

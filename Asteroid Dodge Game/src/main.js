@@ -4,7 +4,7 @@ import { sounds } from './audio.js';
 import { updateAsteroids, drawAsteroids, resetAsteroids } from './asteroid.js';
 import { updatePowerUps, drawPowerUps, activePowerUps, resetPowerUps } from './powerups.js';
 import { initStars, updateStars, drawStars } from './stars.js';
-import { drawMenuOverlay, toggleMenu, isMenuVisible, handleClick } from "./menu.js";
+import { drawMenuOverlay, toggleMenu, isMenuVisible } from "./menu.js";
 
 import { startMenu } from './start.js';
 import { effects } from './effects.js';
@@ -119,7 +119,7 @@ canvas.addEventListener('click', (e) => {
   const mouseX = e.clientX - rect.left;
   const mouseY = e.clientY - rect.top;
 
-  handleClick(mouseX, mouseY);
+   (mouseX, mouseY);
 })
 
 // --- Scoring / difficulty ---

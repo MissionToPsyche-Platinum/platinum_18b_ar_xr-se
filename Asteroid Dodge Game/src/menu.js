@@ -1,5 +1,4 @@
-import { toggleMute } from "./audio.js";
-import { audioState } from "./audio.js";
+import { audioState, toggleMaster, toggleMusic, toggleSfx } from "./audio.js";
 import { powerUpDescriptions } from "./powerups.js";
 
 let showMenu = false;
@@ -31,6 +30,8 @@ let isMuted = {
     sfx: false
 };
 
+/*
+
 export function handleClick(mouseX, mouseY) {
     console.log("Mouse X: ", mouseX, "Mouse Y", mouseY);
     console.log(muteButtonBounds);
@@ -48,6 +49,7 @@ export function handleClick(mouseX, mouseY) {
         console.log("No Button Pressed");
     }
 }
+*/
 
 export function toggleMenu() {
     showMenu = !showMenu;
@@ -183,18 +185,24 @@ function renderControlsMenu() {
     master_mute.addEventListener("click", () => {
         isMuted.master = !isMuted.master;
         master_mute.src = isMuted.master ? './resources/unmute.svg' : './resources/mute.svg';
-
+        toggleMaster(isMuted.master);
+        if(!isMuted.master) {
+            toggleMusic(isMuted.music);
+            toggleSfx(isMuted.sfx);
+        }
     });
 
     music_mute.addEventListener("click", () => {
         isMuted.music = !isMuted.music;
         music_mute.src = isMuted.music ? './resources/unmute.svg' : './resources/mute.svg';
+        toggleMusic(isMuted.music);
 
     });
 
     sfx_mute.addEventListener("click", () => {
         isMuted.sfx = !isMuted.sfx;
         sfx_mute.src = isMuted.sfx ? './resources/unmute.svg' : './resources/mute.svg';
+        toggleSfx(isMuted.sfx);
 
     })
 
