@@ -174,7 +174,7 @@ function update(dt) {
   if (gameState !== "playing") return;
     if (isPaused || isMenuVisible()) {
     // Keep background alive
-    //updateStars(canvas);
+    updateStars(canvas);
     // Keep effects from animating while paused
      effects.update(dt);
     return;
