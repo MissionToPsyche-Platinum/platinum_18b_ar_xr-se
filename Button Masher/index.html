@@ -6,7 +6,6 @@
   <title>Button Masher</title>
 
   <style>
-
 /* Psyche Black        rgba(18, 3, 29, 1)
    Dark Purple         rgba(48, 33, 68, 1)
    Purple              rgba(89, 38, 81, 1)
@@ -19,31 +18,30 @@
       --border-soft: rgba(255,255,255,0.12);
       --glow: 0 18px 42px rgba(0,0,0,0.35);
 
-  /* Psyche palette */
-  --psyche-black: #12031d;
-  --psyche-dark-purple: #302144;
-  --psyche-purple: #592651;
-  --psyche-magenta: #a53f5b;
-  --psyche-coral: #ef5966;
-  --psyche-gold: #f47c33;
-  --psyche-mustard: #f9a000;
+      --psyche-black: #12031d;
+      --psyche-dark-purple: #302144;
+      --psyche-purple: #592651;
+      --psyche-magenta: #a53f5b;
+      --psyche-coral: #ef5966;
+      --psyche-gold: #f47c33;
+      --psyche-mustard: #f9a000;
 
-  --bg: #0b1020;
-  --panel: rgba(255, 255, 255, 0.06);
-  --panel-2: rgba(255, 255, 255, 0.10);
-  --text: rgba(255, 255, 255, 0.92);
-  --muted: rgba(255, 255, 255, 0.65);
-  --radius: 22px;
-}
+      --bg: #0b1020;
+      --panel: rgba(255, 255, 255, 0.06);
+      --panel-2: rgba(255, 255, 255, 0.10);
+      --text: rgba(255, 255, 255, 0.92);
+      --muted: rgba(255, 255, 255, 0.65);
+      --radius: 22px;
+    }
 
     * { box-sizing: border-box; }
     html, body { height: 100%; }
 
     body {
       margin: 0;
-background:
-  radial-gradient(900px 500px at 50% 15%, rgba(239, 89, 102, 0.18) 0%, rgba(239, 89, 102, 0.00) 60%),
-  linear-gradient(135deg, var(--psyche-dark-purple) 0%, var(--psyche-black) 50%);
+      background:
+        radial-gradient(900px 500px at 50% 15%, rgba(239, 89, 102, 0.18) 0%, rgba(239, 89, 102, 0.00) 60%),
+        linear-gradient(135deg, var(--psyche-dark-purple) 0%, var(--psyche-black) 50%);
       color: var(--text);
       font-family: "Helvetica Neue", Helvetica, Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       user-select: none;
@@ -61,48 +59,46 @@ background:
     }
 
     .header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 14px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 14px;
 
-  padding: 18px;
-  border-radius: var(--radius);
-  border: 1px solid rgba(249,160,0,0.35);
+      padding: 18px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(249,160,0,0.35);
 
-  background: linear-gradient(135deg, rgba(48, 33, 68, 1) 0%, rgba(18,3,29,0.55) 100%);
-  box-shadow: var(--glow);
-  backdrop-filter: blur(10px);
+      background: linear-gradient(135deg, rgba(48, 33, 68, 1) 0%, rgba(18,3,29,0.55) 100%);
+      box-shadow: var(--glow);
+      backdrop-filter: blur(10px);
 
-  position: relative;
-  overflow: hidden;
+      position: relative;
+      overflow: hidden;
+    }
 
-}
+    .stat { text-align: center; }
 
-.stat { text-align: center; }
+    .divider {
+      width: 1px;
+      height: 80%;
+      background: rgba(249,160,0,0.35);
+      border-radius: 2px;
+    }
 
-.divider {
-  width: 1px;
-  height: 80%;
-  background: rgba(249,160,0,0.35);
-  border-radius: 2px;
-}
+    .label {
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.70);
+      margin-bottom: 8px;
+    }
 
-.label {
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.70);
-  margin-bottom: 8px;
-}
-
-.count {
-  font-size: clamp(44px, 7vw, 70px);
-  font-weight: 800;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
+    .count {
+      font-size: clamp(44px, 7vw, 70px);
+      font-weight: 800;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
 
     .btn {
       flex: 1;
@@ -119,30 +115,26 @@ background:
     }
 
     #mashBtn {
-  white-space: pre-line;
-  background: linear-gradient(135deg, var(--psyche-purple) 0%, var(--psyche-dark-purple) 80%);
-  border: 1px solid rgba(249,160,0,0.55);
-}
-
-    #resetBtn {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.14);
-  color: var(--text);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-
-    .btn:active {
-      transform: scale(0.985);
+      white-space: pre-line;
+      background: linear-gradient(135deg, var(--psyche-purple) 0%, var(--psyche-dark-purple) 80%);
+      border: 1px solid rgba(249,160,0,0.55);
     }
 
-    /*.btn.disabled {
-      background: rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.4);
-      pointer-events: none;
+    #resetBtn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: var(--text);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .btn:active { transform: scale(0.985); }
+
+    .btn.disabled {
       opacity: 0.6;
-    }*/
+      pointer-events: none;
+    }
+
     .reset {
       flex: 0;
       padding: 10px 18px;
@@ -156,100 +148,349 @@ background:
       color: var(--muted);
       font-size: 14px;
     }
+
+    /* --- "Pages" --- */
+    .page { display: none; }
+    .page.active { display: flex; }
+
+    /* Results page visuals */
+    .results {
+      height: 100%;
+      padding: 16px;
+      
+      flex-direction: column;
+      gap: 14px;
+      max-width: 720px;
+      margin: 0 auto;
+      justify-content: center;
+    }
+
+    .card {
+      border-radius: var(--radius);
+      border: 1px solid rgba(249,160,0,0.35);
+      background: linear-gradient(135deg, rgba(48, 33, 68, 0.9) 0%, rgba(18,3,29,0.55) 100%);
+      box-shadow: var(--glow);
+      padding: 18px;
+      text-align: center;
+    }
+
+    .big {
+      font-size: clamp(22px, 3.5vw, 30px);
+      font-weight: 900;
+      margin: 0 0 10px;
+    }
+
+    .sub {
+      color: rgba(255,255,255,0.75);
+      margin: 0;
+    }
+
+    .satellite-wrap {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 6px 0 2px;
+    }
+
+    .satellite-gif {
+      width: 240px;
+      max-width: 60vw;
+      opacity: 0.95;
+      pointer-events: none;
+      filter: drop-shadow(0 6px 18px rgba(0,0,0,0.45));
+    }
+
+    .asteroid-overlay {
+      position: absolute;
+      width: 62px;
+      height: 62px;
+      pointer-events: none;
+      left: 51%;
+      top: 50%;
+      transform: translate(-55%, -42%);
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.45));
+    }
+
+    #funFact {
+      white-space: pre-line;
+      font-size: 18px;
+      line-height: 1.35;
+      margin-top: 10px;
+      display: none; /* shown after 5s */
+    }
   </style>
 </head>
 
 <body>
-  <main class="wrap">
-<section class="header" aria-live="polite">
-  <div class="stat">
-    <div class="label">Time Left</div>
-    <div id="time" class="count">5</div>
-  </div>
+  <audio id="mashSfx" src="assets/mash-loop.mp3" preload="auto" loop></audio>
 
-  <div class="divider" aria-hidden="true"></div>
+  <audio id="cameraSound1" src="assets/camera sound 1.mp3" preload="auto"></audio>
+  <audio id="cameraSound2" src="assets/camera sound 2.mp3" preload="auto"></audio>
 
-  
-  <div class="stat">
-    <div class="label">Presses</div>
-    <div id="count" class="count">0</div>
-  </div>
-</section>
+  <audio id="congratsSfx" src="assets/congratulations.mp3" preload="auto"></audio>
 
+  <!-- PAGE 1: GAME -->
+  <main id="pageGame" class="wrap page active">
+    <section class="header" aria-live="polite">
+      <div class="stat">
+        <div class="label">Time Left</div>
+        <div id="time" class="count">5</div>
+      </div>
+
+      <div class="divider" aria-hidden="true"></div>
+
+      <div class="stat">
+        <div class="label">Presses</div>
+        <div id="count" class="count">0</div>
+      </div>
+    </section>
 
     <button id="mashBtn" class="btn" type="button">PRESS THE BUTTON TO START</button>
 
-
-    <button id="resetBtn" class="btn reset" type="button">
-      RESET
-    </button>
+    <button id="resetBtn" class="btn reset" type="button">RESET</button>
 
     <div class="hint">Mash as fast as you can 🚀</div>
   </main>
 
+  <!-- PAGE 2: RESULTS -->
+  <main id="pageResults" class="results page">
+    <div class="card">
+      <p class="big">Scanning complete 🛰️</p>
+      <p class="sub">Your presses: <span id="finalScore">0</span></p>
+
+      <div id="animWrap" class="satellite-wrap" aria-hidden="true">
+        <img id="satGif" src="assets/satellite.gif" alt="Satellite orbiting an asteroid" class="satellite-gif" />
+        <img src="assets/asteroid.png" alt="" class="asteroid-overlay" />
+      </div>
+
+      <div id="funFact"></div>
+
+      <button id="playAgainBtn" class="btn reset" type="button" style="margin-top:14px;">
+        PLAY AGAIN
+      </button>
+    </div>
+  </main>
+
   <script>
+    const pageGame = document.getElementById("pageGame");
+    const pageResults = document.getElementById("pageResults");
+
     const countEl = document.getElementById("count");
     const timeEl = document.getElementById("time");
     const btn = document.getElementById("mashBtn");
     const resetBtn = document.getElementById("resetBtn");
 
+    const finalScoreEl = document.getElementById("finalScore");
+    const animWrap = document.getElementById("animWrap");
+    const funFactEl = document.getElementById("funFact");
+    const playAgainBtn = document.getElementById("playAgainBtn");
+
+    const satGif = document.getElementById("satGif");
+
+    const mashSfx = document.getElementById("mashSfx");
+    const cameraSound1 = document.getElementById("cameraSound1");
+    const cameraSound2 = document.getElementById("cameraSound2");
+
+    const congratsSfx = document.getElementById("congratsSfx");
+
+
+
+    let cameraSoundInterval = null;
     let count = 0;
     let timeLeft = 5;
     let timerStarted = false;
     let timerId = null;
+    let resultsTimeoutId = null;
 
-    function resetGame() {
-  if (timerId !== null) {
-    clearInterval(timerId);
-    timerId = null;
+    function pickGifForScore(score) {
+
+  if (score <= 5)
+    return "assets/satellite-very-slow.gif";
+
+  if (score <= 10)
+    return "assets/satellite-slow.gif";
+
+  if (score <= 15)
+    return "assets/satellite.gif";
+
+  if (score <= 20)
+    return "assets/satellite-fast.gif";
+
+  if (score <= 25)
+    return "assets/satellite-very-fast.gif";
+
+  if (score <= 30)
+    return "assets/satellite-extremely-fast.gif";
+
+  return "assets/satellite-max-speed.gif";
+}
+
+function startMashAudio() {
+  if (!mashSfx) return;
+  mashSfx.currentTime = 0;
+  mashSfx.play().catch(() => {
+    // autoplay restrictions are normal; first user gesture usually unlocks it
+  });
+}
+
+function stopMashAudio() {
+  if (!mashSfx) return;
+  mashSfx.pause();
+  mashSfx.currentTime = 0;
+}
+function startCameraSounds() {
+
+  stopCameraSounds();
+
+  cameraSoundInterval = setInterval(() => {
+
+    const sound = Math.random() < 0.5 ? cameraSound1 : cameraSound2;
+
+    sound.currentTime = 0;
+
+    sound.play().catch(() => {});
+
+  }, 400 + Math.random() * 600);
+
+}
+
+function stopCameraSounds() {
+
+  if (cameraSoundInterval !== null) {
+    clearInterval(cameraSoundInterval);
+    cameraSoundInterval = null;
   }
 
-  count = 0;
-  timeLeft = 5;
-  timerStarted = false;
-
-  countEl.textContent = count;
-  timeEl.textContent = timeLeft;
-
-  btn.classList.remove("disabled");
-  btn.textContent = "PRESS THE BUTTON TO START";
+  cameraSound1.pause();
+  cameraSound2.pause();
 
 }
-function getEndMessage(score) {
-  if (score < 2) return "You scanned 3% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
-  if (score < 3) return "You scanned 6% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
-  if (score < 4) return "You scanned 9% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered";
-  if (score < 5) return "You scanned 12% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered";
-  if (score < 6) return "You scanned 15% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered";
-  if (score < 7) return "You scanned 18% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 8) return "You scanned 21% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 9) return "You scanned 24% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 10) return "You scanned 27% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 11) return "You scanned 30% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 12) return "You scanned 33% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 13) return "You scanned 36% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 14) return "You scanned 39% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 15) return "You scanned 42% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 16) return "You scanned 45% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 17) return "You scanned 48% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 18) return "You scanned 51% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 19) return "You scanned 54% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 20) return "You scanned 57% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 21) return "You scanned 60% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 22) return "You scanned 63% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 23) return "You scanned 66% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 24) return "You scanned 69% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 25) return "You scanned 72% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 26) return "You scanned 75% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 27) return "You scanned 78% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 28) return "You scanned 81% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 29) return "You scanned 84% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 30) return "You scanned 87% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 31) return "You scanned 90% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 32) return "You scanned 93% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  if (score < 33) return "You scanned 96% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-  return "You scanned 100% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+
+function playCongrats() {
+  if (!congratsSfx) return;
+  congratsSfx.currentTime = 0;
+  congratsSfx.play().catch(() => {});
 }
+
+function stopCongrats() {
+  if (!congratsSfx) return;
+  congratsSfx.pause();
+  congratsSfx.currentTime = 0;
+}
+
+
+    function showPage(which) {
+      pageGame.classList.toggle("active", which === "game");
+      pageResults.classList.toggle("active", which === "results");
+    }
+
+    function resetGame() {
+      stopMashAudio();
+      stopCameraSounds();
+      stopCongrats();
+
+      if (timerId !== null) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+      if (resultsTimeoutId !== null) {
+        clearTimeout(resultsTimeoutId);
+        resultsTimeoutId = null;
+      }
+
+      count = 0;
+      timeLeft = 5;
+      timerStarted = false;
+
+      countEl.textContent = count;
+      timeEl.textContent = timeLeft;
+
+      btn.classList.remove("disabled");
+      btn.textContent = "PRESS THE BUTTON TO START";
+
+      // reset results page state
+      finalScoreEl.textContent = "0";
+      funFactEl.style.display = "none";
+      funFactEl.textContent = "";
+      animWrap.style.display = "flex";
+
+      showPage("game");
+    }
+
+    function getEndMessage(score) {
+      if (score < 2) return "You scanned 3% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
+      if (score < 3) return "You scanned 6% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
+      if (score < 4) return "You scanned 9% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered";
+      if (score < 5) return "You scanned 12% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered";
+      if (score < 6) return "You scanned 15% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered";
+      if (score < 7) return "You scanned 18% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 8) return "You scanned 21% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 9) return "You scanned 24% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 10) return "You scanned 27% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 11) return "You scanned 30% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 12) return "You scanned 33% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 13) return "You scanned 36% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 14) return "You scanned 39% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 15) return "You scanned 42% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 16) return "You scanned 45% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 17) return "You scanned 48% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 18) return "You scanned 51% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 19) return "You scanned 54% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 20) return "You scanned 57% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 21) return "You scanned 60% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 22) return "You scanned 63% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 23) return "You scanned 66% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 24) return "You scanned 69% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 25) return "You scanned 72% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 26) return "You scanned 75% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 27) return "You scanned 78% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 28) return "You scanned 81% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 29) return "You scanned 84% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 30) return "You scanned 87% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 31) return "You scanned 90% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 32) return "You scanned 93% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 33) return "You scanned 96% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      return "You scanned 100% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+    }
+
+    function endGame() {
+      stopMashAudio();
+
+      // lock input
+      btn.classList.add("disabled");
+
+      // go to results page
+      finalScoreEl.textContent = String(count);
+      // select correct speed gif
+satGif.src = pickGifForScore(count);
+
+// force restart animation
+satGif.src = satGif.src.split("?")[0] + "?t=" + Date.now();
+
+      showPage("results");
+      startCameraSounds();
+
+      // show gif for 5 seconds, then hide + show fun fact
+      funFactEl.textContent = getEndMessage(count);
+      funFactEl.style.display = "none";
+      animWrap.style.display = "flex";
+
+      resultsTimeoutId = setTimeout(() => {
+  stopCameraSounds();
+
+  animWrap.style.display = "none";
+  funFactEl.style.display = "block";
+
+  // play congrats when they hit 100% and see their fact
+  if (getEndMessage(count).includes("100%")) {
+    playCongrats();
+  }
+}, 5000);
+
+
+    }
+
     function startTimer() {
       timerId = setInterval(() => {
         timeLeft--;
@@ -257,8 +498,8 @@ function getEndMessage(score) {
 
         if (timeLeft <= 0) {
           clearInterval(timerId);
-          btn.classList.add("disabled");
-          btn.textContent = getEndMessage(count);
+          timerId = null;
+          endGame();
         }
       }, 1000);
     }
@@ -266,9 +507,12 @@ function getEndMessage(score) {
     btn.addEventListener("pointerdown", (e) => {
       e.preventDefault();
 
+      if (btn.classList.contains("disabled")) return;
+
       if (!timerStarted) {
         timerStarted = true;
         btn.textContent = "TAP!";
+        startMashAudio();
         startTimer();
       }
 
@@ -277,12 +521,9 @@ function getEndMessage(score) {
         countEl.textContent = count;
       }
     }, { passive: false });
-    resetBtn.addEventListener("click", () => {
-  resetGame();
-});
 
+    resetBtn.addEventListener("click", resetGame);
+    playAgainBtn.addEventListener("click", resetGame);
   </script>
 </body>
 </html>
-
-
