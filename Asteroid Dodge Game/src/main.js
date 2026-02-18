@@ -28,6 +28,26 @@ resizeCanvas();
 let W = canvas.width;
 let H = canvas.height;
 
+// --- UI scaling helpers ---
+function getUiScale() {
+  // 390x844 scale down/up smoothly
+  return Math.min(W / 390, H / 844);
+}
+
+function fontPx(px, family = "sans-serif", weight = "") {
+  const size = Math.max(12, Math.round(px * getUiScale())); // never too tiny
+  return `${weight ? weight + " " : ""}${size}px ${family}`;
+}
+
+// --- Safe area ---
+function getSafeTop() {
+  // visualViewport offset helps on mobile browsers 
+  const vv = window.visualViewport;
+  const top = vv ? Math.max(0, vv.offsetTop) : 0;
+  return top + 16; // add small margin so HUD isn't hugging the edge
+}
+
+
 // --- Mobile haptics (safe fallback) ---
 function vibrate(pattern) {
   if (navigator.vibrate) navigator.vibrate(pattern);
@@ -309,9 +329,11 @@ function draw() {
 
   if (gameState === "playing") {
     ctx.fillStyle = "white";
-    ctx.font = UI.HUD_FONT;
+    const safeTop = getSafeTop();
+    ctx.font = fontPx(22, "monospace"); 
+
     ctx.textAlign = "left";
-    ctx.fillText(`Score: ${score}`, 20, 40);
+    ctx.fillText(`Score: ${score}`, 20, safeTop + 24);
 
     // --- Start hint overlay ---
     if (startHintAlpha > 0) {
@@ -330,7 +352,7 @@ function draw() {
       const boxH = 22 + padY * 2;
 
       const x = W / 2;
-      const y = UI.START_HINT_Y;
+      const y = safeTop + 85;
 
       ctx.fillStyle = "rgba(0,0,0,0.55)";
       ctx.fillRect(x - boxW / 2, y - boxH / 2, boxW, boxH);
@@ -342,7 +364,7 @@ function draw() {
     }
 
     // power-up indicators
-    let y = 70;
+    let y = safeTop + 55;
     if (activePowerUps.shield) {
       ctx.fillStyle = "cyan";
       ctx.fillText("🛡️ Shield Active", 20, y);
