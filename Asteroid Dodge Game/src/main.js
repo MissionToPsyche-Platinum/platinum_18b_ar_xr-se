@@ -16,9 +16,8 @@ const { SCORING, UI, PLAYER } = CONSTANTS;
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 let gameOverFade = 0;
-let isPaused = false; 
+let isPaused = false;
 effects.playerRef = player;
-
 
 //fit to screen for mobile/web
 function resizeCanvas() {
@@ -29,12 +28,16 @@ resizeCanvas();
 let W = canvas.width;
 let H = canvas.height;
 
+// --- Mobile haptics (safe fallback) ---
+function vibrate(pattern) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+
 // --- Initialize Player ---
 player.init(W, H);
 
-// --- Initialize Facts --- //
+// --- Initialize Facts ---
 facts.init();
-
 
 // Keep updated when window resizes
 window.addEventListener('resize', () => {
@@ -42,9 +45,6 @@ window.addEventListener('resize', () => {
   W = canvas.width;
   H = canvas.height;
 });
-
-
-
 
 // --- Input (keyboard) ---
 let keys = { left: false, right: false };
@@ -56,23 +56,28 @@ window.addEventListener('keydown', e => {
     else if (gameState === "gameover") restartGame();
   }
 
-   // Toggle educational facts
-  if (e.code === 'KeyF') {
-    facts.toggle();
-  }
+  // Toggle educational facts
+  if (e.code === 'KeyF') facts.toggle();
 
   if ((e.code === "KeyP" || e.code === "Escape") && gameState === "playing") {
     isPaused = !isPaused;
-    // Stop movement if a key was held during pause
     keys.left = false;
     keys.right = false;
   }
-
 });
 
 window.addEventListener('keyup', e => {
   if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
   if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+});
+
+// --- Auto-pause when app loses focus ---
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && gameState === "playing") {
+    isPaused = true;
+    keys.left = false;
+    keys.right = false;
+  }
 });
 
 // --- Touch (Mobile) ---
@@ -139,12 +144,13 @@ canvas.addEventListener(
   { passive: false }
 );
 
-
 // --- Scoring / difficulty ---
 let score = 0;
 let highScore = parseInt(localStorage.getItem("highScore")) || 0;
 let elapsedTime = 0;
 let difficulty = 1;
+
+// --- Start overlay hint state ---
 let startHintTimer = 0;
 let startHintAlpha = 0;
 
@@ -162,17 +168,18 @@ function startGame() {
   gameState = "playing";
   score = 0;
   elapsedTime = 0;
-  startHintTimer = 0;
-  startHintAlpha  = 1
   difficulty = 1;
   isPaused = false;
+
+  // reset start hint each run
+  startHintTimer = 0;
+  startHintAlpha = 1;
 
   resetAsteroids();
   resetPowerUps();
   effects.reset();
   facts.reset();
 
- 
   // reset player position each run
   player.x = W / 2 - player.w / 2;
   player.y = H - PLAYER.GAME_BOTTOM_OFFSET;
@@ -199,13 +206,12 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
-// --- Difficulty easing --- (starts slow, ramps, then smooths out)
+// --- Difficulty easing ---
 function easedDifficulty(elapsed, rampTime, cap) {
-  const t = Math.max(0, Math.min(1, elapsed / rampTime)); 
-  const eased = t * t * (3 - 2 * t); 
-  return 1 + eased * cap; 
+  const t = Math.max(0, Math.min(1, elapsed / rampTime));
+  const eased = t * t * (3 - 2 * t); // smoothstep
+  return 1 + eased * cap;
 }
-
 
 // --- Update ---
 function update(dt) {
@@ -216,14 +222,12 @@ function update(dt) {
   }
 
   if (gameState !== "playing") return;
-    if (isPaused) {
-    // Keep background alive
+
+  if (isPaused) {
     updateStars(canvas);
-    // Keep effects from animating while paused
-     effects.update(dt);
+    effects.update(dt);
     return;
   }
-
 
   // world + score and facts update
   updateStars(canvas);
@@ -231,7 +235,7 @@ function update(dt) {
   score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? SCORING.SCORE_BOOST_MULTIPLIER : 1));
   difficulty = easedDifficulty(elapsedTime, SCORING.DIFFICULTY_RAMP_TIME, SCORING.DIFFICULTY_CAP);
   facts.update(dt, elapsedTime, score);
-  
+
   // --- Start hint timing (shows once per run) ---
   startHintTimer += dt;
   const hintHold = UI.START_HINT_HOLD;
@@ -249,27 +253,35 @@ function update(dt) {
   // player movement
   player.update(dt, keys, W);
 
-  // --- Collision check + asteroid update ---
-  updateAsteroids(dt, player, W, H, difficulty, activePowerUps, () => {
-    if (gameState !== "gameover") {
-      effects.triggerExplosion(player.x + player.w / 2, player.y + player.h / 2);
-      effects.triggerFlash();
-      effects.triggerShake();
+  // asteroids + collisions
+  updateAsteroids(
+    dt,
+    player,
+    W,
+    H,
+    difficulty,
+    activePowerUps,
+    () => {
+      if (gameState !== "gameover") {
+        effects.triggerExplosion(player.x + player.w / 2, player.y + player.h / 2);
+        effects.triggerFlash();
+        effects.triggerShake();
+        vibrate([60, 30, 60]); // game over vibration
 
-      sounds.bg.pause();
-      updateHighScore();
+        sounds.bg.pause();
+        updateHighScore();
 
-      setTimeout(() => {
-        gameState = "gameover";
-      }, 1300);
+        setTimeout(() => {
+          gameState = "gameover";
+        }, 1300);
+      }
+    },
+    () => {
+      // Near-miss feedback
+      effects.triggerNearMiss(player);
+      vibrate(15);
     }
-  },
-  () => {
-    // Near-miss feedback
-    effects.triggerNearMiss(player);
-  }
-);
-
+  );
 
   // power-ups
   updatePowerUps(dt, player, W, H);
@@ -278,13 +290,12 @@ function update(dt) {
   effects.update(dt);
 }
 
-// --Draw ---
+// --- Draw ---
 function draw() {
   ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = 'midnightblue';
   ctx.fillRect(0, 0, W, H);
 
-  // background stars
   drawStars(ctx);
 
   if (gameState === "start") {
@@ -292,13 +303,11 @@ function draw() {
     return;
   }
 
-  // --- Gameplay visuals ---
   drawAsteroids(ctx);
   drawPowerUps(ctx);
   player.draw(ctx);
 
   if (gameState === "playing") {
-    // in-game HUD
     ctx.fillStyle = "white";
     ctx.font = UI.HUD_FONT;
     ctx.textAlign = "left";
@@ -309,7 +318,6 @@ function draw() {
       ctx.save();
       ctx.globalAlpha = startHintAlpha;
 
-      // background pill
       const text = UI.START_HINT_TEXT;
       ctx.font = UI.START_HINT_FONT;
       ctx.textAlign = "center";
@@ -320,10 +328,10 @@ function draw() {
       const textW = ctx.measureText(text).width;
       const boxW = textW + padX * 2;
       const boxH = 22 + padY * 2;
+
       const x = W / 2;
       const y = UI.START_HINT_Y;
 
-      // rounded-ish rectangle 
       ctx.fillStyle = "rgba(0,0,0,0.55)";
       ctx.fillRect(x - boxW / 2, y - boxH / 2, boxW, boxH);
 
@@ -332,7 +340,6 @@ function draw() {
 
       ctx.restore();
     }
-
 
     // power-up indicators
     let y = 70;
@@ -346,46 +353,42 @@ function draw() {
       ctx.fillText("💫 Score x2", 20, y);
     }
 
-    // draw facts
     facts.draw(ctx, W);
   }
 
-  //freeze frame when paused
-    if (isPaused) {
-      ctx.fillStyle = "rgba(0,0,0,0.55)";
-      ctx.fillRect(0, 0, W, H);
+  if (isPaused) {
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.fillRect(0, 0, W, H);
 
-      ctx.textAlign = "center";
-      ctx.fillStyle = "white";
-      ctx.font = "bold 60px sans-serif";
-      ctx.fillText("PAUSED", W / 2, H / 2 - 40);
+    ctx.textAlign = "center";
+    ctx.fillStyle = "white";
+    ctx.font = "bold 60px sans-serif";
+    ctx.fillText("PAUSED", W / 2, H / 2 - 40);
 
-      ctx.font = "22px sans-serif";
-      ctx.fillStyle = "lightgray";
-      ctx.fillText("Press P or Esc to Resume", W / 2, H / 2 + 20);
-    }
+    ctx.font = "22px sans-serif";
+    ctx.fillStyle = "lightgray";
+    ctx.fillText("Press P or Esc to Resume", W / 2, H / 2 + 20);
+  }
 
-  // --- Draw effects on top of everything ---
   effects.draw(ctx, W, H);
 
   if (gameState === "gameover") {
-    // blackout overlay
     ctx.fillStyle = "rgba(0,0,0,0.85)";
     ctx.fillRect(0, 0, W, H);
     ctx.textAlign = "center";
-    
-    ctx.font = UI.GAMEOVER_TITLE_FONT;   
+
+    ctx.font = UI.GAMEOVER_TITLE_FONT;
     ctx.fillStyle = "red";
     ctx.fillText("GAME OVER", W / 2, H / 2 - 80);
 
-    ctx.font = UI.GAMEOVER_STATS_FONT;         
+    ctx.font = UI.GAMEOVER_STATS_FONT;
     ctx.fillStyle = "gold";
     ctx.fillText(`🏆 High Score: ${highScore}`, W / 2, H / 2);
 
     ctx.fillStyle = "white";
     ctx.fillText(`💫 Your Score: ${score}`, W / 2, H / 2 + 40);
 
-    ctx.font = UI.GAMEOVER_HINT_FONT;        
+    ctx.font = UI.GAMEOVER_HINT_FONT;
     ctx.fillStyle = "lightgray";
     ctx.fillText("Tap to Restart", W / 2, H / 2 + 100);
   }
