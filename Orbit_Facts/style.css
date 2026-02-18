@@ -15,15 +15,14 @@ body {
     align-items: center;
 }
 
-/* Sun scales with viewport */
+/* Sun glow effect */
 .sun {
+    left: calc(49.5%); /* fixes alignment */
     position: absolute;
     width: clamp(80px, 10vmin, 140px);
     height: clamp(80px, 10vmin, 140px);
-    background: radial-gradient(circle, #ffec8b, #f4c542, #e69500);
-    border-radius: 50%;
     box-shadow: 0 0 80px 30px rgba(255, 200, 50, 0.6);
-    z-index: 1;
+    pointer-events: none;
 }
 
 /* Orbit scales with viewport and stays centered */
@@ -38,7 +37,6 @@ body {
 }
 
 .orbit-circle {
-    /* no longer used, moved to .js to calculate orbital lines */
     display: none;
 }
 

@@ -37,31 +37,35 @@ function initThreeSize() {
     renderer.setSize(width, height);
     renderer.setPixelRatio(window.devicePixelRatio || 1);
 
-    const padding = 150;
+    const padding = 250; // Increased padding to accommodate Sun and elliptical offset
+
+    // Calculate elliptical offset for camera positioning
+    const eccentricity = 0.14;
+    const centerOffset = radius * eccentricity;
 
     // Create or update an orthographic camera that matches the orbit dimensions
     if (!camera) {
         camera = new THREE.OrthographicCamera(
-            width / -4 - padding,
-            width / 4 + padding,
-            height / 4 + padding,
-            height / -4 - padding,
+            width / -2 - padding - centerOffset,
+            width / 2 + padding - centerOffset,
+            height / 2 + padding,
+            height / -2 - padding,
             0.1,
             2000
         );
-        camera.position.set(0, 0, 1000);
-        camera.lookAt(0, 0, 0);
+        camera.position.set(-centerOffset, 0, 1000);
+        camera.lookAt(-centerOffset, 0, 0);
     } else {
-        camera.left = width / -3 - padding;
-        camera.right = width / 3 + padding;
-        camera.top = height / 3 + padding;
-        camera.bottom = height / -3 - padding;
+        camera.left = width / -2 - padding - centerOffset;
+        camera.right = width / 2 + padding - centerOffset;
+        camera.top = height / 2 + padding;
+        camera.bottom = height / -2 - padding;
         camera.updateProjectionMatrix();
     }
 
     // Calculate radius from orbit container since orbit-circle is now hidden
     const circleRadius = Math.min(width, height) / 1.32;
-    radius = circleRadius / 2;
+    radius = circleRadius;
 
     // Draw the elliptical orbit line in Three.js using the same values as the asteroid path
     drawOrbitLine();
@@ -245,6 +249,32 @@ loader.load(
     }
 );
 
+// Load Sun GLTF model
+loader.load(
+    './models/psyche/sun.glb',
+    function (gltf) {
+        const sunModel = gltf.scene;
+        sunModel.position.set(0, 0, 0); // Position at origin (center)
+        sunModel.scale.set(150, 150, 150); // Enlarged for visibility
+
+        // Disable frustum culling
+        sunModel.traverse((child) => {
+            if (child.isMesh) {
+                child.frustumCulled = false;
+            }
+        });
+
+        scene.add(sunModel);
+        console.log('Sun model loaded!');
+    },
+    function (xhr) {
+        console.log('Sun: ' + (xhr.loaded / xhr.total * 100) + '% loaded');
+    },
+    function (error) {
+        console.error('Error loading Sun model:', error);
+    }
+);
+
 // Slider listener
 slider.addEventListener('input', () => {
     const angle = parseFloat(slider.value);
@@ -259,10 +289,10 @@ viewToggle.addEventListener('click', () => {
     if (psycheModel) {
         if (isRealisticView) {
             // "Realistic" (smaller) view
-            psycheModel.scale.set(.6, .6, .6);
+            psycheModel.scale.set(1, 1, 1);
         } else {
             // To Scale view - easier to see
-            psycheModel.scale.set(7, 7, 7);
+            psycheModel.scale.set(8, 8, 8);
         }
 
         const currentAngle = parseFloat(slider.value);
