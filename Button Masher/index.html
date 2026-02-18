@@ -228,6 +228,7 @@
   <audio id="cameraSound1" src="assets/camera sound 1.mp3" preload="auto"></audio>
   <audio id="cameraSound2" src="assets/camera sound 2.mp3" preload="auto"></audio>
 
+  <audio id="congratsSfx" src="assets/congratulations.mp3" preload="auto"></audio>
 
   <!-- PAGE 1: GAME -->
   <main id="pageGame" class="wrap page active">
@@ -291,6 +292,7 @@
     const cameraSound1 = document.getElementById("cameraSound1");
     const cameraSound2 = document.getElementById("cameraSound2");
 
+    const congratsSfx = document.getElementById("congratsSfx");
 
 
 
@@ -365,6 +367,18 @@ function stopCameraSounds() {
 
 }
 
+function playCongrats() {
+  if (!congratsSfx) return;
+  congratsSfx.currentTime = 0;
+  congratsSfx.play().catch(() => {});
+}
+
+function stopCongrats() {
+  if (!congratsSfx) return;
+  congratsSfx.pause();
+  congratsSfx.currentTime = 0;
+}
+
 
     function showPage(which) {
       pageGame.classList.toggle("active", which === "game");
@@ -374,6 +388,7 @@ function stopCameraSounds() {
     function resetGame() {
       stopMashAudio();
       stopCameraSounds();
+      stopCongrats();
 
       if (timerId !== null) {
         clearInterval(timerId);
@@ -462,13 +477,17 @@ satGif.src = satGif.src.split("?")[0] + "?t=" + Date.now();
       animWrap.style.display = "flex";
 
       resultsTimeoutId = setTimeout(() => {
-
   stopCameraSounds();
 
   animWrap.style.display = "none";
   funFactEl.style.display = "block";
 
+  // play congrats when they hit 100% and see their fact
+  if (getEndMessage(count).includes("100%")) {
+    playCongrats();
+  }
 }, 5000);
+
 
     }
 
