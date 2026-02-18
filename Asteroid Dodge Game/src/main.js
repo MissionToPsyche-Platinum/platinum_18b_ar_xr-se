@@ -352,7 +352,7 @@ function draw() {
       const boxH = 22 + padY * 2;
 
       const x = W / 2;
-      const y = safeTop + 85;
+    const y = safeTop + 85;
 
       ctx.fillStyle = "rgba(0,0,0,0.55)";
       ctx.fillRect(x - boxW / 2, y - boxH / 2, boxW, boxH);
@@ -384,10 +384,10 @@ function draw() {
 
     ctx.textAlign = "center";
     ctx.fillStyle = "white";
-    ctx.font = "bold 60px sans-serif";
+    ctx.font = fontPx(56, "sans-serif", "bold");
     ctx.fillText("PAUSED", W / 2, H / 2 - 40);
 
-    ctx.font = "22px sans-serif";
+    ctx.font = fontPx(22, "sans-serif");
     ctx.fillStyle = "lightgray";
     ctx.fillText("Press P or Esc to Resume", W / 2, H / 2 + 20);
   }
@@ -399,18 +399,18 @@ function draw() {
     ctx.fillRect(0, 0, W, H);
     ctx.textAlign = "center";
 
-    ctx.font = UI.GAMEOVER_TITLE_FONT;
+    ctx.font = fontPx(54, "sans-serif", "bold");
     ctx.fillStyle = "red";
     ctx.fillText("GAME OVER", W / 2, H / 2 - 80);
 
-    ctx.font = UI.GAMEOVER_STATS_FONT;
+    ctx.font = fontPx(26, "sans-serif");
     ctx.fillStyle = "gold";
     ctx.fillText(`🏆 High Score: ${highScore}`, W / 2, H / 2);
 
     ctx.fillStyle = "white";
     ctx.fillText(`💫 Your Score: ${score}`, W / 2, H / 2 + 40);
 
-    ctx.font = UI.GAMEOVER_HINT_FONT;
+    ctx.font = fontPx(20, "sans-serif");
     ctx.fillStyle = "lightgray";
     ctx.fillText("Tap to Restart", W / 2, H / 2 + 100);
   }
