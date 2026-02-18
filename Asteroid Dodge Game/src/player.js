@@ -33,12 +33,34 @@ export const player = {
     if (this.x + this.w > W) this.x = W - this.w;
   },
 
-  draw(ctx) {
+     draw(ctx) {
+    ctx.save();
+
+    // Subtle outline/glow for better visibility on bright screens
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = "rgba(255,255,255,0.85)";
+
     if (this.sprite && this.sprite.complete && this.sprite.naturalWidth > 0) {
       ctx.drawImage(this.sprite, this.x, this.y, this.w, this.h);
+
+      // Thin outline helps even more 
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(255,255,255,0.35)";
+      ctx.strokeRect(this.x + 1, this.y + 1, this.w - 2, this.h - 2);
     } else {
-      ctx.fillStyle = "#ee4444"; // red block fallback
+      // fallback block + outline
+      ctx.fillStyle = "#ee4444";
       ctx.fillRect(this.x, this.y, this.w, this.h);
+
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(255,255,255,0.6)";
+      ctx.strokeRect(this.x + 1, this.y + 1, this.w - 2, this.h - 2);
     }
+
+    ctx.restore();
   }
+
+
 };
