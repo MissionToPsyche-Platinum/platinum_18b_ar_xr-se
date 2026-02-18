@@ -4,7 +4,7 @@ import { sounds } from './audio.js';
 import { updateAsteroids, drawAsteroids, resetAsteroids } from './asteroid.js';
 import { updatePowerUps, drawPowerUps, activePowerUps, resetPowerUps } from './powerups.js';
 import { initStars, updateStars, drawStars } from './stars.js';
-import { drawMenuOverlay, toggleMenu, isMenuVisible } from "./menu.js";
+import { toggleMenu, isMenuVisible } from "./menu.js";
 
 import { startMenu } from './start.js';
 import { effects } from './effects.js';
@@ -18,8 +18,6 @@ const { SCORING, UI, PLAYER } = CONSTANTS;
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
-const disclaimer = "This is not an accurate representation of the Mission to Psyche." +
-                  "The Mission to Psyche will not travel through the asteroid belt and will not be dodging asteroids/meteoroids.";
 let gameOverFade = 0;
 let isPaused = false; 
 effects.playerRef = player;
@@ -73,6 +71,7 @@ window.addEventListener('keydown', e => {
       gameState = "menu";
     } else {
       gameState = prevState;
+      prevState = null;
     }
   }
 
@@ -108,19 +107,6 @@ canvas.addEventListener('touchmove', e => {
 canvas.addEventListener('touchend', () => {
   touchStartX = null;
 });
-
-// This might need to be changed/edited later if we want to support more clicks
-// --- Mute Icon Listener --- //
-canvas.addEventListener('click', (e) => {
-
-  if(gameState !== "menu") return;
-
-  const rect = canvas.getBoundingClientRect();
-  const mouseX = e.clientX - rect.left;
-  const mouseY = e.clientY - rect.top;
-
-   (mouseX, mouseY);
-})
 
 // --- Scoring / difficulty ---
 let score = 0;
@@ -186,9 +172,9 @@ function update(dt) {
   }
 
   if (gameState !== "playing") return;
-    if (isPaused) {
+    if (isPaused || isMenuVisible()) {
     // Keep background alive
-    updateStars(canvas);
+    //updateStars(canvas);
     // Keep effects from animating while paused
      effects.update(dt);
     return;
@@ -242,10 +228,6 @@ function draw() {
 
   if (gameState === "start" || (isMenuVisible && prevState === "start")) {
     startMenu.draw(ctx, W, H);
-    if(isMenuVisible()) {
-      console.log("");
-      drawMenuOverlay(ctx);
-    }
     return;
   }
 
@@ -315,9 +297,6 @@ function draw() {
     ctx.font = UI.GAMEOVER_HINT_FONT;        
     ctx.fillStyle = "lightgray";
     ctx.fillText("Tap to Restart", W / 2, H / 2 + 100);
-  }
-  if(isMenuVisible()) {
-    drawMenuOverlay(ctx);
   }
 }
 

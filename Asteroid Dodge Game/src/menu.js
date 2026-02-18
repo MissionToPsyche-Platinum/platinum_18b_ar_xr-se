@@ -62,10 +62,6 @@ export function isMenuVisible() {
     return showMenu;
 }
 
-//Rewrite to use HTML elements instead of draw on the canvas
-export function drawMenuOverlay(ctx) {
-}
-
 function buildMenuDOM() {
     const menu = document.createElement("div");
     menu.id = "game-overlay";
