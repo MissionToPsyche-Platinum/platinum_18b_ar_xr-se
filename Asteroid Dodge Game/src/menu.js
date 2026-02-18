@@ -67,7 +67,6 @@ function buildMenuDOM() {
     menu.id = "game-overlay";
     menu.className = "game-overlay";
     menu.innerHTML = `
-    <div class="paused-label">Paused</div>
     <div class="overlay-center">
         <div id="menu-content"></div>
     </div>

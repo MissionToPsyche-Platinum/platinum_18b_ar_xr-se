@@ -171,7 +171,7 @@ function update(dt) {
     return;
   }
 
-  if (gameState !== "playing") return;
+  if (gameState !== "playing" &&  prevState !== "playing") return;
     if (isPaused || isMenuVisible()) {
     // Keep background alive
     updateStars(canvas);
@@ -260,7 +260,7 @@ function draw() {
   }
 
   //freeze frame when paused
-    if (isPaused) {
+    if (isPaused || isMenuVisible()) {
       ctx.fillStyle = "rgba(0,0,0,0.55)";
       ctx.fillRect(0, 0, W, H);
 

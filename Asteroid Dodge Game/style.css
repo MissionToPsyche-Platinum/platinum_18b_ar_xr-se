@@ -16,13 +16,15 @@ canvas {
 .game-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: transparent;
     display: grid;
     place-items: center;
     z-index: 1000;
+    pointer-events: none;
 }
 
 .overlay-center {
+    pointer-events: auto;
     display: grid;
     place-items: center;
     width: 100%;
