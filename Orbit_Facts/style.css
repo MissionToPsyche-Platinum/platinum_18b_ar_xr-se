@@ -15,15 +15,14 @@ body {
     align-items: center;
 }
 
-/* Sun scales with viewport */
+/* Sun glow effect */
 .sun {
+    left: calc(49.5%); /* fixes alignment */
     position: absolute;
     width: clamp(80px, 10vmin, 140px);
     height: clamp(80px, 10vmin, 140px);
-    background: radial-gradient(circle, #ffec8b, #f4c542, #e69500);
-    border-radius: 50%;
     box-shadow: 0 0 80px 30px rgba(255, 200, 50, 0.6);
-    z-index: 1;
+    pointer-events: none;
 }
 
 /* Orbit scales with viewport and stays centered */
@@ -38,12 +37,7 @@ body {
 }
 
 .orbit-circle {
-    position: absolute;
-    width: 80%;
-    height: 80%;
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    pointer-events: none;
+    display: none;
 }
 
 /* Three.js canvas fills the orbit container */
@@ -90,6 +84,18 @@ body {
 .view-toggle {
     position: absolute;
     top: 20px;
+    left: 20px;
+    color: white;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Autoplay toggle */
+.autoplay-toggle {
+    position: absolute;
+    top: 55px;
     left: 20px;
     color: white;
     z-index: 10;

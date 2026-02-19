@@ -2,10 +2,13 @@ const slider = document.querySelector('#orbitSlider');
 const infoBox = document.querySelector('#infoBox');
 const container = document.getElementById('three-container');
 const viewToggle = document.getElementById('viewToggle');
+const autoplayToggle = document.getElementById('autoplayToggle');
 
 let radius = 0;           // Will be set based on container size
 let isRealisticView = false; // Start with To Scale view
 let psycheModel = null;   // Will hold the loaded 3D model
+let isAutoplay = false;   // Autoplay state
+let animationId = null;   // Animation frame ID
 
 // Three.js setup
 const scene = new THREE.Scene();
@@ -19,7 +22,7 @@ container.appendChild(renderer.domElement);
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Increased ambient light
 scene.add(ambientLight);
 
-const sunLight = new THREE.DirectionalLight(0xffffff, 3); // Increased sunlight intensity
+const sunLight = new THREE.DirectionalLight(0xffffff, 10); // Increased sunlight intensity
 sunLight.position.set(0, 0, 100);
 scene.add(sunLight);
 
@@ -34,77 +37,105 @@ function initThreeSize() {
     renderer.setSize(width, height);
     renderer.setPixelRatio(window.devicePixelRatio || 1);
 
-    const padding = 150;
+    const padding = 250; // Increased padding to accommodate Sun and elliptical offset
+
+    // Calculate elliptical offset for camera positioning
+    const eccentricity = 0.14;
+    const centerOffset = radius * eccentricity;
 
     // Create or update an orthographic camera that matches the orbit dimensions
     if (!camera) {
         camera = new THREE.OrthographicCamera(
-            width / -2 - padding,
-            width / 2 + padding,
+            width / -2 - padding - centerOffset,
+            width / 2 + padding - centerOffset,
             height / 2 + padding,
             height / -2 - padding,
             0.1,
             2000
         );
-        camera.position.set(0, 0, 1000);
-        camera.lookAt(0, 0, 0);
+        camera.position.set(-centerOffset, 0, 1000);
+        camera.lookAt(-centerOffset, 0, 0);
     } else {
-        camera.left = width / -2 - padding;
-        camera.right = width / 2 + padding;
+        camera.left = width / -2 - padding - centerOffset;
+        camera.right = width / 2 + padding - centerOffset;
         camera.top = height / 2 + padding;
         camera.bottom = height / -2 - padding;
         camera.updateProjectionMatrix();
     }
 
-    // Inner dashed circle: used for actual orbit radius
-    const circleElem = document.querySelector('.orbit-circle');
-    if (circleElem) {
-        const circleRect = circleElem.getBoundingClientRect();
-        const circleWidth = circleRect.width;
-        const circleHeight = circleRect.height;
-        const circleRadius = Math.min(circleWidth, circleHeight) / 1.32;
-        const margin = 0;
-        radius = circleRadius - margin;
-    } else {
-        // Fallback if .orbit-circle doesn't exist
-        const circleRadius = Math.min(width, height) / 2;
-        const margin = 50;
-        radius = circleRadius - margin;
+    // Calculate radius from orbit container since orbit-circle is now hidden
+    const circleRadius = Math.min(width, height) / 1.32;
+    radius = circleRadius;
+
+    // Draw the elliptical orbit line in Three.js using the same values as the asteroid path
+    drawOrbitLine();
+}
+
+let orbitLine = null;
+function drawOrbitLine() {
+    // Remove existing orbit line if present
+    if (orbitLine) {
+        scene.remove(orbitLine);
     }
+
+    const eccentricity = 0.14;
+    const semiMajorAxis = radius;
+    const semiMinorAxis = radius * Math.sqrt(1 - eccentricity * eccentricity);
+    const centerOffset = radius * eccentricity;
+
+    // EllipseCurve(x, y, xRadius, yRadius, startAngle, endAngle)
+    const curve = new THREE.EllipseCurve(
+        -centerOffset, 0,       // Center offset so Sun is at one focus
+        semiMajorAxis,          // X radius
+        semiMinorAxis,          // Y radius
+        0, 2 * Math.PI,         // Full ellipse
+        false                   // Clockwise
+    );
+
+    const points = curve.getPoints(128);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        opacity: 0.5,
+        transparent: true
+    });
+
+    orbitLine = new THREE.LineLoop(geometry, material);
+    scene.add(orbitLine);
 }
 
 // Fun facts about seasons on 16 Psyche
 const facts = [
     {
-        range: [0, 45],
+        range: [0, 450],
         text: "Psyche's axial tilt of ~98° causes extreme seasons, where poles face the Sun directly during parts of the orbit."
     },
     {
-        range: [45, 90],
+        range: [450, 900],
         text: "Unlike Earth where the equator is warmest, Psyche's sideways rotation means the poles receive the most intense seasonal heating."
     },
     {
-        range: [90, 135],
+        range: [900, 1350],
         text: "Due to the high tilt, one pole experiences continuous sunlight for about 2.5 Earth years, mimicking a 2.5 year long summer day."
     },
     {
-        range: [135, 180],
+        range: [1350, 1800],
         text: "Temperature swings of 240°F can occur on Psyche between its sunlit and shadowed poles during different seasons."
     },
     {
-        range: [180, 225],
+        range: [1800, 2250],
         text: "The opposite pole endures darkness for the same duration, resulting in a long 'winter' night."
     },
     {
-        range: [225, 270],
+        range: [2250, 2700],
         text: "Psyche's elliptical orbit brings it as close as 235 million miles to the Sun and as far as 309 million miles away."
     },
     {
-        range: [270, 315],
+        range: [2700, 3150],
         text: "The rapid 4.2-hour rotation means the asteroid rotates over 10,000 times per orbit."
     },
     {
-        range: [315, 360],
+        range: [3150, 3600],
         text: "At the warmest, Psyche's surface reaches only -100°F (-70°C). At the poles during winter, temperatures plunge to -340°F (-200°C)."
     }
 ];
@@ -116,8 +147,18 @@ function updatePosition(angle) {
     }
 
     const rad = angle * Math.PI / 1800;
-    const x = Math.cos(rad) * radius;
-    const y = Math.sin(rad) * radius;
+
+    // Psyche's orbital eccentricity is ~0.14
+    // Semi-major axis (a) and semi-minor axis (b) relationship: b = a * sqrt(1 - e^2)
+    const eccentricity = 0.14;
+    const semiMajorAxis = radius;
+    const semiMinorAxis = radius * Math.sqrt(1 - eccentricity * eccentricity);
+
+    // Center offset to keep Sun at one focus (not center)
+    const centerOffset = radius * eccentricity;
+
+    const x = Math.cos(rad) * semiMajorAxis - centerOffset;
+    const y = Math.sin(rad) * semiMinorAxis;
 
     // Move the model along the orbit
     if (psycheModel) {
@@ -125,7 +166,7 @@ function updatePosition(angle) {
         psycheModel.position.y = -y;
 
         // Update sunlight to point from sun (at origin) to Psyche
-        sunLight.position.set(-x, -y, 100);
+        sunLight.position.set(0, 0, 0);
         sunLight.target = psycheModel;
 
         //calculate spins
@@ -208,6 +249,32 @@ loader.load(
     }
 );
 
+// Load Sun GLTF model
+loader.load(
+    './models/psyche/sun.glb',
+    function (gltf) {
+        const sunModel = gltf.scene;
+        sunModel.position.set(0, 0, 0); // Position at origin (center)
+        sunModel.scale.set(150, 150, 150); // Enlarged for visibility
+
+        // Disable frustum culling
+        sunModel.traverse((child) => {
+            if (child.isMesh) {
+                child.frustumCulled = false;
+            }
+        });
+
+        scene.add(sunModel);
+        console.log('Sun model loaded!');
+    },
+    function (xhr) {
+        console.log('Sun: ' + (xhr.loaded / xhr.total * 100) + '% loaded');
+    },
+    function (error) {
+        console.error('Error loading Sun model:', error);
+    }
+);
+
 // Slider listener
 slider.addEventListener('input', () => {
     const angle = parseFloat(slider.value);
@@ -238,6 +305,46 @@ window.addEventListener('resize', () => {
     initThreeSize();
     const currentAngle = parseFloat(slider.value);
     updatePosition(currentAngle);
+});
+
+// Autoplay animation function (1 degree per second = 10 slider units per second with max 3600)
+let lastTime = Date.now();
+let currentValue = 0;
+
+function animate() {
+    if (isAutoplay) {
+        const currentTime = Date.now();
+        const deltaTime = (currentTime - lastTime) / 1000; // seconds elapsed
+        lastTime = currentTime;
+
+        currentValue += 10 * deltaTime; // 10 slider units = 1 degree, so 10 per second
+
+        if (currentValue >= 3600) {
+            currentValue = 0;
+        }
+
+        slider.value = Math.floor(currentValue);
+        updatePosition(Math.floor(currentValue));
+
+        animationId = requestAnimationFrame(animate);
+    }
+}
+
+// Autoplay toggle listener
+autoplayToggle.addEventListener('click', () => {
+    isAutoplay = !isAutoplay;
+    autoplayToggle.classList.toggle('active');
+
+    if (isAutoplay) {
+        currentValue = parseFloat(slider.value);
+        lastTime = Date.now();
+        animate();
+    } else {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+    }
 });
 
 // Initial sizing and render
