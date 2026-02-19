@@ -284,6 +284,39 @@
 </head>
 
 <body>
+  <!-- Return to Hub button (drop-in) -->
+<a id="returnToHub" href="#" aria-label="Return to Hub">← Hub</a>
+
+<style>
+  #returnToHub{
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 9999;
+
+    padding: 10px 12px;
+    border-radius: 999px;
+    text-decoration: none;
+    font: 600 14px/1 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+    /* tweak these to match your Psyche palette */
+    background: rgba(18, 3, 29, 0.85);
+    color: #e8eaf0;
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(6px);
+  }
+  #returnToHub:active{ transform: scale(0.98); }
+</style>
+
+<script>
+  (function () {
+    // Works on GitHub Pages project sites: https://domain.com/<repo>/...
+    // Sets link to "/<repo>/" which loads the hub index.html.
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    const repoRoot = parts.length ? `/${parts[0]}/` : '/';
+    document.getElementById('returnToHub').href = repoRoot;
+  })();
+</script>
   <div id="disclaimer" class="page active">
   <p id="introText"></p>
 
