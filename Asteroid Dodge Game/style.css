@@ -346,3 +346,40 @@ canvas {
     gap: 18px 18px;
     align-items: start;
 }
+
+.menu-container, .controls-container, .credits-container {
+    max-height: 50vh;
+    overflow-y: auto;
+
+    /* Firefox Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.25);
+}
+
+/* Chrome/Edge/Safari */
+.menu-container::-webkit-scrollbar,
+.controls-container::-webkit-scrollbar,
+.credits-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.menu-container::-webkit-scrollbar-track,
+.controls-container::-webkit-scrollbar-track,
+.credits-container::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+}
+
+.menu-container::-webkit-scrollbar-thumb,
+.controls-container::-webkit-scrollbar-thumb,
+.credits-container::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.22);
+    border: 1px solid rgba(0,0,0,0.35);
+    border-radius: 10px;
+}
+
+.menu-container::-webkit-scrollbar-thumb:hover,
+.controls-container::-webkit-scrollbar-thumb:hover,
+.credits-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.33);
+}
