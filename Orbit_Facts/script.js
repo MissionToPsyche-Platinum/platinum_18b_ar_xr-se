@@ -1,5 +1,6 @@
 const slider = document.querySelector('#orbitSlider');
 const infoBox = document.querySelector('#infoBox');
+const generalInfoBox = document.querySelector('#generalInfoBox');
 const container = document.getElementById('three-container');
 const viewToggle = document.getElementById('viewToggle');
 const autoplayToggle = document.getElementById('autoplayToggle');
@@ -67,8 +68,40 @@ function initThreeSize() {
     const circleRadius = Math.min(width, height) / 1.32;
     radius = circleRadius;
 
+    // Position sun glow to match the Sun's position accounting for camera offset
+    updateSunGlowPosition();
+
     // Draw the elliptical orbit line in Three.js using the same values as the asteroid path
     drawOrbitLine();
+}
+
+function updateSunGlowPosition() {
+    const sunGlow = document.querySelector('.sun');
+    const orbitContainer = document.querySelector('.orbit');
+    if (sunGlow && orbitContainer) {
+        // The camera lookAt is at (-centerOffset, 0, 0)
+        // But the Sun is at (0, 0, 0)
+        // So visually, the Sun appears offset from center
+        const eccentricity = 0.14;
+        const centerOffset = radius * eccentricity;
+
+        // Get orbit container rect to position relative to it
+        const orbitRect = orbitContainer.getBoundingClientRect();
+        const spaceRect = document.querySelector('.space').getBoundingClientRect();
+
+        // Sun at (0,0,0) with camera looking at (-centerOffset, 0, 0)
+        // means Sun appears at +centerOffset in screen space
+        const sunScreenX = (orbitRect.width / 2) + centerOffset;
+        const sunScreenY = orbitRect.height / 2;
+
+        // Position relative to space container
+        const leftOffset = (orbitRect.left - spaceRect.left) + sunScreenX;
+        const topOffset = (orbitRect.top - spaceRect.top) + sunScreenY;
+
+        sunGlow.style.left = `${leftOffset}px`;
+        sunGlow.style.top = `${topOffset}px`;
+        sunGlow.style.transform = 'translate(-50%, -50%)';
+    }
 }
 
 let orbitLine = null;
@@ -140,6 +173,42 @@ const facts = [
     }
 ];
 
+// General facts about 16 Psyche
+const generalFacts = [
+    {
+        range: [0, 450],
+        text: "Psyche measures approximately 280 kilometers across—roughly the size of Massachusetts."
+    },
+    {
+        range: [450, 900],
+        text: "Psyche contains about 1% of the Moon's mass, yet may hold more metal than has ever been mined on Earth."
+    },
+    {
+        range: [900, 1350],
+        text: "Psyche's 98° axial tilt is nearly identical to Uranus, meaning both worlds roll sideways along their orbits."
+    },
+    {
+        range: [1350, 1800],
+        text: "Scientists believe Psyche is an exposed planetary core, offering a rare glimpse into planetary interiors."
+    },
+    {
+        range: [1800, 2250],
+        text: "Psyche orbits the Sun every 5 Earth years at an average distance of 270 million miles."
+    },
+    {
+        range: [2250, 2700],
+        text: "The metallic asteroid could help us understand how Earth and other planets formed their iron cores."
+    },
+    {
+        range: [2700, 3150],
+        text: "NASA's Psyche mission, launched in 2023, will reach the asteroid in 2029 to study its composition."
+    },
+    {
+        range: [3150, 3600],
+        text: "If mined, Psyche's metal could theoretically be worth more than the entire global economy."
+    }
+];
+
 function updatePosition(angle) {
     // Ensure radius is initialized
     if (!radius) {
@@ -191,6 +260,16 @@ function updatePosition(angle) {
         }
     }
     infoBox.textContent = `Fun Fact: ${currentFact}`;
+
+    // Update general fact based on angle
+    let currentGeneralFact = generalFacts[0].text;
+    for (const fact of generalFacts) {
+        if (angle >= fact.range[0] && angle < fact.range[1]) {
+            currentGeneralFact = fact.text;
+            break;
+        }
+    }
+    generalInfoBox.textContent = `General Fact: ${currentGeneralFact}`;
 
     if (camera) {
         renderer.render(scene, camera);
