@@ -383,3 +383,64 @@ canvas {
 .credits-container::-webkit-scrollbar-thumb:hover {
     background: rgba(255,255,255,0.33);
 }
+
+#fact-content {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 950;
+    width: 50%;
+    pointer-events: none;
+}
+
+.facts-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background: rgba(17, 17, 17, 0.92);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 10px 14px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+
+    color: #ddd;
+    overflow: hidden;
+}
+
+.facts-label {
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.facts-viewport {
+    flex: 1;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.facts-text {
+    white-space: nowrap;
+    display: inline-block;
+    transform: translateX(0);
+    will-change: transform;
+
+    --scroll-distance: 0px;
+    --scroll-duration: 10s;
+    --scroll-delay: 2s;
+}
+
+.facts-text.is-scrolling {
+    animation-name: facts-scroll;
+    animation-duration: var(--scroll-duration);
+    animation-delay: var(--scroll-delay);
+    animation-timing-function: linear;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes facts-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-1 * var(--scroll-distance))); }
+}

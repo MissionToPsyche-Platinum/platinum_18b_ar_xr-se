@@ -275,7 +275,10 @@ function draw() {
 
       ctx.font = "22px sans-serif";
       ctx.fillStyle = "lightgray";
-      ctx.fillText("Press P or Esc to Resume", W / 2, H / 5 * 4  + 30);
+
+      if (isPaused) ctx.fillText("Press P to Resume", W / 2, H / 5 * 4  + 30);
+      if (isMenuVisible()) ctx.fillText("Press Esc to Resume", W / 2, H / 5 * 4 + 30);
+
     }
 
   // --- Draw effects on top of everything ---

@@ -1,5 +1,6 @@
 import { audioState, toggleMaster, toggleMusic, toggleSfx, isMuted } from "./audio.js";
 import { powerUpDescriptions } from "./powerups.js";
+import { DEFAULT_FACTS } from "./facts.js";
 
 let showMenu = false;
 
@@ -11,11 +12,11 @@ const controlDKey = new Image();
 const muteIcon = new Image();
 const unmuteIcon = new Image();
 
-let muteButtonBounds;
-let creditsButtonBounds;
-
-const MUTE_ICON_SIZE = 48;
-const MUTE_ICON_PADDING = 20;
+let factIntervalId = null;
+let rotateTimeoutId = null;
+let currentFactIndex = 0;
+let factStartTime = 0;
+let scrollEnded = true;
 
 controlLeftArrow.src = './resources/leftkey.svg';
 controlRightArrow.src = './resources/rightkey.svg';
@@ -55,6 +56,7 @@ export function toggleMenu() {
         const newMenu = buildMenuDOM();
         document.body.appendChild(newMenu);
         renderMainMenu();
+        renderFactContent();
     }
 }
 
@@ -69,6 +71,7 @@ function buildMenuDOM() {
     menu.innerHTML = `
     <div class="overlay-center">
         <div id="menu-content"></div>
+        <div id="fact-content"></div>
     </div>
     `;
     return menu;
@@ -269,7 +272,6 @@ function renderCreditsMenu() {
     
     updateMenuContent(container);
 }
-
 function updateMenuContent(newContent) {
     const menuContent = document.getElementById("menu-content");
     menuContent.innerHTML = '';
@@ -291,4 +293,132 @@ function powerupsHTML(items) {
         `).join("")}
     </div>
     `;
+}
+
+function renderFactContent() {
+    console.log("Rendering Fact Content");
+    const factRoot = document.getElementById("fact-content");
+    if(!factRoot) return;
+
+    if(!factRoot.dataset.built) {
+        factRoot.dataset.built = true;
+
+
+        factRoot.innerHTML = `
+            <div class="facts-bar">
+                <div class="facts-label">Fun Fact:</div>
+                <div class="facts-viewport">
+                    <div class="facts-text" id="facts-text"></div>
+                </div>
+            </div>
+        `;
+
+        currentFactIndex = Math.floor(Math.random() * DEFAULT_FACTS.length);
+
+        setFactText();
+
+        positionFactBar();
+        window.addEventListener("resize", () => {
+            positionFactBar();
+            const textEl = document.getElementById("facts-text");
+            if(textEl) setupScrollIfNeeded(textEl);
+        });
+    } else {
+        positionFactBar();
+    }
+}
+
+function setFactText() {
+    const textEl = document.getElementById("facts-text");
+    if (!textEl) return;
+
+    if (rotateTimeoutId) {
+        clearTimeout(rotateTimeoutId);
+        rotateTimeoutId = null;
+    }
+
+    textEl.textContent = DEFAULT_FACTS[currentFactIndex];
+    textEl.classList.remove("is-scrolling");
+    textEl.style.removeProperty("--scroll-distance");
+    textEl.style.removeProperty("--scroll-duration");
+
+    factStartTime = performance.now();
+    scrollEnded = true;
+
+    requestAnimationFrame(() => {
+        setupScrollIfNeeded(textEl);
+        scheduleRotation(textEl);
+    });
+}
+
+function setupScrollIfNeeded(textEl) {
+    const viewport = textEl.closest(".facts-viewport");
+    if(!viewport) return;
+
+    const viewportW = viewport.clientWidth;
+    const textW = textEl.scrollWidth;
+
+    const overflow = textW - viewportW;
+    if (overflow <= 4) {
+        textEl.classList.remove("is-scrolling");
+        scrollEnded = true;
+        return;
+    }
+
+    scrollEnded = false;
+
+    const SPEED_PX_PER_SEC = 80;
+
+    const distance = overflow + 20;
+
+    const durationSec = Math.max(3, distance / SPEED_PX_PER_SEC);
+
+    textEl.style.setProperty("--scroll-distance", `${distance}px`);
+    textEl.style.setProperty("--scroll-duration", `${durationSec}s`);
+    textEl.style.setProperty("--scroll-delay", `2s`);
+
+    textEl.onanimationend = null;
+
+    textEl.classList.add("is-scrolling");
+
+    textEl.addEventListener("animationend", () => {
+        scrollEnded = true;
+        maybeRotateNow();
+    }, { once : true });
+}
+
+function positionFactBar() {
+    const factRoot = document.getElementById("fact-content");
+    if (!factRoot) return;
+
+    const H = window.innerHeight;
+    const hintY = H / 5 * 4 + 30;
+
+    const gapBelowHint = 18;
+    let top = Math.round(hintY + gapBelowHint);
+
+    const bar = factRoot.querySelector(".facts-bar");
+    const barHeight = bar ? bar.getBoundingClientRect().height : 60;
+    top = Math.min(top, H - barHeight - 12);
+
+    factRoot.style.top = `${top}px`;
+}
+
+function scheduleRotation(textEl) {
+    const MIN_VISIBLE_MS = 8000;
+
+    rotateTimeoutId = setTimeout(() => {
+        maybeRotateNow();
+    }, MIN_VISIBLE_MS);
+}
+
+function maybeRotateNow() {
+    const MIN_VISIBLE_MS = 8000;
+    const elapsed = performance.now() - factStartTime;
+
+    if (elapsed < MIN_VISIBLE_MS) return;
+    if (!scrollEnded) return;
+
+    currentFactIndex = (currentFactIndex + 1) % DEFAULT_FACTS.length;
+    setFactText();
 }

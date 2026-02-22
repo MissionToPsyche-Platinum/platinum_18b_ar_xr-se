@@ -26,11 +26,7 @@ export const startMenu = {
     gradient.addColorStop(1, "violet");
     ctx.fillStyle = gradient;
     ctx.font = `${Math.floor(W / 15)}px Orbitron, sans-serif`;
-<<<<<<< HEAD
     ctx.fillText("METEOROID DODGE", W / 2, H / 2 - 100);
-=======
-    ctx.fillText("METEROID DODGE", W / 2, H / 2 - 100);
->>>>>>> pause-overlay
 
     // blinking "Tap to Start"
     const alpha = (Math.sin(this.animTime * 3) + 1) / 2;
