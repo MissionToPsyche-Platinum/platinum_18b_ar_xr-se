@@ -171,7 +171,7 @@ function update(dt) {
     return;
   }
 
-  if (gameState !== "playing") return;
+  if (gameState !== "playing" &&  prevState !== "playing") return;
     if (isPaused || isMenuVisible()) {
     // Keep background alive
     updateStars(canvas);
@@ -226,8 +226,12 @@ function draw() {
   // background stars
   drawStars(ctx);
 
-  if (gameState === "start" || (isMenuVisible && prevState === "start")) {
+  if (gameState === "start" || (isMenuVisible() && prevState === "start")) {
     startMenu.draw(ctx, W, H);
+    if(isMenuVisible()) {
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(0, 0, W, H);
+    }
     return;
   }
 
@@ -260,18 +264,18 @@ function draw() {
   }
 
   //freeze frame when paused
-    if (isPaused) {
+    if (isPaused || (isMenuVisible() && prevState != "gameover")) {
       ctx.fillStyle = "rgba(0,0,0,0.55)";
       ctx.fillRect(0, 0, W, H);
 
       ctx.textAlign = "center";
       ctx.fillStyle = "white";
       ctx.font = "bold 60px sans-serif";
-      ctx.fillText("PAUSED", W / 2, H / 2 - 40);
+      ctx.fillText("PAUSED", W / 2, H / 5 -  10);
 
       ctx.font = "22px sans-serif";
       ctx.fillStyle = "lightgray";
-      ctx.fillText("Press P or Esc to Resume", W / 2, H / 2 + 20);
+      ctx.fillText("Press P or Esc to Resume", W / 2, H / 5 * 4  + 30);
     }
 
   // --- Draw effects on top of everything ---
