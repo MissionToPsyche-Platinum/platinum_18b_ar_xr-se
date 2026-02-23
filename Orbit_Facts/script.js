@@ -153,23 +153,23 @@ const facts = [
     },
     {
         range: [1350, 1800],
-        text: "Temperature swings of 240°F can occur on Psyche between its sunlit and shadowed poles during different seasons."
-    },
-    {
-        range: [1800, 2250],
         text: "The opposite pole endures darkness for the same duration, resulting in a long 'winter' night."
     },
     {
+        range: [1800, 2250],
+        text: "Temperature swings of 240°F can occur on Psyche between its sunlit and shadowed poles during different seasons."
+    },
+    {
         range: [2250, 2700],
-        text: "Psyche's elliptical orbit brings it as close as 235 million miles to the Sun and as far as 309 million miles away."
+        text: "At the warmest, Psyche's surface reaches only -100°F (-70°C). At the poles during winter, temperatures plunge to -340°F (-200°C)."
     },
     {
         range: [2700, 3150],
-        text: "The rapid 4.2-hour rotation means the asteroid rotates over 10,000 times per orbit."
+        text: "During Psyche's polar winter, temperatures plunge to -340°F—cold enough to freeze carbon dioxide into dry ice and turn gases like methane and ammonia into solid ice crystals in the shadowed polar craters."
     },
     {
         range: [3150, 3600],
-        text: "At the warmest, Psyche's surface reaches only -100°F (-70°C). At the poles during winter, temperatures plunge to -340°F (-200°C)."
+        text: "The temperature difference between Psyche's sunlit and shadowed hemispheres can exceed 240°F, creating extreme thermal stress on the asteroid's metallic surface."
     }
 ];
 
@@ -177,35 +177,35 @@ const facts = [
 const generalFacts = [
     {
         range: [0, 450],
-        text: "Psyche measures approximately 280 kilometers across—roughly the size of Massachusetts."
+        text: "Psyche's elliptical orbit brings it as close as 235 million miles to the Sun and as far as 309 million miles away."
     },
     {
         range: [450, 900],
-        text: "Psyche contains about 1% of the Moon's mass, yet may hold more metal than has ever been mined on Earth."
+        text: "Psyche's orbital eccentricity of 0.14 means its distance from the Sun varies by about 74 million miles between its closest and farthest points."
     },
     {
         range: [900, 1350],
-        text: "Psyche's 98° axial tilt is nearly identical to Uranus, meaning both worlds roll sideways along their orbits."
+        text: "Due to its elliptical orbit, Psyche moves faster when closer to the Sun (perihelion) and slower when farther away (aphelion), following Kepler's laws of planetary motion."
     },
     {
         range: [1350, 1800],
-        text: "Scientists believe Psyche is an exposed planetary core, offering a rare glimpse into planetary interiors."
+        text: "The rapid 4.2-hour rotation means the asteroid rotates over 10,000 times per orbit."
     },
     {
         range: [1800, 2250],
-        text: "Psyche orbits the Sun every 5 Earth years at an average distance of 270 million miles."
+        text: "Despite being only 1% of the Moon's mass, Psyche may contain more iron-nickel metal than has ever been mined on Earth throughout human history."
     },
     {
         range: [2250, 2700],
-        text: "The metallic asteroid could help us understand how Earth and other planets formed their iron cores."
+        text: "Psyche measures approximately 280 kilometers (173 miles) across at its widest point—roughly the distance from Los Angeles to San Diego."
     },
     {
         range: [2700, 3150],
-        text: "NASA's Psyche mission, launched in 2023, will reach the asteroid in 2029 to study its composition."
+        text: "Psyche may be the exposed iron-nickel core of a protoplanet that lost its outer layers in ancient collisions, offering a rare glimpse into planetary interiors normally hidden beneath rock and ice."
     },
     {
         range: [3150, 3600],
-        text: "If mined, Psyche's metal could theoretically be worth more than the entire global economy."
+        text: "Psyche may help us understand how terrestrial planets like Earth, Mars, Venus, and Mercury formed their iron cores during the chaotic first 10 million years of solar system history—a period when planetary bodies were still colliding and separating into distinct layers."
     }
 ];
 
