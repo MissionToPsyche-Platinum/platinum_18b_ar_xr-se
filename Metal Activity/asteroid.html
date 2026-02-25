@@ -299,7 +299,7 @@
     text-decoration: none;
     font: 600 14px/1 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
-    /* tweak these to match your Psyche palette */
+    
     background: rgba(18, 3, 29, 0.85);
     color: #e8eaf0;
     border: 1px solid rgba(255,255,255,0.18);
@@ -310,8 +310,7 @@
 
 <script>
   (function () {
-    // Works on GitHub Pages project sites: https://domain.com/<repo>/...
-    // Sets link to "/<repo>/" which loads the hub index.html.
+
     const parts = window.location.pathname.split('/').filter(Boolean);
     const repoRoot = parts.length ? `/${parts[0]}/` : '/';
     document.getElementById('returnToHub').href = repoRoot;
