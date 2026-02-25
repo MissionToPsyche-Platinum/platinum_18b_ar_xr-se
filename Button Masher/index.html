@@ -57,6 +57,30 @@
       max-width: 720px;
       margin: 0 auto;
     }
+.topbar{
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(249,160,0,0.35);
+  background: linear-gradient(135deg, rgba(48, 33, 68, 1) 0%, rgba(18,3,29,0.55) 100%);
+  box-shadow: var(--glow);
+  backdrop-filter: blur(10px);
+}
+
+.progress-track{
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.14);
+  overflow: hidden;
+}
+
+.progress-fill{
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--psyche-mustard), var(--psyche-coral));
+  transition: width 80ms linear;
+}
 
     .header {
       display: grid;
@@ -75,7 +99,17 @@
       position: relative;
       overflow: hidden;
     }
-
+.sr-only{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
     .stat { text-align: center; }
 
     .divider {
@@ -232,20 +266,31 @@
 
   <!-- PAGE 1: GAME -->
   <main id="pageGame" class="wrap page active">
-    <section class="header" aria-live="polite">
-      <div class="stat">
-        <div class="label">Time Left</div>
-        <div id="time" class="count">5</div>
-      </div>
+<section class="topbar" aria-label="Progress">
+  <div class="progress-track">
+    <div id="progressFill" class="progress-fill" style="width:0%"></div>
+  </div>
+</section>
+<!-- Hidden values for JS (timer + presses) -->
+<div class="sr-only">
+  <span id="time">5</span>
+  <span id="count">0</span>
+</div>
+<!-- OLD HEADER THAT SHOWED TIMER AND SCORE
+<section class="header" aria-live="polite">
+  <div class="stat">
+    <div class="label">Time Left</div>
+    <div id="time" class="count">5</div>
+  </div>
 
-      <div class="divider" aria-hidden="true"></div>
+  <div class="divider" aria-hidden="true"></div>
 
-      <div class="stat">
-        <div class="label">Presses</div>
-        <div id="count" class="count">0</div>
-      </div>
-    </section>
-
+  <div class="stat">
+    <div class="label">Presses</div>
+    <div id="count" class="count">0</div>
+  </div>
+</section>
+-->
     <button id="mashBtn" class="btn" type="button">PRESS THE BUTTON TO START</button>
 
     <button id="resetBtn" class="btn reset" type="button">RESET</button>
@@ -294,6 +339,7 @@
 
     const congratsSfx = document.getElementById("congratsSfx");
 
+	const progressFill = document.getElementById("progressFill");
 
 
     let cameraSoundInterval = null;
@@ -389,6 +435,7 @@ function stopCongrats() {
       stopMashAudio();
       stopCameraSounds();
       stopCongrats();
+	progressFill.style.width = "0%";
 
       if (timerId !== null) {
         clearInterval(timerId);
