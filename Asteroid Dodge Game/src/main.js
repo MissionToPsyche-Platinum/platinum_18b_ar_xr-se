@@ -183,6 +183,25 @@ function updateHighScore() {
 
 startMenu.init(canvas);
 
+// --- Tap to Start / Restart (Mobile + Desktop pointer) ---
+canvas.addEventListener(
+  "pointerdown",
+  (e) => {
+    // Only handle start/restart taps. Otherwise let pointer be used for movement logic.
+    if (gameState === "start") {
+      e.preventDefault();
+      startGame();
+      return;
+    }
+    if (gameState === "gameover") {
+      e.preventDefault();
+      restartGame();
+      return;
+    }
+  },
+  { passive: false }
+);
+
 // --- Game flow ---
 function startGame() {
   gameState = "playing";
