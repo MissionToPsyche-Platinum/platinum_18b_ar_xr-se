@@ -256,7 +256,7 @@ function renderCreditsMenu() {
                 <br>
                 <br>
                 This is not an accurate representation of the Mission to Psyche.
-                The Mission to Psyche will not travel through the asteroid belt and will not be dodging asteroids nor meteroids.
+                While the satellite to Psyche will travel through the asteroid belt, the average distance between asteroids in the asteroid belt is approximately 600,000 miles.
                 This game is simply for your enjoyment.
             </p>
         </div>
