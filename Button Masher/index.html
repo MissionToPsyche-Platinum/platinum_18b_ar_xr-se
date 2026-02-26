@@ -241,10 +241,18 @@
   animation: orbitSpin var(--orbitDur) linear infinite;
   filter: drop-shadow(0 6px 18px rgba(0,0,0,0.45));
 }
-
+.asteroid{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 110px;          /* tweak size here */
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  filter: drop-shadow(0 10px 28px rgba(0,0,0,0.45));
+}
 /* tweak this until the "front" points at the pink dot */
 :root{
-  --sat-face-offset: 180deg;
+  --sat-face-offset: 210deg;
 }
 
 .satellite {
@@ -307,11 +315,16 @@
       <p class="sub">Your presses: <span id="finalScore">0</span></p>
 
       <div id="animWrap" class="satellite-wrap" aria-hidden="true">
-        <div id="orbit" class="orbit">
-          <div class="asteroid-dot" aria-hidden="true"></div>
-          <img id="satImg" class="satellite" src="assets/satellite.png" alt="Satellite" />
-        </div>
-      </div>
+
+  <!-- Rooted asteroid (does NOT spin) -->
+  <img class="asteroid" src="assets/asteroid.png" alt="" aria-hidden="true" />
+
+  <!-- Rotating orbit container -->
+  <div id="orbit" class="orbit">
+    <img id="satImg" class="satellite" src="assets/satellite.png" alt="Satellite" />
+  </div>
+
+</div>
 
       <div id="funFact"></div>
 
@@ -357,7 +370,7 @@
       if (score <= 20) return 5.0;
       if (score <= 25) return 4.2;
       if (score <= 30) return 3.6;
-      return 3.0;
+      return 2.0;
     }
 
     function startMashAudio() {
