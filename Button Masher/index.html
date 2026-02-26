@@ -32,6 +32,11 @@
       --text: rgba(255, 255, 255, 0.92);
       --muted: rgba(255, 255, 255, 0.65);
       --radius: 22px;
+
+      /* Orbit tuning */
+      --orbit-size: 260px;
+      --orbit-radius: calc(var(--orbit-size) / 2);
+      --orbitDur: 6s; /* JS updates this based on score */
     }
 
     * { box-sizing: border-box; }
@@ -57,30 +62,31 @@
       max-width: 720px;
       margin: 0 auto;
     }
-.topbar{
-  padding: 14px 18px;
-  border-radius: var(--radius);
-  border: 1px solid rgba(249,160,0,0.35);
-  background: linear-gradient(135deg, rgba(48, 33, 68, 1) 0%, rgba(18,3,29,0.55) 100%);
-  box-shadow: var(--glow);
-  backdrop-filter: blur(10px);
-}
 
-.progress-track{
-  height: 18px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.10);
-  border: 1px solid rgba(255,255,255,0.14);
-  overflow: hidden;
-}
+    .topbar{
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(249,160,0,0.35);
+      background: linear-gradient(135deg, rgba(48, 33, 68, 1) 0%, rgba(18,3,29,0.55) 100%);
+      box-shadow: var(--glow);
+      backdrop-filter: blur(10px);
+    }
 
-.progress-fill{
-  height: 100%;
-  width: 0%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--psyche-mustard), var(--psyche-coral));
-  transition: width 80ms linear;
-}
+    .progress-track{
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.14);
+      overflow: hidden;
+    }
+
+    .progress-fill{
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--psyche-mustard), var(--psyche-coral));
+      transition: width 80ms linear;
+    }
 
     .header {
       display: grid;
@@ -99,17 +105,19 @@
       position: relative;
       overflow: hidden;
     }
-.sr-only{
-  position:absolute;
-  width:1px;
-  height:1px;
-  padding:0;
-  margin:-1px;
-  overflow:hidden;
-  clip:rect(0,0,0,0);
-  white-space:nowrap;
-  border:0;
-}
+
+    .sr-only{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+
     .stat { text-align: center; }
 
     .divider {
@@ -183,15 +191,12 @@
       font-size: 14px;
     }
 
-    /* --- "Pages" --- */
     .page { display: none; }
     .page.active { display: flex; }
 
-    /* Results page visuals */
     .results {
       height: 100%;
       padding: 16px;
-      
       flex-direction: column;
       gap: 14px;
       max-width: 720px;
@@ -224,26 +229,51 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 6px 0 2px;
+      margin: 10px 0 2px;
+      min-height: 280px;
     }
 
-    .satellite-gif {
-      width: 240px;
-      max-width: 60vw;
-      opacity: 0.95;
-      pointer-events: none;
-      filter: drop-shadow(0 6px 18px rgba(0,0,0,0.45));
-    }
+/* CSS orbit */
+.orbit {
+  position: relative;
+  width: var(--orbit-size);
+  height: var(--orbit-size);
+  animation: orbitSpin var(--orbitDur) linear infinite;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.45));
+}
+.asteroid{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 110px;          /* tweak size here */
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  filter: drop-shadow(0 10px 28px rgba(0,0,0,0.45));
+}
+/* tweak this until the "front" points at the pink dot */
+:root{
+  --sat-face-offset: 210deg;
+}
 
-    .asteroid-overlay {
-      position: absolute;
-      width: 62px;
-      height: 62px;
-      pointer-events: none;
-      left: 51%;
-      top: 50%;
-      transform: translate(-55%, -42%);
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.45));
+.satellite {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 92px;
+
+  /* sit on the orbit path + point inward */
+  transform: translate(-50%, calc(-50% - var(--orbit-radius))) rotate(var(--sat-face-offset));
+  pointer-events: none;
+}
+
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+    @keyframes counterSpin {
+      from { transform: translate(-50%, calc(-50% - var(--orbit-radius))) rotate(0deg); }
+      to   { transform: translate(-50%, calc(-50% - var(--orbit-radius))) rotate(-360deg); }
     }
 
     #funFact {
@@ -251,63 +281,50 @@
       font-size: 18px;
       line-height: 1.35;
       margin-top: 10px;
-      display: none; /* shown after 5s */
+      display: none;
     }
   </style>
 </head>
 
 <body>
   <audio id="mashSfx" src="assets/mash-loop.mp3" preload="auto" loop></audio>
-
   <audio id="cameraSound1" src="assets/camera sound 1.mp3" preload="auto"></audio>
   <audio id="cameraSound2" src="assets/camera sound 2.mp3" preload="auto"></audio>
-
   <audio id="congratsSfx" src="assets/congratulations.mp3" preload="auto"></audio>
 
-  <!-- PAGE 1: GAME -->
   <main id="pageGame" class="wrap page active">
-<section class="topbar" aria-label="Progress">
-  <div class="progress-track">
-    <div id="progressFill" class="progress-fill" style="width:0%"></div>
-  </div>
-</section>
-<!-- Hidden values for JS (timer + presses) -->
-<div class="sr-only">
-  <span id="time">5</span>
-  <span id="count">0</span>
-</div>
-<!-- OLD HEADER THAT SHOWED TIMER AND SCORE
-<section class="header" aria-live="polite">
-  <div class="stat">
-    <div class="label">Time Left</div>
-    <div id="time" class="count">5</div>
-  </div>
+    <section class="topbar" aria-label="Progress">
+      <div class="progress-track">
+        <div id="progressFill" class="progress-fill" style="width:0%"></div>
+      </div>
+    </section>
 
-  <div class="divider" aria-hidden="true"></div>
+    <div class="sr-only">
+      <span id="time">5</span>
+      <span id="count">0</span>
+    </div>
 
-  <div class="stat">
-    <div class="label">Presses</div>
-    <div id="count" class="count">0</div>
-  </div>
-</section>
--->
     <button id="mashBtn" class="btn" type="button">PRESS THE BUTTON TO START</button>
-
     <button id="resetBtn" class="btn reset" type="button">RESET</button>
-
-    <div class="hint">Mash as fast as you can 🚀</div>
+    <div class="hint">Mash as fast as you can</div>
   </main>
 
-  <!-- PAGE 2: RESULTS -->
   <main id="pageResults" class="results page">
     <div class="card">
-      <p class="big">Scanning complete 🛰️</p>
+      <p class="big">Scanning complete</p>
       <p class="sub">Your presses: <span id="finalScore">0</span></p>
 
       <div id="animWrap" class="satellite-wrap" aria-hidden="true">
-        <img id="satGif" src="assets/satellite.gif" alt="Satellite orbiting an asteroid" class="satellite-gif" />
-        <img src="assets/asteroid.png" alt="" class="asteroid-overlay" />
-      </div>
+
+  <!-- Rooted asteroid (does NOT spin) -->
+  <img class="asteroid" src="assets/asteroid.png" alt="" aria-hidden="true" />
+
+  <!-- Rotating orbit container -->
+  <div id="orbit" class="orbit">
+    <img id="satImg" class="satellite" src="assets/satellite.png" alt="Satellite" />
+  </div>
+
+</div>
 
       <div id="funFact"></div>
 
@@ -331,16 +348,13 @@
     const funFactEl = document.getElementById("funFact");
     const playAgainBtn = document.getElementById("playAgainBtn");
 
-    const satGif = document.getElementById("satGif");
+    const orbitEl = document.getElementById("orbit");
 
     const mashSfx = document.getElementById("mashSfx");
     const cameraSound1 = document.getElementById("cameraSound1");
     const cameraSound2 = document.getElementById("cameraSound2");
-
     const congratsSfx = document.getElementById("congratsSfx");
-
-	const progressFill = document.getElementById("progressFill");
-
+    const progressFill = document.getElementById("progressFill");
 
     let cameraSoundInterval = null;
     let count = 0;
@@ -349,82 +363,57 @@
     let timerId = null;
     let resultsTimeoutId = null;
 
-    function pickGifForScore(score) {
+    function scoreToOrbitSeconds(score) {
+      if (score <= 5) return 9.0;
+      if (score <= 10) return 7.5;
+      if (score <= 15) return 6.0;
+      if (score <= 20) return 5.0;
+      if (score <= 25) return 4.2;
+      if (score <= 30) return 3.6;
+      return 2.0;
+    }
 
-  if (score <= 5)
-    return "assets/satellite-very-slow.gif";
+    function startMashAudio() {
+      if (!mashSfx) return;
+      mashSfx.currentTime = 0;
+      mashSfx.play().catch(() => {});
+    }
 
-  if (score <= 10)
-    return "assets/satellite-slow.gif";
+    function stopMashAudio() {
+      if (!mashSfx) return;
+      mashSfx.pause();
+      mashSfx.currentTime = 0;
+    }
 
-  if (score <= 15)
-    return "assets/satellite.gif";
+    function startCameraSounds() {
+      stopCameraSounds();
+      cameraSoundInterval = setInterval(() => {
+        const sound = Math.random() < 0.5 ? cameraSound1 : cameraSound2;
+        sound.currentTime = 0;
+        sound.play().catch(() => {});
+      }, 400 + Math.random() * 600);
+    }
 
-  if (score <= 20)
-    return "assets/satellite-fast.gif";
+    function stopCameraSounds() {
+      if (cameraSoundInterval !== null) {
+        clearInterval(cameraSoundInterval);
+        cameraSoundInterval = null;
+      }
+      cameraSound1.pause();
+      cameraSound2.pause();
+    }
 
-  if (score <= 25)
-    return "assets/satellite-very-fast.gif";
+    function playCongrats() {
+      if (!congratsSfx) return;
+      congratsSfx.currentTime = 0;
+      congratsSfx.play().catch(() => {});
+    }
 
-  if (score <= 30)
-    return "assets/satellite-extremely-fast.gif";
-
-  return "assets/satellite-max-speed.gif";
-}
-
-function startMashAudio() {
-  if (!mashSfx) return;
-  mashSfx.currentTime = 0;
-  mashSfx.play().catch(() => {
-    // autoplay restrictions are normal; first user gesture usually unlocks it
-  });
-}
-
-function stopMashAudio() {
-  if (!mashSfx) return;
-  mashSfx.pause();
-  mashSfx.currentTime = 0;
-}
-function startCameraSounds() {
-
-  stopCameraSounds();
-
-  cameraSoundInterval = setInterval(() => {
-
-    const sound = Math.random() < 0.5 ? cameraSound1 : cameraSound2;
-
-    sound.currentTime = 0;
-
-    sound.play().catch(() => {});
-
-  }, 400 + Math.random() * 600);
-
-}
-
-function stopCameraSounds() {
-
-  if (cameraSoundInterval !== null) {
-    clearInterval(cameraSoundInterval);
-    cameraSoundInterval = null;
-  }
-
-  cameraSound1.pause();
-  cameraSound2.pause();
-
-}
-
-function playCongrats() {
-  if (!congratsSfx) return;
-  congratsSfx.currentTime = 0;
-  congratsSfx.play().catch(() => {});
-}
-
-function stopCongrats() {
-  if (!congratsSfx) return;
-  congratsSfx.pause();
-  congratsSfx.currentTime = 0;
-}
-
+    function stopCongrats() {
+      if (!congratsSfx) return;
+      congratsSfx.pause();
+      congratsSfx.currentTime = 0;
+    }
 
     function showPage(which) {
       pageGame.classList.toggle("active", which === "game");
@@ -435,7 +424,7 @@ function stopCongrats() {
       stopMashAudio();
       stopCameraSounds();
       stopCongrats();
-	progressFill.style.width = "0%";
+      progressFill.style.width = "0%";
 
       if (timerId !== null) {
         clearInterval(timerId);
@@ -456,11 +445,12 @@ function stopCongrats() {
       btn.classList.remove("disabled");
       btn.textContent = "PRESS THE BUTTON TO START";
 
-      // reset results page state
       finalScoreEl.textContent = "0";
       funFactEl.style.display = "none";
       funFactEl.textContent = "";
       animWrap.style.display = "flex";
+
+      orbitEl.style.setProperty("--orbitDur", "6s");
 
       showPage("game");
     }
@@ -504,38 +494,30 @@ function stopCongrats() {
     function endGame() {
       stopMashAudio();
 
-      // lock input
       btn.classList.add("disabled");
 
-      // go to results page
       finalScoreEl.textContent = String(count);
-      // select correct speed gif
-satGif.src = pickGifForScore(count);
 
-// force restart animation
-satGif.src = satGif.src.split("?")[0] + "?t=" + Date.now();
+      const orbitSeconds = scoreToOrbitSeconds(count);
+      orbitEl.style.setProperty("--orbitDur", orbitSeconds + "s");
 
       showPage("results");
       startCameraSounds();
 
-      // show gif for 5 seconds, then hide + show fun fact
       funFactEl.textContent = getEndMessage(count);
       funFactEl.style.display = "none";
       animWrap.style.display = "flex";
 
       resultsTimeoutId = setTimeout(() => {
-  stopCameraSounds();
+        stopCameraSounds();
 
-  animWrap.style.display = "none";
-  funFactEl.style.display = "block";
+        animWrap.style.display = "none";
+        funFactEl.style.display = "block";
 
-  // play congrats when they hit 100% and see their fact
-  if (getEndMessage(count).includes("100%")) {
-    playCongrats();
-  }
-}, 5000);
-
-
+        if (getEndMessage(count).includes("100%")) {
+          playCongrats();
+        }
+      }, 5000);
     }
 
     function startTimer() {
