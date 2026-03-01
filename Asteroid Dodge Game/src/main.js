@@ -1,4 +1,6 @@
-// main.js
+// ==============================
+//          main.js
+// ==============================
 import { player } from './player.js';
 import { sounds } from './audio.js';
 import { updateAsteroids, drawAsteroids, resetAsteroids } from './asteroid.js';
@@ -100,10 +102,12 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-// --- Touch (Mobile) ---
+// ==============================
+//       Touch (Mobile) 
 // Supports BOTH:
-// 1) Tap/hold left-right zones for movement
-// 2) Swipe/drag to reposition the ship
+//   Tap/hold left-right zones for movement
+//   Swipe/drag to reposition the ship
+// ==============================
 let touchStartX = null;
 let touchMoved = false;
 
@@ -182,8 +186,9 @@ function updateHighScore() {
 }
 
 startMenu.init(canvas);
-
-// --- Tap to Start / Restart (Mobile + Desktop pointer) ---
+// ==============================
+//  Tap to Start / Restart 
+// ==============================
 canvas.addEventListener(
   "pointerdown",
   (e) => {
@@ -198,9 +203,55 @@ canvas.addEventListener(
       restartGame();
       return;
     }
+    if (isPaused && gameState === "playing") {
+      e.preventDefault();
+      isPaused = false;
+      return;
+}
   },
   { passive: false }
 );
+
+
+// ==============================
+// Mobile Orientation Handling
+// ==============================
+function isLandscape() {
+  return window.innerWidth > window.innerHeight;
+}
+
+function showRotateOverlay(show) {
+  let el = document.getElementById("rotateOverlay");
+
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "rotateOverlay";
+    el.style.cssText =
+      "position:fixed;inset:0;display:flex;align-items:center;justify-content:center;" +
+      "background:rgba(0,0,0,0.9);color:white;font:24px sans-serif;" +
+      "text-align:center;z-index:99999;padding:20px;";
+    el.innerText = "Rotate your phone back to Portrait to play.";
+    document.body.appendChild(el);
+  }
+
+  el.style.display = show ? "flex" : "none";
+}
+
+function handleOrientation() {
+  const landscape = isLandscape();
+  showRotateOverlay(landscape);
+
+  // auto-pause when landscape
+  if (landscape && gameState === "playing") {
+    isPaused = true;
+    keys.left = false;
+    keys.right = false;
+  }
+}
+
+window.addEventListener("resize", handleOrientation);
+window.addEventListener("orientationchange", handleOrientation);
+handleOrientation();
 
 // --- Game flow ---
 function startGame() {
@@ -252,7 +303,9 @@ function easedDifficulty(elapsed, rampTime, cap) {
   return 1 + eased * cap;
 }
 
-// --- Update ---
+// ==============================
+//            Update 
+// ==============================
 function update(dt) {
   if (gameState === "start") {
     startMenu.update(dt, canvas);
@@ -292,7 +345,9 @@ function update(dt) {
   // player movement
   player.update(dt, keys, W);
 
-  // asteroids + collisions
+  // ==============================
+  //    asteroids + collisions
+  // ==============================
   updateAsteroids(
     dt,
     player,
