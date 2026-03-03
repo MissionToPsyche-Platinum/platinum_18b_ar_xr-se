@@ -5,9 +5,12 @@ html, body {
   background: black;
   width: 100%;
   height: 100%;
+  touch-action: none;
+  overscroll-behavior: none;
 }
 
 canvas {
+<<<<<<< HEAD
     border: 2px solid white;
     display: block;
     margin: auto;
@@ -444,3 +447,8 @@ canvas {
     from { transform: translateX(0); }
     to { transform: translateX(calc(-1 * var(--scroll-distance))); }
 }
+=======
+  display: block;
+  touch-action: none;
+}
+>>>>>>> main

@@ -1,4 +1,6 @@
-// main.js
+// ==============================
+//          main.js
+// ==============================
 import { player } from './player.js';
 import { sounds } from './audio.js';
 import { updateAsteroids, drawAsteroids, resetAsteroids } from './asteroid.js';
@@ -19,9 +21,8 @@ const { SCORING, UI, PLAYER } = CONSTANTS;
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 let gameOverFade = 0;
-let isPaused = false; 
+let isPaused = false;
 effects.playerRef = player;
-
 
 //fit to screen for mobile/web
 function resizeCanvas() {
@@ -32,12 +33,36 @@ resizeCanvas();
 let W = canvas.width;
 let H = canvas.height;
 
+// --- UI scaling helpers ---
+function getUiScale() {
+  // 390x844 scale down/up smoothly
+  return Math.min(W / 390, H / 844);
+}
+
+function fontPx(px, family = "sans-serif", weight = "") {
+  const size = Math.max(12, Math.round(px * getUiScale())); // never too tiny
+  return `${weight ? weight + " " : ""}${size}px ${family}`;
+}
+
+// --- Safe area ---
+function getSafeTop() {
+  // visualViewport offset helps on mobile browsers 
+  const vv = window.visualViewport;
+  const top = vv ? Math.max(0, vv.offsetTop) : 0;
+  return top + 16; // add small margin so HUD isn't hugging the edge
+}
+
+
+// --- Mobile haptics (safe fallback) ---
+function vibrate(pattern) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+
 // --- Initialize Player ---
 player.init(W, H);
 
-// --- Initialize Facts --- //
+// --- Initialize Facts ---
 facts.init();
-
 
 // Keep updated when window resizes
 window.addEventListener('resize', () => {
@@ -45,9 +70,6 @@ window.addEventListener('resize', () => {
   W = canvas.width;
   H = canvas.height;
 });
-
-
-
 
 // --- Input (keyboard) ---
 let keys = { left: false, right: false };
@@ -59,10 +81,8 @@ window.addEventListener('keydown', e => {
     else if (gameState === "gameover") restartGame();
   }
 
-   // Toggle educational facts
-  if (e.code === 'KeyF') {
-    facts.toggle();
-  }
+  // Toggle educational facts
+  if (e.code === 'KeyF') facts.toggle();
 
   if (e.code === 'Escape') {
     toggleMenu();
@@ -77,11 +97,9 @@ window.addEventListener('keydown', e => {
 
   if ((e.code === "KeyP") && gameState === "playing") {
     isPaused = !isPaused;
-    // Stop movement if a key was held during pause
     keys.left = false;
     keys.right = false;
   }
-
 });
 
 window.addEventListener('keyup', e => {
@@ -89,30 +107,90 @@ window.addEventListener('keyup', e => {
   if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
 });
 
-// --- Touch -- Mobile only ---
-let touchStartX = null;
-canvas.addEventListener('touchstart', e => {
-  touchStartX = e.touches[0].clientX;
+// --- Auto-pause when app loses focus ---
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && gameState === "playing") {
+    isPaused = true;
+    keys.left = false;
+    keys.right = false;
+  }
 });
-canvas.addEventListener('touchmove', e => {
-  const currentX = e.touches[0].clientX;
-  const delta = currentX - touchStartX;
-  touchStartX = currentX;
-  player.x += delta;
 
-  // keep player in bounds
-  if (player.x < 0) player.x = 0;
-  if (player.x + player.w > canvas.width) player.x = canvas.width - player.w;
-});
-canvas.addEventListener('touchend', () => {
-  touchStartX = null;
-});
+// ==============================
+//       Touch (Mobile) 
+// Supports BOTH:
+//   Tap/hold left-right zones for movement
+//   Swipe/drag to reposition the ship
+// ==============================
+let touchStartX = null;
+let touchMoved = false;
+
+canvas.addEventListener(
+  "touchstart",
+  (e) => {
+    e.preventDefault();
+    const x = e.touches[0].clientX;
+
+    touchStartX = x;
+    touchMoved = false;
+
+    // Tap zones: left half = left, right half = right
+    keys.left = x < W / 2;
+    keys.right = x >= W / 2;
+  },
+  { passive: false }
+);
+
+canvas.addEventListener(
+  "touchmove",
+  (e) => {
+    e.preventDefault();
+    const x = e.touches[0].clientX;
+
+    if (touchStartX === null) touchStartX = x;
+
+    const delta = x - touchStartX;
+    touchStartX = x;
+
+    // If the finger actually moves, treat it as swipe control
+    if (Math.abs(delta) > 2) {
+      touchMoved = true;
+      keys.left = false;
+      keys.right = false;
+
+      player.x += delta;
+
+      // keep player in bounds
+      if (player.x < 0) player.x = 0;
+      if (player.x + player.w > W) player.x = W - player.w;
+    }
+  },
+  { passive: false }
+);
+
+canvas.addEventListener(
+  "touchend",
+  (e) => {
+    e.preventDefault();
+    touchStartX = null;
+    touchMoved = false;
+
+    // stop tap-zone movement when finger lifts
+    keys.left = false;
+    keys.right = false;
+  },
+  { passive: false }
+);
 
 // --- Scoring / difficulty ---
 let score = 0;
 let highScore = parseInt(localStorage.getItem("highScore")) || 0;
 let elapsedTime = 0;
 let difficulty = 1;
+
+// --- Start overlay hint state ---
+let startHintTimer = 0;
+let startHintAlpha = 0;
 
 function updateHighScore() {
   if (score > highScore) {
@@ -122,6 +200,72 @@ function updateHighScore() {
 }
 
 startMenu.init(canvas);
+// ==============================
+//  Tap to Start / Restart 
+// ==============================
+canvas.addEventListener(
+  "pointerdown",
+  (e) => {
+    // Only handle start/restart taps. Otherwise let pointer be used for movement logic.
+    if (gameState === "start") {
+      e.preventDefault();
+      startGame();
+      return;
+    }
+    if (gameState === "gameover") {
+      e.preventDefault();
+      restartGame();
+      return;
+    }
+    if (isPaused && gameState === "playing") {
+      e.preventDefault();
+      isPaused = false;
+      return;
+}
+  },
+  { passive: false }
+);
+
+
+// ==============================
+// Mobile Orientation Handling
+// ==============================
+function isLandscape() {
+  return window.innerWidth > window.innerHeight;
+}
+
+function showRotateOverlay(show) {
+  let el = document.getElementById("rotateOverlay");
+
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "rotateOverlay";
+    el.style.cssText =
+      "position:fixed;inset:0;display:flex;align-items:center;justify-content:center;" +
+      "background:rgba(0,0,0,0.9);color:white;font:24px sans-serif;" +
+      "text-align:center;z-index:99999;padding:20px;";
+    el.innerText = "Rotate your phone back to Portrait to play.";
+    document.body.appendChild(el);
+  }
+
+  el.style.display = show ? "flex" : "none";
+}
+
+function handleOrientation() {
+  const landscape = isLandscape();
+  showRotateOverlay(landscape);
+
+  // auto-pause when landscape
+  if (landscape && gameState === "playing") {
+    isPaused = true;
+    keys.left = false;
+    keys.right = false;
+  }
+}
+
+window.addEventListener("resize", handleOrientation);
+window.addEventListener("orientationchange", handleOrientation);
+handleOrientation();
 
 // --- Game flow ---
 function startGame() {
@@ -131,12 +275,15 @@ function startGame() {
   difficulty = 1;
   isPaused = false;
 
+  // reset start hint each run
+  startHintTimer = 0;
+  startHintAlpha = 1;
+
   resetAsteroids();
   resetPowerUps();
   effects.reset();
   facts.reset();
 
- 
   // reset player position each run
   player.x = W / 2 - player.w / 2;
   player.y = H - PLAYER.GAME_BOTTOM_OFFSET;
@@ -163,7 +310,16 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
-// --- Update ---
+// --- Difficulty easing ---
+function easedDifficulty(elapsed, rampTime, cap) {
+  const t = Math.max(0, Math.min(1, elapsed / rampTime));
+  const eased = t * t * (3 - 2 * t); // smoothstep
+  return 1 + eased * cap;
+}
+
+// ==============================
+//            Update 
+// ==============================
 function update(dt) {
   if (gameState === "start") {
     startMenu.update(dt, canvas);
@@ -171,44 +327,75 @@ function update(dt) {
     return;
   }
 
+<<<<<<< HEAD
   if (gameState !== "playing" &&  prevState !== "playing") return;
     if (isPaused || isMenuVisible()) {
     // Keep background alive
+=======
+  if (gameState !== "playing") return;
+
+  if (isPaused) {
+>>>>>>> main
     updateStars(canvas);
-    // Keep effects from animating while paused
-     effects.update(dt);
+    effects.update(dt);
     return;
   }
-
 
   // world + score and facts update
   updateStars(canvas);
   elapsedTime += dt;
   score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? SCORING.SCORE_BOOST_MULTIPLIER : 1));
-  difficulty = 1 + Math.min(elapsedTime / SCORING.DIFFICULTY_RAMP_TIME, SCORING.DIFFICULTY_CAP);
+  difficulty = easedDifficulty(elapsedTime, SCORING.DIFFICULTY_RAMP_TIME, SCORING.DIFFICULTY_CAP);
   facts.update(dt, elapsedTime, score);
 
+  // --- Start hint timing (shows once per run) ---
+  startHintTimer += dt;
+  const hintHold = UI.START_HINT_HOLD;
+  const hintFade = UI.START_HINT_FADE;
+
+  if (startHintTimer <= hintHold) {
+    startHintAlpha = 1;
+  } else if (startHintTimer <= hintHold + hintFade) {
+    const t = (startHintTimer - hintHold) / hintFade; // 0..1
+    startHintAlpha = 1 - t;
+  } else {
+    startHintAlpha = 0;
+  }
 
   // player movement
   player.update(dt, keys, W);
 
-  // --- Collision check + asteroid update ---
-  updateAsteroids(dt, player, W, H, difficulty, activePowerUps, () => {
-    if (gameState !== "gameover") {
-      //  Trigger collision visuals
-      effects.triggerExplosion(player.x + player.w / 2, player.y + player.h / 2);
-      effects.triggerFlash();
-      effects.triggerShake();
+  // ==============================
+  //    asteroids + collisions
+  // ==============================
+  updateAsteroids(
+    dt,
+    player,
+    W,
+    H,
+    difficulty,
+    activePowerUps,
+    () => {
+      if (gameState !== "gameover") {
+        effects.triggerExplosion(player.x + player.w / 2, player.y + player.h / 2);
+        effects.triggerFlash();
+        effects.triggerShake();
+        vibrate([60, 30, 60]); // game over vibration
 
-      sounds.bg.pause();
-      updateHighScore();
+        sounds.bg.pause();
+        updateHighScore();
 
-      // brief delay for animation before game over
-      setTimeout(() => {
-        gameState = "gameover";
-      }, 1300);
+        setTimeout(() => {
+          gameState = "gameover";
+        }, 1300);
+      }
+    },
+    () => {
+      // Near-miss feedback
+      effects.triggerNearMiss(player);
+      vibrate(15);
     }
-  });
+  );
 
   // power-ups
   updatePowerUps(dt, player, W, H);
@@ -217,13 +404,12 @@ function update(dt) {
   effects.update(dt);
 }
 
-// --Draw ---
+// --- Draw ---
 function draw() {
   ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = 'midnightblue';
   ctx.fillRect(0, 0, W, H);
 
-  // background stars
   drawStars(ctx);
 
   if (gameState === "start" || (isMenuVisible() && prevState === "start")) {
@@ -235,20 +421,53 @@ function draw() {
     return;
   }
 
-  // --- Gameplay visuals ---
   drawAsteroids(ctx);
   drawPowerUps(ctx);
   player.draw(ctx);
 
+<<<<<<< HEAD
   if (gameState === "playing" || (isMenuVisible() && prevState === "playing")) {
     // in-game HUD
+=======
+  if (gameState === "playing") {
+>>>>>>> main
     ctx.fillStyle = "white";
-    ctx.font = UI.HUD_FONT;
+    const safeTop = getSafeTop();
+    ctx.font = fontPx(22, "monospace"); 
+
     ctx.textAlign = "left";
-    ctx.fillText(`Score: ${score}`, 20, 40);
+    ctx.fillText(`Score: ${score}`, 20, safeTop + 24);
+
+    // --- Start hint overlay ---
+    if (startHintAlpha > 0) {
+      ctx.save();
+      ctx.globalAlpha = startHintAlpha;
+
+      const text = UI.START_HINT_TEXT;
+      ctx.font = UI.START_HINT_FONT;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const padX = 18;
+      const padY = 10;
+      const textW = ctx.measureText(text).width;
+      const boxW = textW + padX * 2;
+      const boxH = 22 + padY * 2;
+
+      const x = W / 2;
+    const y = safeTop + 85;
+
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(x - boxW / 2, y - boxH / 2, boxW, boxH);
+
+      ctx.fillStyle = "white";
+      ctx.fillText(text, x, y);
+
+      ctx.restore();
+    }
 
     // power-up indicators
-    let y = 70;
+    let y = safeTop + 55;
     if (activePowerUps.shield) {
       ctx.fillStyle = "cyan";
       ctx.fillText("🛡️ Shield Active", 20, y);
@@ -259,10 +478,10 @@ function draw() {
       ctx.fillText("💫 Score x2", 20, y);
     }
 
-    // draw facts
     facts.draw(ctx, W);
   }
 
+<<<<<<< HEAD
   //freeze frame when paused
     if (isPaused || (isMenuVisible() && prevState != "gameover")) {
       ctx.fillStyle = "rgba(0,0,0,0.55)";
@@ -280,30 +499,51 @@ function draw() {
       if (isMenuVisible()) ctx.fillText("Press Esc to Resume", W / 2, H / 5 * 4 + 30);
 
     }
+=======
+  if (isPaused) {
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.fillRect(0, 0, W, H);
 
-  // --- Draw effects on top of everything ---
+    ctx.textAlign = "center";
+    ctx.fillStyle = "white";
+    ctx.font = fontPx(56, "sans-serif", "bold");
+    ctx.fillText("PAUSED", W / 2, H / 2 - 40);
+
+    ctx.font = fontPx(22, "sans-serif");
+    ctx.fillStyle = "lightgray";
+    ctx.fillText("Press P or Esc to Resume", W / 2, H / 2 + 20);
+  }
+>>>>>>> main
+
   effects.draw(ctx, W, H);
 
+<<<<<<< HEAD
   if (gameState === "gameover" || (isMenuVisible() && prevState === "gameover")) {
     // blackout overlay
+=======
+  if (gameState === "gameover") {
+>>>>>>> main
     ctx.fillStyle = "rgba(0,0,0,0.85)";
     ctx.fillRect(0, 0, W, H);
     ctx.textAlign = "center";
-    
-    ctx.font = UI.GAMEOVER_TITLE_FONT;   
+
+    ctx.font = fontPx(54, "sans-serif", "bold");
     ctx.fillStyle = "red";
     ctx.fillText("GAME OVER", W / 2, H / 2 - 80);
 
-    ctx.font = UI.GAMEOVER_STATS_FONT;         
+    // --- GAME OVER UI ---
+    ctx.font = fontPx(26, "sans-serif");
+    const lineGap = Math.round(36 * getUiScale()); 
+
     ctx.fillStyle = "gold";
     ctx.fillText(`🏆 High Score: ${highScore}`, W / 2, H / 2);
 
     ctx.fillStyle = "white";
-    ctx.fillText(`💫 Your Score: ${score}`, W / 2, H / 2 + 40);
+    ctx.fillText(`💫 Your Score: ${score}`, W / 2, H / 2 + lineGap);
 
-    ctx.font = UI.GAMEOVER_HINT_FONT;        
+    ctx.font = fontPx(20, "sans-serif");
     ctx.fillStyle = "lightgray";
-    ctx.fillText("Tap to Restart", W / 2, H / 2 + 100);
+    ctx.fillText("Tap to Restart", W / 2, H / 2 + lineGap * 2);
   }
 }
 

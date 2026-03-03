@@ -12,11 +12,19 @@
 </head>
 <body>
 <div class="view-toggle">
-    <span class="toggle-label">Normal View</span>
+    <span class="toggle-label">Enlarged View</span>
     <div class="toggle-switch" id="viewToggle">
         <div class="toggle-slider"></div>
     </div>
-    <span class="toggle-label">Realistic View</span>
+    <span class="toggle-label">To Scale</span>
+</div>
+
+<div class="autoplay-toggle">
+    <span class="toggle-label">Manual</span>
+    <div class="toggle-switch" id="autoplayToggle">
+        <div class="toggle-slider"></div>
+    </div>
+    <span class="toggle-label">Auto Play</span>
 </div>
 
 <div class="space">
@@ -32,7 +40,7 @@
 </div>
 
 <div class="controls">
-    <input type="range" id="orbitSlider" min="0" max="360" value="0" step="1">
+    <input type="range" id="orbitSlider" min="0" max="3600" value="0" step="1">
 </div>
 
 <script src="script.js"></script>
