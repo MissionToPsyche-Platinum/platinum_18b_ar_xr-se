@@ -477,16 +477,19 @@ function draw() {
     ctx.fillStyle = "red";
     ctx.fillText("GAME OVER", W / 2, H / 2 - 80);
 
+    // --- GAME OVER UI ---
     ctx.font = fontPx(26, "sans-serif");
+    const lineGap = Math.round(36 * getUiScale()); 
+
     ctx.fillStyle = "gold";
     ctx.fillText(`🏆 High Score: ${highScore}`, W / 2, H / 2);
 
     ctx.fillStyle = "white";
-    ctx.fillText(`💫 Your Score: ${score}`, W / 2, H / 2 + 40);
+    ctx.fillText(`💫 Your Score: ${score}`, W / 2, H / 2 + lineGap);
 
     ctx.font = fontPx(20, "sans-serif");
     ctx.fillStyle = "lightgray";
-    ctx.fillText("Tap to Restart", W / 2, H / 2 + 100);
+    ctx.fillText("Tap to Restart", W / 2, H / 2 + lineGap * 2);
   }
 }
 
