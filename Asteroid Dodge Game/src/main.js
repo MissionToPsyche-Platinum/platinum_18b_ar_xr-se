@@ -246,6 +246,12 @@ canvas.addEventListener(
 // ==============================
 // Mobile Orientation Handling
 // ==============================
+
+// Function that checks if device is likely a mobile device so this message doesn't appear on desktop
+function isProbablyPhone() {
+
+}
+
 function isLandscape() {
   return window.innerWidth > window.innerHeight;
 }
