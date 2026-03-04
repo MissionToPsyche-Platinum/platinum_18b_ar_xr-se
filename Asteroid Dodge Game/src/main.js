@@ -249,7 +249,20 @@ canvas.addEventListener(
 
 // Function that checks if device is likely a mobile device so this message doesn't appear on desktop
 function isProbablyPhone() {
+  if (navigator.userAgentData && typeof navigator.userAgentData.mobile === "boolean") {
+    return navigator.userAgentData.mobile;
+  }
 
+  // Fallback
+  const hasTouch = 
+    ("maxTouchPoints" in navigator && navigator.maxTouchPoints > 0) ||
+    ("ontouchstart" in window);
+    
+  const coarsePointer = window.matchMedia?.("(pointer: coarse)"?.matches ?? false);
+  const smallScreen = Math.min(window.innerWidth, window.innerHeight) <= 820;
+
+  // Probably phone if has touch capabilities, has coarse pointers and has a smallish screen
+  return hasTouch && coarsePointer && smallScreen;
 }
 
 function isLandscape() {
@@ -274,11 +287,13 @@ function showRotateOverlay(show) {
 }
 
 function handleOrientation() {
+  const enforce = isProbablyPhone();
   const landscape = isLandscape();
-  showRotateOverlay(landscape);
+
+  showRotateOverlay(landscape && enforce);
 
   // auto-pause when landscape
-  if (landscape && gameState === "playing") {
+  if (enforce && landscape && gameState === "playing") {
     isPaused = true;
     keys.left = false;
     keys.right = false;
@@ -565,7 +580,7 @@ function drawPauseButton(ctx) {
   const barW = 6, gap = 8, barH = 22;
   const cx = x + w / 2;
   const cy = y + h / 2; 
-  ctx.fillRect(cx - gap - barW / 2, barW, barH);
+  ctx.fillRect(cx - gap - barW, cy - barH / 2, barW, barH);
   ctx.fillRect(cx + gap, cy - barH / 2, barW, barH);
 
   ctx.restore();
