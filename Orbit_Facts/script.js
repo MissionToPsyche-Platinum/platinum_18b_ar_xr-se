@@ -20,31 +20,27 @@ const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 container.appendChild(renderer.domElement);
 
 // Add lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Increased ambient light
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
-const sunLight = new THREE.DirectionalLight(0xffffff, 10); // Increased sunlight intensity
+const sunLight = new THREE.DirectionalLight(0xffffff, 10);
 sunLight.position.set(0, 0, 100);
 scene.add(sunLight);
 
 function initThreeSize() {
-    // Measure the dashed orbit element itself
     const orbitElem = document.querySelector('.orbit');
     const orbitRect = orbitElem.getBoundingClientRect();
     const width = orbitRect.width;
     const height = orbitRect.height;
 
-    // Match the renderer to the orbit circle
     renderer.setSize(width, height);
     renderer.setPixelRatio(window.devicePixelRatio || 1);
 
-    const padding = 250; // Increased padding to accommodate Sun and elliptical offset
+    const padding = 250;
 
-    // Calculate elliptical offset for camera positioning
     const eccentricity = 0.14;
     const centerOffset = radius * eccentricity;
 
-    // Create or update an orthographic camera that matches the orbit dimensions
     if (!camera) {
         camera = new THREE.OrthographicCamera(
             width / -2 - padding - centerOffset,
@@ -64,14 +60,10 @@ function initThreeSize() {
         camera.updateProjectionMatrix();
     }
 
-    // Calculate radius from orbit container since orbit-circle is now hidden
     const circleRadius = Math.min(width, height) / 1.32;
     radius = circleRadius;
 
-    // Position sun glow to match the Sun's position accounting for camera offset
     updateSunGlowPosition();
-
-    // Draw the elliptical orbit line in Three.js using the same values as the asteroid path
     drawOrbitLine();
 }
 
@@ -79,22 +71,15 @@ function updateSunGlowPosition() {
     const sunGlow = document.querySelector('.sun');
     const orbitContainer = document.querySelector('.orbit');
     if (sunGlow && orbitContainer) {
-        // The camera lookAt is at (-centerOffset, 0, 0)
-        // But the Sun is at (0, 0, 0)
-        // So visually, the Sun appears offset from center
         const eccentricity = 0.14;
         const centerOffset = radius * eccentricity;
 
-        // Get orbit container rect to position relative to it
         const orbitRect = orbitContainer.getBoundingClientRect();
         const spaceRect = document.querySelector('.space').getBoundingClientRect();
 
-        // Sun at (0,0,0) with camera looking at (-centerOffset, 0, 0)
-        // means Sun appears at +centerOffset in screen space
         const sunScreenX = (orbitRect.width / 2) + centerOffset;
         const sunScreenY = orbitRect.height / 2;
 
-        // Position relative to space container
         const leftOffset = (orbitRect.left - spaceRect.left) + sunScreenX;
         const topOffset = (orbitRect.top - spaceRect.top) + sunScreenY;
 
@@ -106,7 +91,6 @@ function updateSunGlowPosition() {
 
 let orbitLine = null;
 function drawOrbitLine() {
-    // Remove existing orbit line if present
     if (orbitLine) {
         scene.remove(orbitLine);
     }
@@ -116,13 +100,12 @@ function drawOrbitLine() {
     const semiMinorAxis = radius * Math.sqrt(1 - eccentricity * eccentricity);
     const centerOffset = radius * eccentricity;
 
-    // EllipseCurve(x, y, xRadius, yRadius, startAngle, endAngle)
     const curve = new THREE.EllipseCurve(
-        -centerOffset, 0,       // Center offset so Sun is at one focus
-        semiMajorAxis,          // X radius
-        semiMinorAxis,          // Y radius
-        0, 2 * Math.PI,         // Full ellipse
-        false                   // Clockwise
+        -centerOffset, 0,
+        semiMajorAxis,
+        semiMinorAxis,
+        0, 2 * Math.PI,
+        false
     );
 
     const points = curve.getPoints(128);
@@ -141,7 +124,7 @@ function drawOrbitLine() {
 const facts = [
     {
         range: [0, 450],
-        text: "Psyche's axial tilt of ~98° causes extreme seasons, where poles face the Sun directly during parts of the orbit."
+        text: "Psyche's axial tilt of ~95° causes extreme seasons, where poles face the Sun directly during parts of the orbit."
     },
     {
         range: [450, 900],
@@ -181,7 +164,7 @@ const generalFacts = [
     },
     {
         range: [450, 900],
-        text: "Psyche's orbital eccentricity of 0.14 means its distance from the Sun varies by about 74 million miles between its closest and farthest points."
+        text: "Psyche's orbital eccentricity of about 0.14 means its distance from the Sun varies by about 74 million miles between its closest and farthest points."
     },
     {
         range: [900, 1350],
@@ -189,7 +172,7 @@ const generalFacts = [
     },
     {
         range: [1350, 1800],
-        text: "The rapid 4.2-hour rotation means the asteroid rotates over 10,000 times per orbit."
+        text: "The rapid 4.2-hour rotation (Psyche's \"day\") means the asteroid rotates over 10,000 times per orbit around the sun (Psyche's \"year\")."
     },
     {
         range: [1800, 2250],
@@ -201,53 +184,41 @@ const generalFacts = [
     },
     {
         range: [2700, 3150],
-        text: "Psyche may be the exposed iron-nickel core of a protoplanet that lost its outer layers in ancient collisions, offering a rare glimpse into planetary interiors normally hidden beneath rock and ice."
+        text: "Psyche may be exposed iron-nickel core material of a planetesimal that lost its outer layers in ancient collisions, offering a rare glimpse into planetary interiors normally hidden beneath rock and ice."
     },
     {
         range: [3150, 3600],
-        text: "Psyche may help us understand how terrestrial planets like Earth, Mars, Venus, and Mercury formed their iron cores during the chaotic first 10 million years of solar system history—a period when planetary bodies were still colliding and separating into distinct layers."
+        text: "Psyche may help us understand how terrestrial planets like Earth, Mars, Venus, and Mercury formed their iron cores during the chaotic early years of solar system history—a period when planetary bodies were still colliding and separating into distinct layers."
     }
 ];
 
 function updatePosition(angle) {
-    // Ensure radius is initialized
     if (!radius) {
         initThreeSize();
     }
 
     const rad = angle * Math.PI / 1800;
 
-    // Psyche's orbital eccentricity is ~0.14
-    // Semi-major axis (a) and semi-minor axis (b) relationship: b = a * sqrt(1 - e^2)
     const eccentricity = 0.14;
     const semiMajorAxis = radius;
     const semiMinorAxis = radius * Math.sqrt(1 - eccentricity * eccentricity);
-
-    // Center offset to keep Sun at one focus (not center)
     const centerOffset = radius * eccentricity;
 
     const x = Math.cos(rad) * semiMajorAxis - centerOffset;
     const y = Math.sin(rad) * semiMinorAxis;
 
-    // Move the model along the orbit
     if (psycheModel) {
         psycheModel.position.x = x;
         psycheModel.position.y = -y;
 
-        // Update sunlight to point from sun (at origin) to Psyche
         sunLight.position.set(0, 0, 0);
         sunLight.target = psycheModel;
 
-        //calculate spins
         const spinx = angle * (10446 / 360) / 10;
-
-        // Rotate the model (spin tied to slider)
         psycheModel.rotation.x = spinx;
-
-        //used to spin model in y direction
         psycheModel.rotation.y = 0;
 
-        // Add 8 degree tilt for 98 degree total axial tilt
+        // 8 degree tilt for ~95 degree total axial tilt
         psycheModel.rotation.z = 8 * Math.PI / 180;
     }
 
@@ -282,35 +253,30 @@ loader.load(
     './models/psyche/scene.glb',
     function (gltf) {
         const model = gltf.scene;
-        model.scale.set(8, 8, 8); // Start with "To Scale" view
+        model.scale.set(8, 8, 8);
 
-        // Disable frustum culling to prevent clipping
         model.traverse((child) => {
             if (child.isMesh) {
                 child.frustumCulled = false;
             }
         });
 
-        // Add pole markers (spheres at top and bottom)
-        const poleGeometry = new THREE.SphereGeometry(1, 16, 16); // Smaller dots
-        const northPoleMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red for north
-        const southPoleMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }); // Blue for south
+        const poleGeometry = new THREE.SphereGeometry(1, 16, 16);
+        const northPoleMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const southPoleMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
 
         const northPole = new THREE.Mesh(poleGeometry, northPoleMaterial);
         const southPole = new THREE.Mesh(poleGeometry, southPoleMaterial);
 
-        // Position poles (adjust Y values based on your model's size)
-        northPole.position.set(6, 0, 0); // Moved closer to center
-        southPole.position.set(-6, 0, 0); // Moved closer to center
+        northPole.position.set(6, 0, 0);
+        southPole.position.set(-6, 0, 0);
 
-        // Add poles to the model so they rotate with it
         model.add(northPole);
         model.add(southPole);
 
         psycheModel = model;
         scene.add(model);
 
-        // Ensure everything is initialized before first render
         if (!radius || !camera) {
             initThreeSize();
         }
@@ -333,10 +299,9 @@ loader.load(
     './models/psyche/sun.glb',
     function (gltf) {
         const sunModel = gltf.scene;
-        sunModel.position.set(0, 0, 0); // Position at origin (center)
-        sunModel.scale.set(150, 150, 150); // Enlarged for visibility
+        sunModel.position.set(0, 0, 0);
+        sunModel.scale.set(150, 150, 150);
 
-        // Disable frustum culling
         sunModel.traverse((child) => {
             if (child.isMesh) {
                 child.frustumCulled = false;
@@ -367,10 +332,8 @@ viewToggle.addEventListener('click', () => {
 
     if (psycheModel) {
         if (isRealisticView) {
-            // "Realistic" (smaller) view
             psycheModel.scale.set(1, 1, 1);
         } else {
-            // To Scale view - easier to see
             psycheModel.scale.set(8, 8, 8);
         }
 
@@ -386,17 +349,17 @@ window.addEventListener('resize', () => {
     updatePosition(currentAngle);
 });
 
-// Autoplay animation function (1 degree per second = 10 slider units per second with max 3600)
+// Autoplay animation function
 let lastTime = Date.now();
 let currentValue = 0;
 
 function animate() {
     if (isAutoplay) {
         const currentTime = Date.now();
-        const deltaTime = (currentTime - lastTime) / 1000; // seconds elapsed
+        const deltaTime = (currentTime - lastTime) / 1000;
         lastTime = currentTime;
 
-        currentValue += 10 * deltaTime; // 10 slider units = 1 degree, so 10 per second
+        currentValue += 10 * deltaTime;
 
         if (currentValue >= 3600) {
             currentValue = 0;
