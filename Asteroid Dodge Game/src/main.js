@@ -24,18 +24,30 @@ let gameOverFade = 0;
 let isPaused = false;
 effects.playerRef = player;
 
-const pauseBtn = {
+const uiButtons = {
   size: 56,
   pad: 16,
-  x: 0, y:0, w:0, h:0,
+  gap: 12,
+
+  menu: {x: 0, y: 0, w: 0, h: 0},
+  pause: {x: 0, y: 0, w: 0, h: 0},
   updateBounds(W) {
-    this.w = this.size;
-    this.h = this.size;
-    this.x = W - this.pad - this.size;
-    this.y = this.pad;
+    const s = this.size;
+    const x = W - this.pad - s;
+
+    this.menu.x = x;
+    this.menu.y = this.pad;
+    this.menu.w = s;
+    this.menu.h = s;
+    
+    this.pause.x = x;
+    this.pause.y = this.pad + s + this.gap;
+    this.pause.w = s;
+    this.pause.h = s;
   },
-  contains(px, py) {
-    return px >= this.x && px <= this.x + this.w && py >= this.y && py <= this.y + this.h;
+
+  contains(btn, px, py) {
+    return px >= btn.x && px <= btn.x + btn.w && py >= btn.y && py <= btn.y + btn.h;
   }
 };
 
@@ -43,7 +55,7 @@ const pauseBtn = {
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  pauseBtn.updateBounds(canvas.width);
+  uiButtons.updateBounds(canvas.width);
 }
 resizeCanvas();
 let W = canvas.width;
@@ -493,8 +505,13 @@ function draw() {
       ctx.restore();
     }
 
-    pauseBtn.updateBounds(W);
-    drawPauseButton(ctx);
+    uiButtons.updateBounds(W);
+    
+    drawButtonBase(ctx, uiButtons.menu);
+    drawHamburgerIcon(ctx, uiButtons.menu);
+
+    drawButtonBase(ctx, uiButtons.pause);
+    drawPauseIcon(ctx, uiButtons.pause);
 
     // power-up indicators
     let y = safeTop + 55;
@@ -557,14 +574,15 @@ function draw() {
   }
 }
 
-function drawPauseButton(ctx) {
+function drawButtonBase(ctx, btn) {
+  const { x, y, w, h } = btn;
+  const r = 12;
+
   ctx.save();
   ctx.globalAlpha = 0.85;
   ctx.fillStyle = "rgba(0,0,0,0.35)";
   ctx.lineWidth = 2;
 
-  const r = 12;
-  const { x, y, w, h } = pauseBtn;
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -575,11 +593,49 @@ function drawPauseButton(ctx) {
   ctx.fill();
   ctx.stroke();
 
-  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+function drawHamburgerIcon(ctx, btn) {
+  const { x, y, w, h } = btn;
+
+  ctx.save();
   ctx.fillStyle = "white";
-  const barW = 6, gap = 8, barH = 22;
+  ctx.globalAlpha = 0.95;
+
+  const barW = Math.round(w * 0.55);
+  const barH = 4;
+  const gap = 8;
+
   const cx = x + w / 2;
-  const cy = y + h / 2; 
+  const cy = y + h / 2;
+
+  const left = Math.round(cx - barW / 2);
+  const top1 = Math.round(cy - gap - barH);
+  const top2 = Math.round(cy - barH / 2);
+  const top3 = Math.round(cy + gap);
+
+  ctx.fillRect(left, top1, barW, barH);
+  ctx.fillRect(left, top2, barW, barH);
+  ctx.fillRect(left, top3, barW, barH);
+
+  ctx.restore();
+}
+
+function drawPauseIcon(ctx, btn) {
+  const { x, y, w, h } = btn;
+
+  ctx.save();
+  ctx.fillStyle = "white";
+  ctx.globalAlpha = 0.95;
+
+  const barW = 6;
+  const barH = 22;
+  const gap = 8;
+  
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+
   ctx.fillRect(cx - gap - barW, cy - barH / 2, barW, barH);
   ctx.fillRect(cx + gap, cy - barH / 2, barW, barH);
 
