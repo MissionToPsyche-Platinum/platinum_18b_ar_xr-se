@@ -24,10 +24,26 @@ let gameOverFade = 0;
 let isPaused = false;
 effects.playerRef = player;
 
+const pauseBtn = {
+  size: 56,
+  pad: 16,
+  x: 0, y:0, w:0, h:0,
+  updateBounds(W) {
+    this.w = this.size;
+    this.h = this.size;
+    this.x = W - this.pad - this.size;
+    this.y = this.pad;
+  },
+  contains(px, py) {
+    return px >= this.x && px <= this.x + this.w && py >= this.y && py <= this.y + this.h;
+  }
+};
+
 //fit to screen for mobile/web
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  pauseBtn.updateBounds(canvas.width);
 }
 resizeCanvas();
 let W = canvas.width;
@@ -327,15 +343,9 @@ function update(dt) {
     return;
   }
 
-<<<<<<< HEAD
   if (gameState !== "playing" &&  prevState !== "playing") return;
     if (isPaused || isMenuVisible()) {
     // Keep background alive
-=======
-  if (gameState !== "playing") return;
-
-  if (isPaused) {
->>>>>>> main
     updateStars(canvas);
     effects.update(dt);
     return;
@@ -425,12 +435,8 @@ function draw() {
   drawPowerUps(ctx);
   player.draw(ctx);
 
-<<<<<<< HEAD
   if (gameState === "playing" || (isMenuVisible() && prevState === "playing")) {
     // in-game HUD
-=======
-  if (gameState === "playing") {
->>>>>>> main
     ctx.fillStyle = "white";
     const safeTop = getSafeTop();
     ctx.font = fontPx(22, "monospace"); 
@@ -481,7 +487,6 @@ function draw() {
     facts.draw(ctx, W);
   }
 
-<<<<<<< HEAD
   //freeze frame when paused
     if (isPaused || (isMenuVisible() && prevState != "gameover")) {
       ctx.fillStyle = "rgba(0,0,0,0.55)";
@@ -499,30 +504,11 @@ function draw() {
       if (isMenuVisible()) ctx.fillText("Press Esc to Resume", W / 2, H / 5 * 4 + 30);
 
     }
-=======
-  if (isPaused) {
-    ctx.fillStyle = "rgba(0,0,0,0.55)";
-    ctx.fillRect(0, 0, W, H);
-
-    ctx.textAlign = "center";
-    ctx.fillStyle = "white";
-    ctx.font = fontPx(56, "sans-serif", "bold");
-    ctx.fillText("PAUSED", W / 2, H / 2 - 40);
-
-    ctx.font = fontPx(22, "sans-serif");
-    ctx.fillStyle = "lightgray";
-    ctx.fillText("Press P or Esc to Resume", W / 2, H / 2 + 20);
-  }
->>>>>>> main
 
   effects.draw(ctx, W, H);
-
-<<<<<<< HEAD
+  
   if (gameState === "gameover" || (isMenuVisible() && prevState === "gameover")) {
     // blackout overlay
-=======
-  if (gameState === "gameover") {
->>>>>>> main
     ctx.fillStyle = "rgba(0,0,0,0.85)";
     ctx.fillRect(0, 0, W, H);
     ctx.textAlign = "center";
@@ -545,6 +531,18 @@ function draw() {
     ctx.fillStyle = "lightgray";
     ctx.fillText("Tap to Restart", W / 2, H / 2 + lineGap * 2);
   }
+}
+
+function drawPauseButton(ctx) {
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  ctx.lineWidth = 2;
+
+  const r = 12;
+  const { x, y, w, h } = pauseBtn;
+  ctx.beginPath();
+  ctx.moveTo(x + r)
 }
 
 requestAnimationFrame(loop);
