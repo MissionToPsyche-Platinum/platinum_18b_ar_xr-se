@@ -10,10 +10,10 @@ html, body {
 }
 
 canvas {
-<<<<<<< HEAD
     border: 2px solid white;
     display: block;
     margin: auto;
+    touch-action: none;
 }
 
 .game-overlay {
@@ -447,8 +447,3 @@ canvas {
     from { transform: translateX(0); }
     to { transform: translateX(calc(-1 * var(--scroll-distance))); }
 }
-=======
-  display: block;
-  touch-action: none;
-}
->>>>>>> main

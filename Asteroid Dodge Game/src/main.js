@@ -472,6 +472,9 @@ function draw() {
       ctx.restore();
     }
 
+    pauseBtn.updateBounds(W);
+    drawPauseButton(ctx);
+
     // power-up indicators
     let y = safeTop + 55;
     if (activePowerUps.shield) {
@@ -542,7 +545,24 @@ function drawPauseButton(ctx) {
   const r = 12;
   const { x, y, w, h } = pauseBtn;
   ctx.beginPath();
-  ctx.moveTo(x + r)
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = "white";
+  const barW = 6, gap = 8, barH = 22;
+  const cx = x + w / 2;
+  const cy = y + h / 2; 
+  ctx.fillRect(cx - gap - barW / 2, barW, barH);
+  ctx.fillRect(cx + gap, cy - barH / 2, barW, barH);
+
+  ctx.restore();
 }
 
 requestAnimationFrame(loop);
