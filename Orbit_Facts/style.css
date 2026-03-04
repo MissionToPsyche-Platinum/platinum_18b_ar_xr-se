@@ -2,19 +2,19 @@
 
 /* ─── CSS Variables ─────────────────────────────────────────── */
 :root {
-    --gold:        #C9A84C;
-    --gold-light:  #E8C97A;
-    --gold-dim:    rgba(201, 168, 76, 0.25);
-    --gold-glow:   rgba(201, 168, 76, 0.12);
+    --gold:        #E2B93B;
+    --gold-light:  #F5D06A;
+    --gold-dim:    rgba(226, 185, 59, 0.25);
+    --gold-glow:   rgba(226, 185, 59, 0.14);
     --space-deep:  #04060F;
     --space-mid:   #080D1A;
     --panel-bg:    rgba(8, 14, 28, 0.82);
-    --border:      rgba(201, 168, 76, 0.22);
-    --text-primary:   #EDE8DC;
-    --text-secondary: #A89F8C;
-    --text-mono:      #8FB8C8;
-    --toggle-off:  rgba(255, 255, 255, 0.12);
-    --toggle-on:   rgba(201, 168, 76, 0.45);
+    --border:      rgba(90, 50, 150, 0.45);
+    --text-primary:   #EDE8F5;
+    --text-secondary: #8A7BA0;
+    --text-mono:      #8A60C0;
+    --toggle-off: rgba(98, 50, 150, 0.22);
+    --toggle-on:   rgba(226, 185, 59, 0.50);
     --transition:  0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -82,12 +82,18 @@ body::after {
     width: clamp(80px, 10vmin, 140px);
     height: clamp(80px, 10vmin, 140px);
     border-radius: 50%;
+    background: radial-gradient(circle at center,
+    rgba(255, 245, 180, 0.90) 0%,
+    rgba(255, 210,  80, 0.70) 40%,
+    rgba(255, 160,  30, 0.30) 70%,
+    transparent 100%
+    );
     box-shadow:
             0 0 40px 16px rgba(255, 210, 80, 0.55),
             0 0 100px 40px rgba(255, 160, 30, 0.30),
             0 0 180px 80px rgba(255, 120, 10, 0.12);
     pointer-events: none;
-    z-index: 2;
+    z-index: 1;
 }
 
 /* ─── Orbit ─────────────────────────────────────────────────── */
@@ -136,15 +142,15 @@ body::after {
     overflow: hidden;
     box-shadow:
             0 8px 32px rgba(0, 0, 0, 0.5),
-            inset 0 1px 0 rgba(201, 168, 76, 0.15);
+            inset 0 1px 0 rgba(90, 50, 150, 0.2);
     transition: box-shadow var(--transition);
 }
 
 .info-box:hover {
     box-shadow:
             0 8px 40px rgba(0, 0, 0, 0.6),
-            0 0 20px var(--gold-glow),
-            inset 0 1px 0 rgba(201, 168, 76, 0.2);
+            0 0 20px rgba(90, 50, 150, 0.12),
+            inset 0 1px 0 rgba(90, 50, 150, 0.25);
 }
 
 /* Gold accent bar at top */
@@ -166,7 +172,7 @@ body::after {
     text-transform: uppercase;
     color: var(--gold);
     opacity: 0.85;
-    border-bottom: 1px solid rgba(201, 168, 76, 0.1);
+    border-bottom: 1px solid rgba(90, 50, 150, 0.15);
 }
 
 .info-box-body {
@@ -233,8 +239,8 @@ input[type="range"]#orbitSlider::-webkit-slider-thumb {
     background: var(--gold-light);
     border: 2px solid var(--space-deep);
     box-shadow:
-            0 0 8px rgba(201, 168, 76, 0.7),
-            0 0 16px rgba(201, 168, 76, 0.35);
+            0 0 8px rgba(226, 185, 59, 0.7),
+            0 0 16px rgba(226, 185, 59, 0.35);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -242,8 +248,8 @@ input[type="range"]#orbitSlider::-webkit-slider-thumb {
 input[type="range"]#orbitSlider::-webkit-slider-thumb:hover {
     transform: scale(1.25);
     box-shadow:
-            0 0 12px rgba(201, 168, 76, 0.9),
-            0 0 24px rgba(201, 168, 76, 0.5);
+            0 0 12px rgba(226, 185, 59, 0.9),
+            0 0 24px rgba(226, 185, 59, 0.5);
 }
 
 input[type="range"]#orbitSlider:active::-webkit-slider-thumb {
@@ -257,7 +263,7 @@ input[type="range"]#orbitSlider::-moz-range-thumb {
     border-radius: 50%;
     background: var(--gold-light);
     border: 2px solid var(--space-deep);
-    box-shadow: 0 0 8px rgba(201, 168, 76, 0.7);
+    box-shadow: 0 0 8px rgba(226, 185, 59, 0.7);
     cursor: pointer;
 }
 
@@ -321,8 +327,8 @@ input[type="range"]#orbitSlider::-moz-range-progress {
 
 .toggle-switch.active {
     background: var(--toggle-on);
-    border-color: rgba(201, 168, 76, 0.5);
-    box-shadow: 0 0 10px var(--gold-dim), inset 0 0 6px rgba(201,168,76,0.1);
+    border-color: rgba(226, 185, 59, 0.5);
+    box-shadow: 0 0 10px var(--gold-dim), inset 0 0 6px rgba(226, 185, 59, 0.1);
 }
 
 /* Toggle switch thumb */
@@ -341,7 +347,7 @@ input[type="range"]#orbitSlider::-moz-range-progress {
 .toggle-switch.active .toggle-slider {
     transform: translateX(22px);
     background: var(--gold-light);
-    box-shadow: 0 0 6px rgba(201, 168, 76, 0.7), 0 1px 4px rgba(0,0,0,0.4);
+    box-shadow: 0 0 6px rgba(226, 185, 59, 0.7), 0 1px 4px rgba(0,0,0,0.4);
 }
 
 /* Toggle labels */

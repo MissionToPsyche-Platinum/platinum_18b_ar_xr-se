@@ -83,7 +83,7 @@ function updateSunGlowPosition() {
         // But the Sun is at (0, 0, 0)
         // So visually, the Sun appears offset from center
         const eccentricity = 0.14;
-        const centerOffset = radius * eccentricity;
+
 
         // Get orbit container rect to position relative to it
         const orbitRect = orbitContainer.getBoundingClientRect();
@@ -91,7 +91,7 @@ function updateSunGlowPosition() {
 
         // Sun at (0,0,0) with camera looking at (-centerOffset, 0, 0)
         // means Sun appears at +centerOffset in screen space
-        const sunScreenX = (orbitRect.width / 2) + centerOffset;
+        const sunScreenX = (orbitRect.width / 2);
         const sunScreenY = orbitRect.height / 2;
 
         // Position relative to space container
