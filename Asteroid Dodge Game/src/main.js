@@ -99,6 +99,7 @@ window.addEventListener('resize', () => {
   H = canvas.height;
 });
 
+
 // --- Input (keyboard) ---
 let keys = { left: false, right: false };
 window.addEventListener('keydown', e => {
@@ -157,10 +158,31 @@ canvas.addEventListener(
   "touchstart",
   (e) => {
     e.preventDefault();
-    const x = e.touches[0].clientX;
+
+    const t = e.touches[0];
+    const x = t.clientX;
+    const y = t. clientY;
 
     touchStartX = x;
     touchMoved = false;
+
+    uiButtons.updateBounds(W);
+
+    if (uiButtons.contains(uiButtons.menu, x, y)) {
+      toggleMenu();
+      keys.left = false;
+      keys.right = false;
+      touchStartX = null;
+      return;
+    }
+
+    if (uiButtons.contains(uiButtons.pause, x, y) && gameState === "playing") {
+      isPaused = !isPaused;
+      keys.left = false;
+      keys.right = false;
+      touchStartX = null;
+      return;
+    }
 
     // Tap zones: left half = left, right half = right
     keys.left = x < W / 2;
@@ -234,6 +256,26 @@ startMenu.init(canvas);
 canvas.addEventListener(
   "pointerdown",
   (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    uiButtons.updateBounds(W);
+
+    if (uiButtons.contains(uiButtons.menu, x, y)) {
+      e.preventDefault();
+      toggleMenu();
+      return;
+    }
+
+    if (uiButtons.contains(uiButtons.pause, x, y) && gameState === "playing") {
+      e.preventDefault();
+      isPaused = !isPaused;
+      keys.left = false;
+      keys.right = false;
+      return;
+    }
+
     // Only handle start/restart taps. Otherwise let pointer be used for movement logic.
     if (gameState === "start") {
       e.preventDefault();
@@ -245,11 +287,6 @@ canvas.addEventListener(
       restartGame();
       return;
     }
-    if (isPaused && gameState === "playing") {
-      e.preventDefault();
-      isPaused = false;
-      return;
-}
   },
   { passive: false }
 );
