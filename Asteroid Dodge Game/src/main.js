@@ -548,7 +548,11 @@ function draw() {
     drawHamburgerIcon(ctx, uiButtons.menu);
 
     drawButtonBase(ctx, uiButtons.pause);
-    drawPauseIcon(ctx, uiButtons.pause);
+    if (isMenuVisible() || isPaused) {
+      drawPlayIcon(ctx, uiButtons.pause);
+    } else {
+      drawPauseIcon(ctx, uiButtons.pause);
+    }
 
     // power-up indicators
     let y = safeTop + 55;
@@ -668,7 +672,7 @@ function drawPauseIcon(ctx, btn) {
 
   const barW = 6;
   const barH = 22;
-  const gap = 8;
+  const gap = 4;
   
   const cx = x + w / 2;
   const cy = y + h / 2;
@@ -677,6 +681,29 @@ function drawPauseIcon(ctx, btn) {
   ctx.fillRect(cx + gap, cy - barH / 2, barW, barH);
 
   ctx.restore();
+}
+
+function drawPlayIcon(ctx, btn) {
+  const { x, y, w, h } = btn;
+
+  ctx.save();
+  ctx.fillStyle = "white";
+  ctx.globalAlpha = 0.95;
+
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+
+  const triW = 18;
+  const triH = 24;
+
+  ctx.beginPath();
+  ctx.moveTo(cx - triW / 2, cy - triH / 2);
+  ctx.lineTo(cx - triW / 2, cy + triH / 2);
+  ctx.lineTo(cx + triW / 2, cy);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
 }
 
 requestAnimationFrame(loop);
