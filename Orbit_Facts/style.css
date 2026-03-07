@@ -13,7 +13,7 @@
     --text-primary:   #EDE8F5;
     --text-secondary: #8A7BA0;
     --text-mono:      #8A60C0;
-    --toggle-off: rgba(98, 50, 150, 0.22);
+    --toggle-off:  rgba(90, 50, 150, 0.22);
     --toggle-on:   rgba(226, 185, 59, 0.50);
     --transition:  0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -365,4 +365,138 @@ input[type="range"]#orbitSlider::-moz-range-progress {
 .view-toggle .toggle-switch.active ~ .toggle-label,
 .autoplay-toggle .toggle-switch.active ~ .toggle-label {
     color: var(--gold-light);
+}
+
+/* ─── Mobile / Touch ────────────────────────────────────────── */
+@media (max-width: 700px) {
+
+    /* Give the orbit less vertical space so panels fit below */
+    .space {
+        height: 52vh;
+        align-items: center;
+    }
+
+    /* Stack toggles horizontally across the top */
+    .view-toggle,
+    .autoplay-toggle {
+        top: 10px;
+        padding: 6px 10px;
+        gap: 7px;
+    }
+
+    .view-toggle {
+        left: 10px;
+    }
+
+    .autoplay-toggle {
+        left: auto;
+        right: 10px;
+        top: 10px;
+    }
+
+    .toggle-label {
+        font-size: 11px;
+    }
+
+    /* Stack info boxes vertically below the orbit */
+    .info-box {
+        position: relative;
+        bottom: auto;
+        left: auto !important;
+        right: auto !important;
+        width: calc(100vw - 24px);
+        margin: 0 12px;
+        font-size: 12.5px;
+    }
+
+    /* Wrapper to stack the two boxes */
+    #infoBox,
+    #generalInfoBox {
+        position: relative;
+    }
+
+    /* Move controls up slightly to sit just below the panels */
+    .controls {
+        position: relative;
+        bottom: auto;
+        margin-top: 8px;
+        padding-bottom: 10px;
+    }
+
+    /* Larger slider thumb for touch accuracy */
+    input[type="range"]#orbitSlider {
+        width: calc(100vw - 40px);
+        height: 4px;
+        /* Increase tap area */
+        padding: 10px 0;
+    }
+
+    input[type="range"]#orbitSlider::-webkit-slider-thumb {
+        width: 26px;
+        height: 26px;
+        border-width: 3px;
+    }
+
+    input[type="range"]#orbitSlider::-moz-range-thumb {
+        width: 26px;
+        height: 26px;
+        border-width: 3px;
+    }
+
+    /* Larger toggle tap targets */
+    .toggle-switch {
+        width: 48px;
+        height: 26px;
+        border-radius: 13px;
+    }
+
+    .toggle-slider {
+        width: 20px;
+        height: 20px;
+    }
+
+    .toggle-switch.active .toggle-slider {
+        transform: translateX(22px);
+    }
+}
+
+/* Wrap info boxes and controls into a scrollable bottom area on mobile */
+@media (max-width: 700px) {
+    body {
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .space {
+        position: relative;
+    }
+
+    /* Layout the two panels side by side if there's room, else stack */
+    .info-panels-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 0 12px;
+        z-index: 10;
+        position: relative;
+    }
+}
+
+/* Slightly larger screens (tablets) — keep side by side but narrower */
+@media (min-width: 701px) and (max-width: 1024px) {
+    .info-box {
+        width: min(42vw, 280px);
+        font-size: 12.5px;
+    }
+
+    input[type="range"]#orbitSlider::-webkit-slider-thumb {
+        width: 22px;
+        height: 22px;
+    }
+
+    input[type="range"]#orbitSlider::-moz-range-thumb {
+        width: 22px;
+        height: 22px;
+    }
 }

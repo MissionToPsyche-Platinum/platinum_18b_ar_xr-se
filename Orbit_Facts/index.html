@@ -42,26 +42,31 @@
     </div>
 </div>
 
-<!-- Seasonal / fun facts panel -->
-<div class="info-box" id="infoBox">
-    <span class="info-box-label">Seasonal Fact</span>
-    <div class="info-box-body">
-        Psyche's axial tilt of ~95° causes extreme seasons, where poles face the Sun directly during parts of the orbit.
-    </div>
-</div>
+<!-- Info + controls wrapper (stacks on mobile) -->
+<div class="info-panels-wrapper">
 
-<!-- General facts panel -->
-<div class="info-box" id="generalInfoBox">
-    <span class="info-box-label">Mission Data</span>
-    <div class="info-box-body">
-        Psyche is one of the largest metallic asteroids in the solar system.
+    <!-- Seasonal / fun facts panel -->
+    <div class="info-box" id="infoBox">
+        <span class="info-box-label">Seasonal Fact</span>
+        <div class="info-box-body">
+            Psyche's axial tilt of ~95° causes extreme seasons, where poles face the Sun directly during parts of the orbit.
+        </div>
     </div>
-</div>
 
-<!-- Orbit slider -->
-<div class="controls">
-    <span class="slider-label">Orbital Position</span>
-    <input type="range" id="orbitSlider" min="0" max="3600" value="0" step="1">
+    <!-- General facts panel -->
+    <div class="info-box" id="generalInfoBox">
+        <span class="info-box-label">Mission Data</span>
+        <div class="info-box-body">
+            Psyche is one of the largest metallic asteroids in the solar system.
+        </div>
+    </div>
+
+    <!-- Orbit slider -->
+    <div class="controls">
+        <span class="slider-label">Orbital Position</span>
+        <input type="range" id="orbitSlider" min="0" max="3600" value="0" step="1">
+    </div>
+
 </div>
 
 <script src="script.js"></script>

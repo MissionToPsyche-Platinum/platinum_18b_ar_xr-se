@@ -84,7 +84,6 @@ function updateSunGlowPosition() {
         // So visually, the Sun appears offset from center
         const eccentricity = 0.14;
 
-
         // Get orbit container rect to position relative to it
         const orbitRect = orbitContainer.getBoundingClientRect();
         const spaceRect = document.querySelector('.space').getBoundingClientRect();
@@ -365,6 +364,7 @@ slider.addEventListener('input', () => {
     const angle = parseFloat(slider.value);
     updatePosition(angle);
 });
+slider.style.touchAction = 'none';
 
 // View toggle listener
 viewToggle.addEventListener('click', () => {
