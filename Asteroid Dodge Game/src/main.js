@@ -114,14 +114,7 @@ window.addEventListener('keydown', e => {
   if (e.code === 'KeyF') facts.toggle();
 
   if (e.code === 'Escape') {
-    toggleMenu();
-    if(isMenuVisible()) {
-      prevState = gameState;
-      gameState = "menu";
-    } else {
-      gameState = prevState;
-      prevState = null;
-    }
+      toggleGameMenu();
   }
 
   if ((e.code === "KeyP") && gameState === "playing") {
@@ -169,15 +162,20 @@ canvas.addEventListener(
     uiButtons.updateBounds(W);
 
     if (uiButtons.contains(uiButtons.menu, x, y)) {
-      toggleMenu();
+      toggleGameMenu();
       keys.left = false;
       keys.right = false;
       touchStartX = null;
       return;
     }
 
-    if (uiButtons.contains(uiButtons.pause, x, y) && gameState === "playing") {
-      isPaused = !isPaused;
+    if (uiButtons.contains(uiButtons.pause, x, y) && (gameState === "playing" || prevState === "playing")) {
+      if(isMenuVisible()) {
+        closeMenu();
+        isPaused = false;
+      } else if (gameState === "playing") {
+        isPaused = !isPaused;
+      }
       keys.left = false;
       keys.right = false;
       touchStartX = null;
@@ -264,13 +262,18 @@ canvas.addEventListener(
 
     if (uiButtons.contains(uiButtons.menu, x, y)) {
       e.preventDefault();
-      toggleMenu();
+      toggleGameMenu();
       return;
     }
 
-    if (uiButtons.contains(uiButtons.pause, x, y) && gameState === "playing") {
+    if (uiButtons.contains(uiButtons.pause, x, y) && (gameState === "playing" || prevState === "playing")) {
       e.preventDefault();
-      isPaused = !isPaused;
+      if(isMenuVisible()) {
+        closeMenu();
+        isPaused = false;
+      } else if (gameState === "playing") {
+        isPaused = !isPaused;
+      }
       keys.left = false;
       keys.right = false;
       return;
@@ -307,7 +310,7 @@ function isProbablyPhone() {
     ("maxTouchPoints" in navigator && navigator.maxTouchPoints > 0) ||
     ("ontouchstart" in window);
     
-  const coarsePointer = window.matchMedia?.("(pointer: coarse)"?.matches ?? false);
+  const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
   const smallScreen = Math.min(window.innerWidth, window.innerHeight) <= 820;
 
   // Probably phone if has touch capabilities, has coarse pointers and has a smallish screen
@@ -704,6 +707,30 @@ function drawPlayIcon(ctx, btn) {
   ctx.fill();
   ctx.restore();
 
+}
+
+function openMenu() {
+  if (isMenuVisible()) return;
+  prevState = gameState;
+  gameState = "menu";
+  keys.left = false;
+  keys.right = false;
+  toggleMenu();
+}
+
+function closeMenu() {
+  if (!isMenuVisible()) return;
+  toggleMenu();
+  gameState = prevState ?? "playing";
+  prevState = null;
+}
+
+function toggleGameMenu() {
+  if (isMenuVisible()) {
+    closeMenu();
+  } else {
+    openMenu();
+  }
 }
 
 requestAnimationFrame(loop);
