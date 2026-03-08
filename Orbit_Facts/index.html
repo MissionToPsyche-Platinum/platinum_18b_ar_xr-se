@@ -11,14 +11,20 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Starfield canvas -->
+<canvas id="star-canvas"></canvas>
+
+<!-- View scale toggle -->
 <div class="view-toggle">
-    <span class="toggle-label">Enlarged View</span>
+    <span class="toggle-label">Enlarged</span>
     <div class="toggle-switch" id="viewToggle">
         <div class="toggle-slider"></div>
     </div>
     <span class="toggle-label">To Scale</span>
 </div>
 
+<!-- Autoplay toggle -->
 <div class="autoplay-toggle">
     <span class="toggle-label">Manual</span>
     <div class="toggle-switch" id="autoplayToggle">
@@ -27,6 +33,7 @@
     <span class="toggle-label">Auto Play</span>
 </div>
 
+<!-- Main simulation space -->
 <div class="space">
     <div class="sun"></div>
     <div class="orbit">
@@ -35,14 +42,71 @@
     </div>
 </div>
 
-<div class="info-box" id="infoBox">
-    Fun Fact: Psyche has an axial tilt of approximately 98°, leading to extreme seasonal variations!
-</div>
+<!-- Info + controls wrapper (stacks on mobile) -->
+<div class="info-panels-wrapper">
 
-<div class="controls">
-    <input type="range" id="orbitSlider" min="0" max="3600" value="0" step="1">
+    <!-- Seasonal / fun facts panel -->
+    <div class="info-box" id="infoBox">
+        <span class="info-box-label">Seasonal Fact</span>
+        <div class="info-box-body">
+            Psyche's axial tilt of ~95° causes extreme seasons, where poles face the Sun directly during parts of the orbit.
+        </div>
+    </div>
+
+    <!-- General facts panel -->
+    <div class="info-box" id="generalInfoBox">
+        <span class="info-box-label">Mission Data</span>
+        <div class="info-box-body">
+            Psyche is one of the largest metallic asteroids in the solar system.
+        </div>
+    </div>
+
+    <!-- Orbit slider -->
+    <div class="controls">
+        <span class="slider-label">Orbital Position</span>
+        <input type="range" id="orbitSlider" min="0" max="3600" value="0" step="1">
+    </div>
+
 </div>
 
 <script src="script.js"></script>
+
+<!-- Starfield generator -->
+<script>
+    (function() {
+        const canvas = document.getElementById('star-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawStars();
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const count = Math.floor((canvas.width * canvas.height) / 3200);
+            for (let i = 0; i < count; i++) {
+                const x    = Math.random() * canvas.width;
+                const y    = Math.random() * canvas.height;
+                const r    = Math.random() * 1.1;
+                const a    = 0.25 + Math.random() * 0.75;
+                // Slight warm/cool tint variation
+                const warm = Math.random() > 0.5;
+                const hue  = warm ? `rgba(255,245,220,${a})` : `rgba(200,225,255,${a})`;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = hue;
+                ctx.fill();
+            }
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+    })();
+</script>
+
+
+
 </body>
 </html>
