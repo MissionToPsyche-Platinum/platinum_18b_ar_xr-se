@@ -8,6 +8,7 @@ const autoplayToggle = document.getElementById('autoplayToggle');
 let radius = 0;           // Will be set based on container size
 let isRealisticView = false; // Start with To Scale view
 let psycheModel = null;   // Will hold the loaded 3D model
+let sunModel = null;      // Will hold the loaded Sun model
 let isAutoplay = false;   // Autoplay state
 let animationId = null;   // Animation frame ID
 
@@ -67,6 +68,12 @@ function initThreeSize() {
     // Calculate radius from orbit container since orbit-circle is now hidden
     const circleRadius = Math.min(width, height) / 1.32;
     radius = circleRadius;
+
+    // Scale sun model proportionally to orbit radius
+    if (sunModel) {
+        const sunScale = radius / 2;
+        sunModel.scale.set(sunScale, sunScale, sunScale);
+    }
 
     // Position sun glow to match the Sun's position accounting for camera offset
     updateSunGlowPosition();
@@ -337,9 +344,9 @@ loader.load(
 loader.load(
     './models/psyche/sun.glb',
     function (gltf) {
-        const sunModel = gltf.scene;
+        sunModel = gltf.scene;
         sunModel.position.set(0, 0, 0); // Position at origin (center)
-        sunModel.scale.set(150, 150, 150); // Enlarged for visibility
+        sunModel.scale.set(150, 150, 150); // Initial scale, overridden by initThreeSize
 
         // Disable frustum culling
         sunModel.traverse((child) => {
@@ -349,6 +356,8 @@ loader.load(
         });
 
         scene.add(sunModel);
+        // Apply dynamic scale immediately now that model is available
+        initThreeSize();
         console.log('Sun model loaded!');
     },
     function (xhr) {
