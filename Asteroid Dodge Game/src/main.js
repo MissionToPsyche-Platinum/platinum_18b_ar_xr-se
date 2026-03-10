@@ -6,12 +6,15 @@ import { sounds } from './audio.js';
 import { updateAsteroids, drawAsteroids, resetAsteroids } from './asteroid.js';
 import { updatePowerUps, drawPowerUps, activePowerUps, resetPowerUps } from './powerups.js';
 import { initStars, updateStars, drawStars } from './stars.js';
+import { toggleMenu, isMenuVisible } from "./menu.js";
+
 import { startMenu } from './start.js';
 import { effects } from './effects.js';
 import { CONSTANTS } from "./constants.js";
 import { facts } from "./facts.js";
 
 export let gameState = "start";
+let prevState;
 
 const { SCORING, UI, PLAYER } = CONSTANTS;
 
@@ -21,10 +24,38 @@ let gameOverFade = 0;
 let isPaused = false;
 effects.playerRef = player;
 
+const uiButtons = {
+  size: 56,
+  pad: 16,
+  gap: 12,
+
+  menu: {x: 0, y: 0, w: 0, h: 0},
+  pause: {x: 0, y: 0, w: 0, h: 0},
+  updateBounds(W) {
+    const s = this.size;
+    const x = W - this.pad - s;
+
+    this.menu.x = x;
+    this.menu.y = this.pad;
+    this.menu.w = s;
+    this.menu.h = s;
+    
+    this.pause.x = x;
+    this.pause.y = this.pad + s + this.gap;
+    this.pause.w = s;
+    this.pause.h = s;
+  },
+
+  contains(btn, px, py) {
+    return px >= btn.x && px <= btn.x + btn.w && py >= btn.y && py <= btn.y + btn.h;
+  }
+};
+
 //fit to screen for mobile/web
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  uiButtons.updateBounds(canvas.width);
 }
 resizeCanvas();
 let W = canvas.width;
@@ -68,6 +99,7 @@ window.addEventListener('resize', () => {
   H = canvas.height;
 });
 
+
 // --- Input (keyboard) ---
 let keys = { left: false, right: false };
 window.addEventListener('keydown', e => {
@@ -81,7 +113,11 @@ window.addEventListener('keydown', e => {
   // Toggle educational facts
   if (e.code === 'KeyF') facts.toggle();
 
-  if ((e.code === "KeyP" || e.code === "Escape") && gameState === "playing") {
+  if (e.code === 'Escape') {
+      toggleGameMenu();
+  }
+
+  if ((e.code === "KeyP") && gameState === "playing") {
     isPaused = !isPaused;
     keys.left = false;
     keys.right = false;
@@ -115,10 +151,36 @@ canvas.addEventListener(
   "touchstart",
   (e) => {
     e.preventDefault();
-    const x = e.touches[0].clientX;
+
+    const t = e.touches[0];
+    const x = t.clientX;
+    const y = t. clientY;
 
     touchStartX = x;
     touchMoved = false;
+
+    uiButtons.updateBounds(W);
+
+    if (uiButtons.contains(uiButtons.menu, x, y)) {
+      toggleGameMenu();
+      keys.left = false;
+      keys.right = false;
+      touchStartX = null;
+      return;
+    }
+
+    if (uiButtons.contains(uiButtons.pause, x, y) && (gameState === "playing" || prevState === "playing")) {
+      if(isMenuVisible()) {
+        closeMenu();
+        isPaused = false;
+      } else if (gameState === "playing") {
+        isPaused = !isPaused;
+      }
+      keys.left = false;
+      keys.right = false;
+      touchStartX = null;
+      return;
+    }
 
     // Tap zones: left half = left, right half = right
     keys.left = x < W / 2;
@@ -192,6 +254,31 @@ startMenu.init(canvas);
 canvas.addEventListener(
   "pointerdown",
   (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    uiButtons.updateBounds(W);
+
+    if (uiButtons.contains(uiButtons.menu, x, y)) {
+      e.preventDefault();
+      toggleGameMenu();
+      return;
+    }
+
+    if (uiButtons.contains(uiButtons.pause, x, y) && (gameState === "playing" || prevState === "playing")) {
+      e.preventDefault();
+      if(isMenuVisible()) {
+        closeMenu();
+        isPaused = false;
+      } else if (gameState === "playing") {
+        isPaused = !isPaused;
+      }
+      keys.left = false;
+      keys.right = false;
+      return;
+    }
+
     // Only handle start/restart taps. Otherwise let pointer be used for movement logic.
     if (gameState === "start") {
       e.preventDefault();
@@ -203,11 +290,6 @@ canvas.addEventListener(
       restartGame();
       return;
     }
-    if (isPaused && gameState === "playing") {
-      e.preventDefault();
-      isPaused = false;
-      return;
-}
   },
   { passive: false }
 );
@@ -216,6 +298,25 @@ canvas.addEventListener(
 // ==============================
 // Mobile Orientation Handling
 // ==============================
+
+// Function that checks if device is likely a mobile device so this message doesn't appear on desktop
+function isProbablyPhone() {
+  if (navigator.userAgentData && typeof navigator.userAgentData.mobile === "boolean") {
+    return navigator.userAgentData.mobile;
+  }
+
+  // Fallback
+  const hasTouch = 
+    ("maxTouchPoints" in navigator && navigator.maxTouchPoints > 0) ||
+    ("ontouchstart" in window);
+    
+  const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
+  const smallScreen = Math.min(window.innerWidth, window.innerHeight) <= 820;
+
+  // Probably phone if has touch capabilities, has coarse pointers and has a smallish screen
+  return hasTouch && coarsePointer && smallScreen;
+}
+
 function isLandscape() {
   return window.innerWidth > window.innerHeight;
 }
@@ -238,11 +339,13 @@ function showRotateOverlay(show) {
 }
 
 function handleOrientation() {
+  const enforce = isProbablyPhone();
   const landscape = isLandscape();
-  showRotateOverlay(landscape);
+
+  showRotateOverlay(landscape && enforce);
 
   // auto-pause when landscape
-  if (landscape && gameState === "playing") {
+  if (enforce && landscape && gameState === "playing") {
     isPaused = true;
     keys.left = false;
     keys.right = false;
@@ -313,9 +416,9 @@ function update(dt) {
     return;
   }
 
-  if (gameState !== "playing") return;
-
-  if (isPaused) {
+  if (gameState !== "playing" &&  prevState !== "playing") return;
+    if (isPaused || isMenuVisible()) {
+    // Keep background alive
     updateStars(canvas);
     effects.update(dt);
     return;
@@ -392,8 +495,12 @@ function draw() {
 
   drawStars(ctx);
 
-  if (gameState === "start") {
+  if (gameState === "start" || (isMenuVisible() && prevState === "start")) {
     startMenu.draw(ctx, W, H);
+    if(isMenuVisible()) {
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(0, 0, W, H);
+    }
     return;
   }
 
@@ -401,7 +508,8 @@ function draw() {
   drawPowerUps(ctx);
   player.draw(ctx);
 
-  if (gameState === "playing") {
+  if (gameState === "playing" || (isMenuVisible() && prevState === "playing")) {
+    // in-game HUD
     ctx.fillStyle = "white";
     const safeTop = getSafeTop();
     ctx.font = fontPx(22, "monospace"); 
@@ -437,6 +545,18 @@ function draw() {
       ctx.restore();
     }
 
+    uiButtons.updateBounds(W);
+    
+    drawButtonBase(ctx, uiButtons.menu);
+    drawHamburgerIcon(ctx, uiButtons.menu);
+
+    drawButtonBase(ctx, uiButtons.pause);
+    if (isMenuVisible() || isPaused) {
+      drawPlayIcon(ctx, uiButtons.pause);
+    } else {
+      drawPauseIcon(ctx, uiButtons.pause);
+    }
+
     // power-up indicators
     let y = safeTop + 55;
     if (activePowerUps.shield) {
@@ -452,23 +572,28 @@ function draw() {
     facts.draw(ctx, W);
   }
 
-  if (isPaused) {
-    ctx.fillStyle = "rgba(0,0,0,0.55)";
-    ctx.fillRect(0, 0, W, H);
+  //freeze frame when paused
+    if (isPaused || (isMenuVisible() && prevState != "gameover")) {
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(0, 0, W, H);
 
-    ctx.textAlign = "center";
-    ctx.fillStyle = "white";
-    ctx.font = fontPx(56, "sans-serif", "bold");
-    ctx.fillText("PAUSED", W / 2, H / 2 - 40);
+      ctx.textAlign = "center";
+      ctx.fillStyle = "white";
+      ctx.font = "bold 60px sans-serif";
+      ctx.fillText("PAUSED", W / 2, H / 5 -  10);
 
-    ctx.font = fontPx(22, "sans-serif");
-    ctx.fillStyle = "lightgray";
-    ctx.fillText("Press P or Esc to Resume", W / 2, H / 2 + 20);
-  }
+      ctx.font = "22px sans-serif";
+      ctx.fillStyle = "lightgray";
+
+      if (isPaused) ctx.fillText("Press P to Resume", W / 2, H / 5 * 4  + 30);
+      if (isMenuVisible()) ctx.fillText("Press Esc to Resume", W / 2, H / 5 * 4 + 30);
+
+    }
 
   effects.draw(ctx, W, H);
-
-  if (gameState === "gameover") {
+  
+  if (gameState === "gameover" || (isMenuVisible() && prevState === "gameover")) {
+    // blackout overlay
     ctx.fillStyle = "rgba(0,0,0,0.85)";
     ctx.fillRect(0, 0, W, H);
     ctx.textAlign = "center";
@@ -490,6 +615,121 @@ function draw() {
     ctx.font = fontPx(20, "sans-serif");
     ctx.fillStyle = "lightgray";
     ctx.fillText("Tap to Restart", W / 2, H / 2 + lineGap * 2);
+  }
+}
+
+function drawButtonBase(ctx, btn) {
+  const { x, y, w, h } = btn;
+  const r = 12;
+
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+  ctx.fillStyle = "rgba(0,0,0,0.35)";
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawHamburgerIcon(ctx, btn) {
+  const { x, y, w, h } = btn;
+
+  ctx.save();
+  ctx.fillStyle = "white";
+  ctx.globalAlpha = 0.95;
+
+  const barW = Math.round(w * 0.55);
+  const barH = 4;
+  const gap = 8;
+
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+
+  const left = Math.round(cx - barW / 2);
+  const top1 = Math.round(cy - gap - barH);
+  const top2 = Math.round(cy - barH / 2);
+  const top3 = Math.round(cy + gap);
+
+  ctx.fillRect(left, top1, barW, barH);
+  ctx.fillRect(left, top2, barW, barH);
+  ctx.fillRect(left, top3, barW, barH);
+
+  ctx.restore();
+}
+
+function drawPauseIcon(ctx, btn) {
+  const { x, y, w, h } = btn;
+
+  ctx.save();
+  ctx.fillStyle = "white";
+  ctx.globalAlpha = 0.95;
+
+  const barW = 6;
+  const barH = 22;
+  const gap = 4;
+  
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+
+  ctx.fillRect(cx - gap - barW, cy - barH / 2, barW, barH);
+  ctx.fillRect(cx + gap, cy - barH / 2, barW, barH);
+
+  ctx.restore();
+}
+
+function drawPlayIcon(ctx, btn) {
+  const { x, y, w, h } = btn;
+
+  ctx.save();
+  ctx.fillStyle = "white";
+  ctx.globalAlpha = 0.95;
+
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+
+  const triW = 18;
+  const triH = 24;
+
+  ctx.beginPath();
+  ctx.moveTo(cx - triW / 2, cy - triH / 2);
+  ctx.lineTo(cx - triW / 2, cy + triH / 2);
+  ctx.lineTo(cx + triW / 2, cy);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+}
+
+function openMenu() {
+  if (isMenuVisible()) return;
+  prevState = gameState;
+  gameState = "menu";
+  keys.left = false;
+  keys.right = false;
+  toggleMenu();
+}
+
+function closeMenu() {
+  if (!isMenuVisible()) return;
+  toggleMenu();
+  gameState = prevState ?? "playing";
+  prevState = null;
+}
+
+function toggleGameMenu() {
+  if (isMenuVisible()) {
+    closeMenu();
+  } else {
+    openMenu();
   }
 }
 
