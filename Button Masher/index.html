@@ -291,6 +291,7 @@
   <audio id="cameraSound1" src="assets/camera sound 1.mp3" preload="auto"></audio>
   <audio id="cameraSound2" src="assets/camera sound 2.mp3" preload="auto"></audio>
   <audio id="congratsSfx" src="assets/congratulations.mp3" preload="auto"></audio>
+  <audio id="dingSfx" src="assets/ding.mp3" preload="auto"></audio>
 
   <main id="pageGame" class="wrap page active">
     <section class="topbar" aria-label="Progress">
@@ -355,6 +356,7 @@
     const cameraSound2 = document.getElementById("cameraSound2");
     const congratsSfx = document.getElementById("congratsSfx");
     const progressFill = document.getElementById("progressFill");
+    const dingSfx = document.getElementById("dingSfx");
 
     let cameraSoundInterval = null;
     let count = 0;
@@ -362,6 +364,21 @@
     let timerStarted = false;
     let timerId = null;
     let resultsTimeoutId = null;
+
+    //Helper method to fill progress bar every press
+    const MAX_PRESSES = 33;
+    function updateProgressBar() {
+      const clamped = Math.min(count, MAX_PRESSES);
+      const pct = (clamped / MAX_PRESSES) * 100;
+      progressFill.style.width = pct + "%";
+    }
+
+    //Helper method for ding sound
+    function playDing() {
+     if (!dingSfx) return;
+      dingSfx.currentTime = 0;
+      dingSfx.play().catch(() => {});
+    }
 
     function scoreToOrbitSeconds(score) {
       if (score <= 5) return 9.0;
@@ -436,6 +453,7 @@
       }
 
       count = 0;
+      updateProgressBar();   //updates the progress bar
       timeLeft = 5;
       timerStarted = false;
 
@@ -546,9 +564,15 @@
       }
 
       if (timeLeft > 0) {
-        count++;
-        countEl.textContent = count;
-      }
+  if (count < MAX_PRESSES) {
+    count++;
+    countEl.textContent = count;
+    updateProgressBar();
+  } else {
+    playDing();
+    updateProgressBar(); 
+  }
+}
     }, { passive: false });
 
     resetBtn.addEventListener("click", resetGame);
