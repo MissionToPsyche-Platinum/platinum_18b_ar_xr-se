@@ -12,8 +12,75 @@
 </head>
 <body>
 
-<!-- Starfield canvas -->
-<canvas id="star-canvas"></canvas>
+<!-- Menu button -->
+<button class="menu-btn" id="menuBtn" aria-label="Open menu">
+    <span></span>
+    <span></span>
+    <span></span>
+</button>
+
+<!-- Menu overlay -->
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- Menu panel -->
+<div class="menu-panel" id="menuPanel">
+
+    <div class="menu-header">
+        <span class="menu-title">orbit_facts</span>
+        <button class="menu-close" id="menuClose" aria-label="Close menu">✕</button>
+    </div>
+
+    <!-- About -->
+    <div class="menu-section">
+        <span class="menu-section-label">About</span>
+        <p class="menu-about-text">
+            This module visualizes the orbit of 16 Psyche, a metallic asteroid in the main asteroid belt.
+            NASA's Psyche mission launched in October 2023 to explore this unique world, which may be
+            the exposed iron-nickel core of a planetesimal.
+        </p>
+    </div>
+
+    <!-- Settings -->
+    <div class="menu-section">
+        <span class="menu-section-label">Settings</span>
+
+        <!-- Scale toggle (mirrored from main UI) -->
+        <div class="menu-setting">
+            <span class="menu-setting-label">View Scale</span>
+            <div class="menu-toggle-row">
+                <span class="toggle-label">Enlarged</span>
+                <div class="toggle-switch" id="menuViewToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+                <span class="toggle-label">To Scale</span>
+            </div>
+        </div>
+
+        <!-- Autoplay speed -->
+        <div class="menu-setting">
+            <span class="menu-setting-label">Autoplay Speed</span>
+            <div class="menu-speed-btns">
+                <button class="speed-btn active" data-speed="10">Slow</button>
+                <button class="speed-btn" data-speed="25">Medium</button>
+                <button class="speed-btn" data-speed="50">Fast</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module links -->
+    <div class="menu-section">
+        <span class="menu-section-label">Other Modules</span>
+        <nav class="menu-links">
+            <a class="menu-link" href="#">Surface Composition</a>
+            <a class="menu-link" href="#">Mission Timeline</a>
+            <a class="menu-link" href="#">Spacecraft Overview</a>
+            <a class="menu-link" href="#">Science Goals</a>
+        </nav>
+    </div>
+
+</div>
+
+
 
 <!-- View scale toggle -->
 <div class="view-toggle">

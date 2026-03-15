@@ -75,9 +75,6 @@ function initThreeSize() {
         sunModel.scale.set(sunScale, sunScale, sunScale);
     }
 
-    // Position sun glow to match the Sun's position accounting for camera offset
-    updateSunGlowPosition();
-
     // Draw the elliptical orbit line in Three.js using the same values as the asteroid path
     drawOrbitLine();
 }
@@ -358,6 +355,8 @@ loader.load(
         scene.add(sunModel);
         // Apply dynamic scale immediately now that model is available
         initThreeSize();
+        // Defer glow position until after browser has painted the updated layout
+        requestAnimationFrame(updateSunGlowPosition);
         console.log('Sun model loaded!');
     },
     function (xhr) {
@@ -397,6 +396,7 @@ viewToggle.addEventListener('click', () => {
 // Handle window resize
 window.addEventListener('resize', () => {
     initThreeSize();
+    updateSunGlowPosition();
     const currentAngle = parseFloat(slider.value);
     updatePosition(currentAngle);
 });
@@ -411,7 +411,7 @@ function animate() {
         const deltaTime = (currentTime - lastTime) / 1000; // seconds elapsed
         lastTime = currentTime;
 
-        currentValue += 10 * deltaTime; // 10 slider units = 1 degree, so 10 per second
+        currentValue += autoplaySpeed * deltaTime;
 
         if (currentValue >= 3600) {
             currentValue = 0;
@@ -439,6 +439,63 @@ autoplayToggle.addEventListener('click', () => {
             animationId = null;
         }
     }
+});
+
+// ─── Menu ───────────────────────────────────────────────────
+const menuBtn     = document.getElementById('menuBtn');
+const menuPanel   = document.getElementById('menuPanel');
+const menuOverlay = document.getElementById('menuOverlay');
+const menuClose   = document.getElementById('menuClose');
+const menuViewToggle = document.getElementById('menuViewToggle');
+const speedBtns   = document.querySelectorAll('.speed-btn');
+
+let autoplaySpeed = 10; // default slow
+
+function openMenu() {
+    menuPanel.classList.add('open');
+    menuOverlay.classList.add('visible');
+    menuBtn.classList.add('open');
+}
+
+function closeMenu() {
+    menuPanel.classList.remove('open');
+    menuOverlay.classList.remove('visible');
+    menuBtn.classList.remove('open');
+}
+
+menuBtn.addEventListener('click', () => {
+    menuPanel.classList.contains('open') ? closeMenu() : openMenu();
+});
+menuClose.addEventListener('click', closeMenu);
+menuOverlay.addEventListener('click', closeMenu);
+
+// Sync menu view toggle with main view toggle
+menuViewToggle.addEventListener('click', () => {
+    isRealisticView = !isRealisticView;
+    menuViewToggle.classList.toggle('active');
+    viewToggle.classList.toggle('active');
+    if (psycheModel) {
+        psycheModel.scale.set(
+            isRealisticView ? 1 : 8,
+            isRealisticView ? 1 : 8,
+            isRealisticView ? 1 : 8
+        );
+        updatePosition(parseFloat(slider.value));
+    }
+});
+
+// Keep main view toggle in sync with menu toggle
+viewToggle.addEventListener('click', () => {
+    menuViewToggle.classList.toggle('active', viewToggle.classList.contains('active'));
+});
+
+// Speed buttons
+speedBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        speedBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        autoplaySpeed = parseFloat(btn.dataset.speed);
+    });
 });
 
 // Initial sizing and render

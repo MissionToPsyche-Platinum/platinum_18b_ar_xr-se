@@ -367,6 +367,234 @@ input[type="range"]#orbitSlider::-moz-range-progress {
     color: var(--gold-light);
 }
 
+/* ─── Menu Button ───────────────────────────────────────────── */
+.menu-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    width: 40px;
+    height: 40px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    padding: 8px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    transition: box-shadow var(--transition), border-color var(--transition);
+}
+
+.menu-btn:hover {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 12px var(--gold-glow);
+    border-color: rgba(226, 185, 59, 0.4);
+}
+
+.menu-btn span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px;
+    transition: transform var(--transition), opacity var(--transition);
+}
+
+/* Animate to X when open */
+.menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.menu-btn.open span:nth-child(2) { opacity: 0; }
+.menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ─── Menu Overlay ──────────────────────────────────────────── */
+.menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 98;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition);
+}
+
+.menu-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* ─── Menu Panel ────────────────────────────────────────────── */
+.menu-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 300px;
+    max-width: 85vw;
+    background: var(--panel-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid var(--border);
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform var(--transition);
+    box-shadow: -8px 0 40px rgba(0,0,0,0.6);
+}
+
+.menu-panel.open {
+    transform: translateX(0);
+}
+
+/* Menu header */
+.menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 18px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.menu-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+.menu-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: color var(--transition);
+    line-height: 1;
+}
+
+.menu-close:hover {
+    color: var(--gold-light);
+}
+
+/* Menu sections */
+.menu-section {
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.menu-section:last-child {
+    border-bottom: none;
+}
+
+.menu-section-label {
+    display: block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.85;
+    margin-bottom: 12px;
+}
+
+/* About text */
+.menu-about-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Settings rows */
+.menu-setting {
+    margin-bottom: 16px;
+}
+
+.menu-setting:last-child {
+    margin-bottom: 0;
+}
+
+.menu-setting-label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-secondary);
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+}
+
+.menu-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Speed buttons */
+.menu-speed-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.speed-btn {
+    flex: 1;
+    padding: 6px 0;
+    background: var(--toggle-off);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.speed-btn:hover {
+    border-color: rgba(226, 185, 59, 0.4);
+    color: var(--text-primary);
+}
+
+.speed-btn.active {
+    background: var(--toggle-on);
+    border-color: rgba(226, 185, 59, 0.5);
+    color: var(--gold-light);
+    box-shadow: 0 0 8px var(--gold-dim);
+}
+
+/* Module links */
+.menu-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.menu-link {
+    display: block;
+    padding: 9px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-primary);
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.menu-link:hover {
+    background: rgba(226, 185, 59, 0.06);
+    border-color: var(--border);
+    color: var(--gold-light);
+}
+
 /* ─── Mobile / Touch ────────────────────────────────────────── */
 @media (max-width: 700px) {
 
@@ -389,9 +617,9 @@ input[type="range"]#orbitSlider::-moz-range-progress {
     }
 
     .autoplay-toggle {
-        left: auto;
-        right: 10px;
-        top: 10px;
+        left: 10px;
+        right: auto;
+        top: 56px;
     }
 
     .toggle-label {
