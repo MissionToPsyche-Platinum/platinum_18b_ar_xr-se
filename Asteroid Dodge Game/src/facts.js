@@ -1,7 +1,7 @@
 // src/facts.js
 import { CONSTANTS } from "./constants.js";
 
-const DEFAULT_FACTS = [
+export const DEFAULT_FACTS = [
   "NASA’s Psyche mission launched in October 2023.",
   "Psyche orbits in the asteroid belt between Mars and Jupiter.",
   "Psyche is thought to be metal-rich—possibly an exposed planetary core.",

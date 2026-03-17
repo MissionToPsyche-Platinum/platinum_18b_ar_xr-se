@@ -10,6 +10,11 @@ const powerUpInterval = POWERUPS.SPAWN_INTERVAL;
 let powerUpTimer = 0;
 const powerUpDuration = POWERUPS.DURATION;
 
+export const powerUpDescriptions = [
+  { id: "shield", name: "Shield", img: "src/assets/shield.png", desc: "Protects against a single collision" },
+  { id: "double-score", name: "Double Score", img: "src/assets/doubleScore.png", desc: "Temporarily doubles your score"}
+]
+
 
 // Load Power-Up Images
 const powerUpImgs = {
