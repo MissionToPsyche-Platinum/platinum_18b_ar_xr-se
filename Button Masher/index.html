@@ -51,9 +51,225 @@
     </div>
   </main>
 
-  <script src="js/dom.js"></script>
-  <script src="js/audio.js"></script>
-  <script src="js/message.js"></script>
-  <script src="js/game.js"></script>
+  <script>
+    const pageGame = document.getElementById("pageGame");
+    const pageResults = document.getElementById("pageResults");
+
+    const countEl = document.getElementById("count");
+    const timeEl = document.getElementById("time");
+    const btn = document.getElementById("mashBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    const finalScoreEl = document.getElementById("finalScore");
+    const animWrap = document.getElementById("animWrap");
+    const funFactEl = document.getElementById("funFact");
+    const playAgainBtn = document.getElementById("playAgainBtn");
+
+    const orbitEl = document.getElementById("orbit");
+
+    const mashSfx = document.getElementById("mashSfx");
+    const cameraSound1 = document.getElementById("cameraSound1");
+    const cameraSound2 = document.getElementById("cameraSound2");
+    const congratsSfx = document.getElementById("congratsSfx");
+    const progressFill = document.getElementById("progressFill");
+
+    let cameraSoundInterval = null;
+    let count = 0;
+    let timeLeft = 5;
+    let timerStarted = false;
+    let timerId = null;
+    let resultsTimeoutId = null;
+
+    function scoreToOrbitSeconds(score) {
+      if (score <= 5) return 9.0;
+      if (score <= 10) return 7.5;
+      if (score <= 15) return 6.0;
+      if (score <= 20) return 5.0;
+      if (score <= 25) return 4.2;
+      if (score <= 30) return 3.6;
+      return 2.0;
+    }
+
+    function startMashAudio() {
+      if (!mashSfx) return;
+      mashSfx.currentTime = 0;
+      mashSfx.play().catch(() => {});
+    }
+
+    function stopMashAudio() {
+      if (!mashSfx) return;
+      mashSfx.pause();
+      mashSfx.currentTime = 0;
+    }
+
+    function startCameraSounds() {
+      stopCameraSounds();
+      cameraSoundInterval = setInterval(() => {
+        const sound = Math.random() < 0.5 ? cameraSound1 : cameraSound2;
+        sound.currentTime = 0;
+        sound.play().catch(() => {});
+      }, 400 + Math.random() * 600);
+    }
+
+    function stopCameraSounds() {
+      if (cameraSoundInterval !== null) {
+        clearInterval(cameraSoundInterval);
+        cameraSoundInterval = null;
+      }
+      cameraSound1.pause();
+      cameraSound2.pause();
+    }
+
+    function playCongrats() {
+      if (!congratsSfx) return;
+      congratsSfx.currentTime = 0;
+      congratsSfx.play().catch(() => {});
+    }
+
+    function stopCongrats() {
+      if (!congratsSfx) return;
+      congratsSfx.pause();
+      congratsSfx.currentTime = 0;
+    }
+
+    function showPage(which) {
+      pageGame.classList.toggle("active", which === "game");
+      pageResults.classList.toggle("active", which === "results");
+    }
+
+    function resetGame() {
+      stopMashAudio();
+      stopCameraSounds();
+      stopCongrats();
+      progressFill.style.width = "0%";
+
+      if (timerId !== null) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+      if (resultsTimeoutId !== null) {
+        clearTimeout(resultsTimeoutId);
+        resultsTimeoutId = null;
+      }
+
+      count = 0;
+      timeLeft = 5;
+      timerStarted = false;
+
+      countEl.textContent = count;
+      timeEl.textContent = timeLeft;
+
+      btn.classList.remove("disabled");
+      btn.textContent = "PRESS THE BUTTON TO START";
+
+      finalScoreEl.textContent = "0";
+      funFactEl.style.display = "none";
+      funFactEl.textContent = "";
+      animWrap.style.display = "flex";
+
+      orbitEl.style.setProperty("--orbitDur", "6s");
+
+      showPage("game");
+    }
+
+    function getEndMessage(score) {
+      if (score < 2) return "You scanned 3% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
+      if (score < 3) return "You scanned 6% of Psyche's surface!\n\nThe satellite that NASA sent to Psyche is about the size of a singles tennis court.";
+      if (score < 4) return "You scanned 9% of Psyche's surface!\n\nThe Psyche satellite has unique plus shaped solar panels.";
+      if (score < 5) return "You scanned 12% of Psyche's surface!\n\nThe satellite will reach the asteroid using low-thrust solar electric propulsion.";
+      if (score < 6) return "You scanned 15% of Psyche's surface!\n\nThe spacecraft headed for Psyche launched on October 13, 2023.";
+      if (score < 7) return "You scanned 18% of Psyche's surface!\n\nThe Psyche satellite will reach the asteroid in mid-2029.";
+      if (score < 8) return "You scanned 21% of Psyche's surface!\n\nNASA plans to have the satellite orbit Psyche for over 2 years.";
+      if (score < 9) return "You scanned 24% of Psyche's surface!\n\nPsyche is roughly the size of Massachusetts.";
+      if (score < 10) return "You scanned 27% of Psyche's surface!\n\nPsyche is the name of the asteroid, mission, and spacecraft.";
+      if (score < 11) return "You scanned 30% of Psyche's surface!\n\nThe spacecraft sent to Psyche will only orbit the asteroid, not land on it.";
+      if (score < 12) return "You scanned 33% of Psyche's surface!\n\nPsyche is named after the goddess of the soul from Greek mythology.";
+      if (score < 13) return "You scanned 36% of Psyche's surface!\n\nPsyche resides in the asteroid belt, between Mars and Jupiter.";
+      if (score < 14) return "You scanned 39% of Psyche's surface!\n\nPsyche may be as high as 60% metal.";
+      if (score < 15) return "You scanned 42% of Psyche's surface!\n\nThe metal richness may indicate that Psyche was once a planetesimal core.";
+      if (score < 16) return "You scanned 45% of Psyche's surface!\n\nScientists believe Psyche may be an early building block of our sun's planetary system.";
+      if (score < 17) return "You scanned 48% of Psyche's surface!\n\nPsyche's surface area us roughly 64,000 square miles.";
+      if (score < 18) return "You scanned 51% of Psyche's surface!\n\nA Gamma-Ray and Neutron Spectrometer will be used by the satellite to detect certain elements.";
+      if (score < 19) return "You scanned 54% of Psyche's surface!\n\nA Multispectral Imager will be used to take images of Psyche, including UV images. ";
+      if (score < 20) return "You scanned 57% of Psyche's surface!\n\nA Magnetometer will be used by the spacecraft to measure Psyche's magnetic fields.";
+      if (score < 21) return "You scanned 60% of Psyche's surface!\n\nThe spacecraft is equipped with an X-band radio telecommunications system to relay info to and from Earth.";
+      if (score < 22) return "You scanned 63% of Psyche's surface!\n\nThe Psyche spacecraft contains an experimental device to communicate with Earth using lasers.";
+      if (score < 23) return "You scanned 66% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 24) return "You scanned 69% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 25) return "You scanned 72% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 26) return "You scanned 75% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 27) return "You scanned 78% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 28) return "You scanned 81% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 29) return "You scanned 84% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 30) return "You scanned 87% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 31) return "You scanned 90% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 32) return "You scanned 93% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      if (score < 33) return "You scanned 96% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+      return "You scanned 100% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+    }
+
+    function endGame() {
+      stopMashAudio();
+
+      btn.classList.add("disabled");
+
+      finalScoreEl.textContent = String(count);
+
+      const orbitSeconds = scoreToOrbitSeconds(count);
+      orbitEl.style.setProperty("--orbitDur", orbitSeconds + "s");
+
+      showPage("results");
+      startCameraSounds();
+
+      funFactEl.textContent = getEndMessage(count);
+      funFactEl.style.display = "none";
+      animWrap.style.display = "flex";
+
+      resultsTimeoutId = setTimeout(() => {
+        stopCameraSounds();
+
+        animWrap.style.display = "none";
+        funFactEl.style.display = "block";
+
+        if (getEndMessage(count).includes("100%")) {
+          playCongrats();
+        }
+      }, 5000);
+    }
+
+    function startTimer() {
+      timerId = setInterval(() => {
+        timeLeft--;
+        timeEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          timerId = null;
+          endGame();
+        }
+      }, 1000);
+    }
+
+    btn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+
+      if (btn.classList.contains("disabled")) return;
+
+      if (!timerStarted) {
+        timerStarted = true;
+        btn.textContent = "TAP!";
+        startMashAudio();
+        startTimer();
+      }
+
+      if (timeLeft > 0) {
+        count++;
+        countEl.textContent = count;
+      }
+    }, { passive: false });
+
+    resetBtn.addEventListener("click", resetGame);
+    playAgainBtn.addEventListener("click", resetGame);
+  </script>
 </body>
 </html>
