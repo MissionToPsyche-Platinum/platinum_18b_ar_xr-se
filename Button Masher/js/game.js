@@ -1,133 +1,171 @@
-    let cameraSoundInterval = null;
-    let count = 0;
-    let timeLeft = 5;
-    let timerStarted = false;
-    let timerId = null;
-    let resultsTimeoutId = null;
-    
-    const MAX_PRESSES = 33;
-    function updateProgressBar() {
-      const clamped = Math.min(count, MAX_PRESSES);
-      const pct = (clamped / MAX_PRESSES) * 100;
-      progressFill.style.width = pct + "%";
-    
+// ===== STAGES =====
+const stages = [
+  { name: "Stage 1", target: 15, time: 5 },
+  { name: "Stage 2", target: 25, time: 5 },
+  { name: "Stage 3", target: 35, time: 6 }
+];
+
+let currentStageIndex = 0;
+let stageTapCount = 0;
+let totalTapCount = 0;
+
+// ===== GAME STATE =====
+let cameraSoundInterval = null;
+let count = 0;
+let timeLeft = stages[0].time;
+let timerStarted = false;
+let timerId = null;
+let resultsTimeoutId = null;
+
+// ===== UI =====
+function updateProgressBar() {
+  const stage = stages[currentStageIndex];
+  const clamped = Math.min(stageTapCount, stage.target);
+  const pct = (clamped / stage.target) * 100;
+  progressFill.style.width = pct + "%";
+}
+
+function showPage(which) {
+  pageGame.classList.toggle("active", which === "game");
+  pageResults.classList.toggle("active", which === "results");
+}
+
+// ===== RESET GAME =====
+function resetGame() {
+  stopMashAudio();
+  stopCameraSounds();
+  stopCongrats();
+
+  if (timerId !== null) {
+    clearInterval(timerId);
+    timerId = null;
+  }
+
+  if (resultsTimeoutId !== null) {
+    clearTimeout(resultsTimeoutId);
+    resultsTimeoutId = null;
+  }
+
+  currentStageIndex = 0;
+  stageTapCount = 0;
+  totalTapCount = 0;
+
+  count = 0;
+  timeLeft = stages[0].time;
+  timerStarted = false;
+
+  countEl.textContent = count;
+  timeEl.textContent = timeLeft;
+
+  progressFill.style.width = "0%";
+
+  btn.classList.remove("disabled");
+  btn.textContent = "START STAGE 1";
+
+  finalScoreEl.textContent = "0";
+  funFactEl.style.display = "none";
+  funFactEl.textContent = "";
+  animWrap.style.display = "flex";
+
+  orbitEl.style.setProperty("--orbitDur", "6s");
+
+  showPage("game");
+}
+
+// ===== END STAGE =====
+function endStage() {
+  stopMashAudio();
+
+  const stage = stages[currentStageIndex];
+
+  if (stageTapCount >= stage.target) {
+    // STAGE CLEAR
+    currentStageIndex++;
+
+    if (currentStageIndex >= stages.length) {
+      endGame();
+      return;
     }
 
-    function showPage(which) {
-      pageGame.classList.toggle("active", which === "game");
-      pageResults.classList.toggle("active", which === "results");
-    }
+    alert(`${stage.name} CLEAR!`);
 
+    // move to next stage
+    stageTapCount = 0;
+    count = 0;
+    timeLeft = stages[currentStageIndex].time;
+    timerStarted = false;
 
-    function resetGame() {
-      stopMashAudio();
-      stopCameraSounds();
-      stopCongrats();
-      progressFill.style.width = "0%";
+    countEl.textContent = 0;
+    timeEl.textContent = timeLeft;
 
-      if (timerId !== null) {
-        clearInterval(timerId);
-        timerId = null;
-      }
-      if (resultsTimeoutId !== null) {
-        clearTimeout(resultsTimeoutId);
-        resultsTimeoutId = null;
-      }
+    progressFill.style.width = "0%";
 
-      count = 0;
-      updateProgressBar();   //updates the progress bar
-      timeLeft = 5;
-      timerStarted = false;
-
-      countEl.textContent = count;
-      timeEl.textContent = timeLeft;
-
-      btn.classList.remove("disabled");
-      btn.textContent = "PRESS THE BUTTON TO START";
-
-      finalScoreEl.textContent = "0";
-      funFactEl.style.display = "none";
-      funFactEl.textContent = "";
-      animWrap.style.display = "flex";
-
-      orbitEl.style.setProperty("--orbitDur", "6s");
-
-      showPage("game");
-    }
-
-    
-
-    function endGame() {
-      stopMashAudio();
-
-      btn.classList.add("disabled");
-
-      finalScoreEl.textContent = String(count);
-
-      const orbitSeconds = scoreToOrbitSeconds(count);
-      orbitEl.style.setProperty("--orbitDur", orbitSeconds + "s");
-
-      showPage("results");
-      startCameraSounds();
-
-      funFactEl.textContent = getEndMessage(count);
-      funFactEl.style.display = "none";
-      animWrap.style.display = "flex";
-
-      resultsTimeoutId = setTimeout(() => {
-        stopCameraSounds();
-
-        animWrap.style.display = "none";
-        funFactEl.style.display = "block";
-
-        if (getEndMessage(count).includes("100%")) {
-          playCongrats();
-        }
-      }, 5000);
-    }
-
-
-    function startTimer() {
-      timerId = setInterval(() => {
-        timeLeft--;
-        timeEl.textContent = timeLeft;
-
-        if (timeLeft <= 0) {
-          clearInterval(timerId);
-          timerId = null;
-          endGame();
-        }
-      }, 1000);
-    }
-
-
-    btn.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-
-      if (btn.classList.contains("disabled")) return;
-
-      if (!timerStarted) {
-        timerStarted = true;
-        btn.textContent = "TAP!";
-        startMashAudio();
-        startTimer();
-      }
-
-      if (timeLeft > 0) {
-  if (count < MAX_PRESSES) {
-    count++;
-    countEl.textContent = count;
-    updateProgressBar();
+    btn.textContent = `START ${stages[currentStageIndex].name}`;
   } else {
-    playDing();
-    updateProgressBar(); 
+    // FAIL
+    alert(`${stage.name} FAILED`);
+    endGame();
   }
 }
-    }, { passive: false });
 
-    resetBtn.addEventListener("click", resetGame);
-    playAgainBtn.addEventListener("click", resetGame);
+// ===== FINAL GAME =====
+function endGame() {
+  stopMashAudio();
 
-  
-   
-  
+  finalScoreEl.textContent = totalTapCount;
+
+  funFactEl.textContent = getRank(totalTapCount);
+
+  showPage("results");
+
+  startCameraSounds();
+
+  resultsTimeoutId = setTimeout(() => {
+    stopCameraSounds();
+
+    animWrap.style.display = "none";
+    funFactEl.style.display = "block";
+  }, 4000);
+}
+
+// ===== TIMER =====
+function startTimer() {
+  timerId = setInterval(() => {
+    timeLeft--;
+    timeEl.textContent = timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(timerId);
+      timerId = null;
+      endStage();
+    }
+  }, 1000);
+}
+
+// ===== BUTTON INPUT =====
+btn.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+
+  if (btn.classList.contains("disabled")) return;
+
+  if (!timerStarted) {
+    timerStarted = true;
+    btn.textContent = "TAP!";
+    startMashAudio();
+    startTimer();
+  }
+
+  if (timeLeft > 0) {
+    stageTapCount++;
+    totalTapCount++;
+
+    count = stageTapCount;
+    countEl.textContent = count;
+
+    updateProgressBar();
+  }
+}, { passive: false });
+
+// ===== RESET BUTTONS =====
+resetBtn.addEventListener("click", resetGame);
+playAgainBtn.addEventListener("click", resetGame);

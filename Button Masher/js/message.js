@@ -44,4 +44,11 @@ function getEndMessage(score) {
       return 2.0;
     }
 
+    function getRank(score) {
+      if (score < 20) return "Mehh 😅";
+      if (score < 40) return "Oh you're pretty good 👀";
+      if (score < 60) return "Super fast 🔥";
+      return "FASTEST HANDS IN THE WEST 🤠";
+    }
+
     
