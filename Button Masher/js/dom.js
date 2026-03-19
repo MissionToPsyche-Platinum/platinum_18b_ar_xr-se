@@ -22,3 +22,5 @@ const stageStatus = document.getElementById("stageStatus");
 const stageOverlay = document.getElementById("stageOverlay");
 const overlayStatus = document.getElementById("overlayStatus");
 const overlayTaps = document.getElementById("overlayTaps");
+const overlayStageLabel = document.getElementById("overlayStageLabel");
+const overlayFact = document.getElementById("overlayFact");

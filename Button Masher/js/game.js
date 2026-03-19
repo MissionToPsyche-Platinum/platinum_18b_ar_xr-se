@@ -88,23 +88,15 @@ function endStage() {
   stopMashAudio();
 
   const stage = stages[currentStageIndex];
-  const cleared = stageTapCount >= stage.target;
+const cleared = stageTapCount >= stage.target;
 
-  // Freeze the button so the user can't keep tapping during transition
-  btn.classList.add("disabled");
+btn.classList.add("disabled");
 
-  // Show the CURRENT stage info/result first
-  stageLabel.textContent = stage.name;
-  stageTarget.textContent = `Target: ${stage.target} taps`;
-  stageTaps.textContent = `Taps: ${stageTapCount}`;
-  stageStatus.textContent = cleared
-    ? `${stage.name} CLEAR!`
-    : `${stage.name} FAILED!`;
-
-  
-  // Show overlay with result
-overlayStatus.textContent = cleared ? `${stage.name} CLEAR! ✅` : `${stage.name} FAILED! ❌`;
+// Populate the card
+overlayStageLabel.textContent = stage.name.toUpperCase();
+overlayStatus.textContent = cleared ? "STAGE COMPLETE ✅" : "STAGE FAILED ❌";
 overlayTaps.textContent = `Taps: ${stageTapCount} / ${stage.target}`;
+overlayFact.textContent = stageFacts[currentStageIndex] ?? "";
 stageOverlay.classList.remove("hidden");
 
 setTimeout(() => {
@@ -136,10 +128,11 @@ setTimeout(() => {
   stageTaps.textContent = "Taps: 0";
   stageStatus.textContent = "";
 
-  btn.textContent = `START ${stages[currentStageIndex].name}`;
+  btn.textContent = `START ${stages[currentStageIndex].name.toUpperCase()}`;
   btn.classList.remove("disabled");
-}, 1500);
+}, 4000); 
 }
+
 
 // ===== FINAL GAME =====
 function endGame() {

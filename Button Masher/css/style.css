@@ -316,23 +316,65 @@
   text-align: center;
   background: rgba(18, 3, 29, 0.88);
   z-index: 100;
-  gap: 12px;
   backdrop-filter: blur(6px);
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  padding-bottom: calc(env(safe-area-inset-bottom) + 10vh);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           calc(env(safe-area-inset-bottom) + 10vh) env(safe-area-inset-left);
 }
 
 .stage-overlay.hidden { display: none; }
 
-.stage-overlay #overlayStatus {
-  font-size: clamp(28px, 6vw, 42px);
+.stage-overlay-card {
+  border-radius: 22px;
+  border: 1px solid rgba(249,160,0,0.35);
+  background: linear-gradient(135deg, rgba(48,33,68,0.95) 0%, rgba(18,3,29,0.85) 100%);
+  box-shadow: 0 18px 42px rgba(0,0,0,0.45);
+  backdrop-filter: blur(10px);
+  padding: 28px 24px;
+  max-width: 340px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#overlayStageLabel {
+  font-size: 14px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+
+#overlayStatus {
+  font-size: clamp(24px, 5vw, 32px);
   font-weight: 900;
   color: var(--psyche-mustard);
   margin: 0;
 }
 
-.stage-overlay #overlayTaps {
-  font-size: 20px;
+#overlayTaps {
+  font-size: 18px;
   color: var(--text);
+  margin: 0;
+}
+
+.overlay-divider {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  margin: 8px 0;
+}
+
+.overlay-fact-label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--psyche-coral);
+  margin: 0;
+}
+
+#overlayFact {
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.80);
   margin: 0;
 }
