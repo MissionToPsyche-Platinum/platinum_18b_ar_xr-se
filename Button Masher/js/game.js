@@ -9,6 +9,14 @@ let currentStageIndex = 0;
 let stageTapCount = 0;
 let totalTapCount = 0;
 
+/// ===== STAGE INFO =====
+function updateStageInfo() {
+  const stage = stages[currentStageIndex];
+  stageLabel.textContent = stage.name;
+  stageTarget.textContent = `Target: ${stage.target} taps`;
+  stageTaps.textContent = `Taps: ${stageTapCount}`;
+}
+
 // ===== GAME STATE =====
 let cameraSoundInterval = null;
 let count = 0;
@@ -35,6 +43,9 @@ function resetGame() {
   stopMashAudio();
   stopCameraSounds();
   stopCongrats();
+  stageStatus.textContent = "";
+  updateStageInfo();
+  stageOverlay.classList.add("hidden");
 
   if (timerId !== null) {
     clearInterval(timerId);
@@ -77,35 +88,57 @@ function endStage() {
   stopMashAudio();
 
   const stage = stages[currentStageIndex];
+  const cleared = stageTapCount >= stage.target;
 
-  if (stageTapCount >= stage.target) {
-    // STAGE CLEAR
-    currentStageIndex++;
+  // Freeze the button so the user can't keep tapping during transition
+  btn.classList.add("disabled");
 
-    if (currentStageIndex >= stages.length) {
-      endGame();
-      return;
-    }
+  // Show the CURRENT stage info/result first
+  stageLabel.textContent = stage.name;
+  stageTarget.textContent = `Target: ${stage.target} taps`;
+  stageTaps.textContent = `Taps: ${stageTapCount}`;
+  stageStatus.textContent = cleared
+    ? `${stage.name} CLEAR!`
+    : `${stage.name} FAILED!`;
 
-    alert(`${stage.name} CLEAR!`);
+  
+  // Show overlay with result
+overlayStatus.textContent = cleared ? `${stage.name} CLEAR! ✅` : `${stage.name} FAILED! ❌`;
+overlayTaps.textContent = `Taps: ${stageTapCount} / ${stage.target}`;
+stageOverlay.classList.remove("hidden");
 
-    // move to next stage
-    stageTapCount = 0;
-    count = 0;
-    timeLeft = stages[currentStageIndex].time;
-    timerStarted = false;
+setTimeout(() => {
+  stageOverlay.classList.add("hidden");
 
-    countEl.textContent = 0;
-    timeEl.textContent = timeLeft;
-
-    progressFill.style.width = "0%";
-
-    btn.textContent = `START ${stages[currentStageIndex].name}`;
-  } else {
-    // FAIL
-    alert(`${stage.name} FAILED`);
+  if (!cleared) {
     endGame();
+    return;
   }
+
+  currentStageIndex++;
+
+  if (currentStageIndex >= stages.length) {
+    endGame();
+    return;
+  }
+
+  stageTapCount = 0;
+  count = 0;
+  timeLeft = stages[currentStageIndex].time;
+  timerStarted = false;
+
+  countEl.textContent = "0";
+  timeEl.textContent = String(timeLeft);
+  progressFill.style.width = "0%";
+
+  stageLabel.textContent = stages[currentStageIndex].name;
+  stageTarget.textContent = `Target: ${stages[currentStageIndex].target} taps`;
+  stageTaps.textContent = "Taps: 0";
+  stageStatus.textContent = "";
+
+  btn.textContent = `START ${stages[currentStageIndex].name}`;
+  btn.classList.remove("disabled");
+}, 1500);
 }
 
 // ===== FINAL GAME =====
@@ -148,6 +181,7 @@ btn.addEventListener("pointerdown", (e) => {
 
   if (btn.classList.contains("disabled")) return;
 
+  // START TIMER ON FIRST TAP
   if (!timerStarted) {
     timerStarted = true;
     btn.textContent = "TAP!";
@@ -155,15 +189,23 @@ btn.addEventListener("pointerdown", (e) => {
     startTimer();
   }
 
+  // ONLY COUNT IF TIME LEFT
   if (timeLeft > 0) {
+    // UPDATE COUNTS
     stageTapCount++;
     totalTapCount++;
 
+    // update displayed count
     count = stageTapCount;
     countEl.textContent = count;
 
+    // UPDATE STAGE UI
+    stageTaps.textContent = `Taps: ${stageTapCount}`;
+
+    // UPDATE PROGRESS BAR
     updateProgressBar();
   }
+
 }, { passive: false });
 
 // ===== RESET BUTTONS =====

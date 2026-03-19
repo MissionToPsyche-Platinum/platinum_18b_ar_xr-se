@@ -19,6 +19,10 @@
       <div class="progress-track">
         <div id="progressFill" class="progress-fill" style="width:0%"></div>
       </div>
+      <div id="stageOverlay" class="stage-overlay hidden">
+        <p id="overlayStatus"></p>
+        <p id="overlayTaps"></p>
+      </div>
     </section>
 
     <div class="sr-only">
@@ -44,6 +48,13 @@
       </div>
 
       <div id="funFact"></div>
+
+      <div id="stageInfo" class="stage-info">
+        <p id="stageLabel">Stage 1</p>
+        <p id="stageTarget">Target: 15 taps</p>
+        <p id="stageTaps">Taps: 0</p>
+        <p id="stageStatus"></p>
+      </div>
 
       <button id="playAgainBtn" class="btn reset" type="button" style="margin-top:14px;">
         PLAY AGAIN

@@ -275,3 +275,64 @@
       margin-top: 10px;
       display: none;
     }
+
+
+    .stage-info {
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+.stage-info p {
+  margin: 6px 0;
+}
+
+#stageLabel {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+#stageTarget,
+#stageTaps {
+  font-size: 16px;
+  color: var(--muted);
+}
+
+#stageStatus {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--psyche-mustard);
+  min-height: 24px;
+}
+
+.stage-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: rgba(18, 3, 29, 0.88);
+  z-index: 100;
+  gap: 12px;
+  backdrop-filter: blur(6px);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 10vh);
+}
+
+.stage-overlay.hidden { display: none; }
+
+.stage-overlay #overlayStatus {
+  font-size: clamp(28px, 6vw, 42px);
+  font-weight: 900;
+  color: var(--psyche-mustard);
+  margin: 0;
+}
+
+.stage-overlay #overlayTaps {
+  font-size: 20px;
+  color: var(--text);
+  margin: 0;
+}
