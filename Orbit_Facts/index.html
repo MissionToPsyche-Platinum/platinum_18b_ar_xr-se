@@ -71,16 +71,16 @@
     <div class="menu-section">
         <span class="menu-section-label">Other Modules</span>
         <nav class="menu-links">
-            <a class="menu-link" href="#">Surface Composition</a>
-            <a class="menu-link" href="#">Mission Timeline</a>
-            <a class="menu-link" href="#">Spacecraft Overview</a>
-            <a class="menu-link" href="#">Science Goals</a>
+            <a class="menu-link" href="https://missiontopsyche-platinum.github.io/platinum_18b_ar_xr-se/Button%20Masher/index.html" target="_blank">Button Masher</a>
+            <a class="menu-link" href="https://missiontopsyche-platinum.github.io/platinum_18b_ar_xr-se/Asteroid%20Dodge%20Game/index.html" target="_blank">Asteroid Dodge</a>
+            <a class="menu-link" href="https://missiontopsyche-platinum.github.io/platinum_18b_ar_xr-se/Metal%20Activity/asteroid.html" target="_blank">Metal Activity</a>
         </nav>
     </div>
 
 </div>
 
-
+<!-- Starfield canvas -->
+<canvas id="star-canvas"></canvas>
 
 <!-- View scale toggle -->
 <div class="view-toggle">
@@ -158,7 +158,6 @@
                 const y    = Math.random() * canvas.height;
                 const r    = Math.random() * 1.1;
                 const a    = 0.25 + Math.random() * 0.75;
-                // Slight warm/cool tint variation
                 const warm = Math.random() > 0.5;
                 const hue  = warm ? `rgba(255,245,220,${a})` : `rgba(200,225,255,${a})`;
                 ctx.beginPath();
@@ -172,8 +171,6 @@
         resize();
     })();
 </script>
-
-
 
 </body>
 </html>
