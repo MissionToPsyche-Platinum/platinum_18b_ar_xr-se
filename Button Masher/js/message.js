@@ -1,3 +1,9 @@
+const stageFacts = [
+  "Psyche is one of the most massive asteroids in the belt, containing enough metal to dwarf Earth's entire iron reserve.",
+  "Psyche orbits the Sun between Mars and Jupiter, taking about 5 Earth years to complete one trip around.",
+  "NASA's Psyche spacecraft launched in October 2023 and is expected to arrive at the asteroid in 2029."
+];
+
 function getEndMessage(score) {
       if (score < 2) return "You scanned 3% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
       if (score < 3) return "You scanned 6% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
