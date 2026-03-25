@@ -14,6 +14,46 @@
    Gold                rgba(244, 124, 51, 1)
    Mustard             rgba(249, 160, 0, 1) */
 
+       .learn-more-wrap {
+      margin-top: 12px;
+      display: none;
+      text-align: left;
+    }
+
+    .facts-panel {
+      margin-top: 12px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      text-align: left;
+    }
+
+    .facts-panel h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .facts-list {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .facts-list li {
+      margin-bottom: 10px;
+    }
+
+.results-buttons {
+  display: flex;
+  justify-content: center;   /* center them instead of spreading */
+  gap: 64px;                 /* space BETWEEN buttons */
+  margin-top: 18px;
+}
+
    #returnToHub{
   position: fixed;
   top: 12px;
@@ -355,10 +395,23 @@
 </div>
 
       <div id="funFact"></div>
+<div class="results-buttons">
+  <button id="playAgainBtn" class="btn reset" type="button">
+    PLAY AGAIN
+  </button>
 
-      <button id="playAgainBtn" class="btn reset" type="button" style="margin-top:14px;">
-        PLAY AGAIN
-      </button>
+  <button id="learnMoreBtn" class="btn reset" type="button" style="display:none;">
+    LEARN MORE
+  </button>
+</div>
+
+<div id="learnMoreWrap" class="learn-more-wrap">
+  <div class="facts-panel">
+    <h3>More Psyche Facts</h3>
+    <ol id="factsList" class="facts-list"></ol>
+  </div>
+</div>
+
     </div>
   </main>
 
@@ -392,6 +445,10 @@
   const progressFill = document.getElementById("progressFill");
 
   const MAX_PROGRESS_PRESSES = 33;
+
+  const learnMoreBtn = document.getElementById("learnMoreBtn");
+  const learnMoreWrap = document.getElementById("learnMoreWrap");
+  const factsList = document.getElementById("factsList");
 
   let cameraSoundInterval = null;
   let count = 0;
@@ -504,10 +561,47 @@
     animWrap.style.display = "flex";
 
     orbitEl.style.setProperty("--orbitDur", "6s");
-
+    learnMoreBtn.style.display = "none";
+    learnMoreWrap.style.display = "none";
+    factsList.innerHTML = "";
+    learnMoreBtn.textContent = "LEARN MORE";
     showPage("game");
   }
-
+  const allFacts = [
+    "Psyche was the 16th asteroid ever discovered.",
+    "The satellite that NASA sent to Psyche is about the size of a singles tennis court.",
+    "The Psyche satellite has unique plus shaped solar panels.",
+    "The satellite will reach the asteroid using low-thrust solar electric propulsion.",
+    "The spacecraft headed for Psyche launched on October 13, 2023.",
+    "The Psyche satellite will reach the asteroid in mid-2029.",
+    "NASA plans to have the satellite orbit Psyche for over 2 years.",
+    "Psyche is roughly the size of Massachusetts.",
+    "Psyche is the name of the asteroid, mission, and spacecraft.",
+    "The spacecraft sent to Psyche will only orbit the asteroid, not land on it.",
+    "Psyche is named after the goddess of the soul from Greek mythology.",
+    "Psyche resides in the asteroid belt, between Mars and Jupiter.",
+    "Psyche may be as high as 60% metal.",
+    "The metal richness may indicate that Psyche was once a planetesimal core.",
+    "Scientists believe Psyche may be an early building block of our sun's planetary system.",
+    "Psyche's surface area is roughly 64,000 square miles.",
+    "A Gamma-Ray and Neutron Spectrometer will be used by the satellite to detect certain elements.",
+    "A Multispectral Imager will be used to take images of Psyche, including UV images.",
+    "A Magnetometer will be used by the spacecraft to measure Psyche's magnetic fields.",
+    "The spacecraft is equipped with an X-band radio telecommunications system to relay info to and from Earth.",
+    "The Psyche spacecraft contains an experimental device to communicate with Earth using lasers.",
+    "Psyche has enough mass that it has a gravitational force on other asteroids.",
+    "Psyche is very tilted and has very long winter and summer seasons.",
+    "Psyche rotates on its side, with an axial tilt of about 98 degrees. Earth's tilt is roughly 23 degrees.",
+    "Psyche is not pure metal, it is a mix of metal and rock.",
+    "So far, it seems Psyche's density is too low to be solid iron, it may be a fragmented metal core.",
+    "Scientists have estimated Psyche's shape using radar and telescopes.",
+    "There are no clear images of Psyche yet, only computer renderings.",
+    "Psyche's mix of rock and metal may be caused by collisions with other asteroids.",
+    "Scientists have evidence that Psyche has water related minerals, which may have been delivered from past collisions with asteroids.",
+    "The mission to Psyche was first proposed to NASA in 2014.",
+    "The Psyche spacecraft is set to use Mars as a gravity slingshot to accelerate towards the asteroid in May 2026.",
+    "Italian astronomer Annibale de Gasparis discovered Psyche in 1852."
+  ];
   function getEndMessage(score) {
     if (score < 2) return "You scanned 3% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
     if (score < 3) return "You scanned 6% of Psyche's surface!\n\nThe satellite that NASA sent to Psyche is about the size of a singles tennis court.";
@@ -543,7 +637,14 @@
     if (score < 33) return "You scanned 96% of Psyche's surface!\n\nThe Psyche spacecraft is set to use Mars as a gravity slingshot to accelerate towards the asteroid in May 2026.";
     return "You scanned 100% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
   }
-
+  function renderAllFacts() {
+    factsList.innerHTML = "";
+    allFacts.forEach((fact) => {
+      const li = document.createElement("li");
+      li.textContent = fact;
+      factsList.appendChild(li);
+    });
+  }
   function endGame() {
     stopMashAudio();
 
@@ -566,6 +667,10 @@
 
       animWrap.style.display = "none";
       funFactEl.style.display = "block";
+      
+      learnMoreBtn.style.display = "inline-block";
+      learnMoreWrap.style.display = "none";
+      renderAllFacts();
 
       if (getEndMessage(count).includes("100%")) {
         playCongrats();
@@ -585,7 +690,11 @@
       }
     }, 1000);
   }
-
+  learnMoreBtn.addEventListener("click", () => {
+    const isOpen = learnMoreWrap.style.display === "block";
+    learnMoreWrap.style.display = isOpen ? "none" : "block";
+    learnMoreBtn.textContent = isOpen ? "LEARN MORE" : "HIDE FACTS";
+  });
   btn.addEventListener("pointerdown", (e) => {
     e.preventDefault();
 
