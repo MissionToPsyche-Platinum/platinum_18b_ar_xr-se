@@ -538,6 +538,40 @@ input[type="range"]#orbitSlider::-moz-range-progress {
     gap: 10px;
 }
 
+.menu-link--featured {
+    border-color: var(--border);
+    color: var(--gold-light);
+    background: rgba(226, 185, 59, 0.06);
+}
+
+.menu-link--featured:hover {
+    background: rgba(226, 185, 59, 0.12);
+    box-shadow: 0 0 10px var(--gold-glow);
+}
+.reset-btn {
+    width: 100%;
+    padding: 8px 0;
+    background: var(--toggle-off);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.reset-btn:hover {
+    background: rgba(226, 185, 59, 0.08);
+    border-color: rgba(226, 185, 59, 0.4);
+    color: var(--gold-light);
+    box-shadow: 0 0 8px var(--gold-glow);
+}
+
+.reset-btn:active {
+    background: rgba(226, 185, 59, 0.15);
+}
+
 /* Speed buttons */
 .menu-speed-btns {
     display: flex;

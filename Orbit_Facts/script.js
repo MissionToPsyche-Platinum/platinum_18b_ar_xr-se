@@ -498,6 +498,23 @@ speedBtns.forEach(btn => {
     });
 });
 
-// Initial sizing and render
+// Reset button
+const resetBtn = document.getElementById('resetBtn');
+resetBtn.addEventListener('click', () => {
+    // Stop autoplay if running
+    if (isAutoplay) {
+        isAutoplay = false;
+        autoplayToggle.classList.remove('active');
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+    }
+    // Reset slider and position to zero
+    currentValue = 0;
+    slider.value = 0;
+    updatePosition(0);
+    closeMenu();
+});
 initThreeSize();
 updatePosition(0);
