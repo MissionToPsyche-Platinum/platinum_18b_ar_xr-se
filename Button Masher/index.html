@@ -14,6 +14,26 @@
    Gold                rgba(244, 124, 51, 1)
    Mustard             rgba(249, 160, 0, 1) */
 
+   .mute-btn{
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 9999;
+
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(18, 3, 29, 0.85);
+  color: #e8eaf0;
+  font: 600 14px/1 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+.mute-btn:active{
+  transform: scale(0.98);
+}
+
        .learn-more-wrap {
       margin-top: 12px;
       display: none;
@@ -350,6 +370,7 @@
 <body>
 
 <a id="returnToHub" href="#" aria-label="Return to Hub">← Hub</a>
+<button id="muteBtn" class="mute-btn" type="button" aria-pressed="false">🔊 Sound On</button>
 
   <audio id="mashSfx" src="assets/mash-loop.mp3" preload="auto" loop></audio>
   <audio id="cameraSound1" src="assets/camera sound 1.mp3" preload="auto"></audio>
@@ -442,6 +463,29 @@
   const cameraSound2 = document.getElementById("cameraSound2");
   const congratsSfx = document.getElementById("congratsSfx");
   const dingSfx = document.getElementById("dingSfx");
+  const muteBtn = document.getElementById("muteBtn");
+
+  let isMuted = false;
+
+function applyMuteState() {
+  const allAudio = [mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx];
+
+  allAudio.forEach(audio => {
+    audio.muted = isMuted;
+  });
+
+  muteBtn.textContent = isMuted ? "🔇 Sound Off" : "🔊 Sound On";
+  muteBtn.setAttribute("aria-pressed", String(isMuted));
+}
+
+muteBtn.addEventListener("click", () => {
+  isMuted = !isMuted;
+  applyMuteState();
+});
+
+// initialize state
+applyMuteState();
+
   const progressFill = document.getElementById("progressFill");
 
   const MAX_PROGRESS_PRESSES = 33;
@@ -450,6 +494,7 @@
   const learnMoreWrap = document.getElementById("learnMoreWrap");
   const factsList = document.getElementById("factsList");
 
+  
   let cameraSoundInterval = null;
   let count = 0;
   let timeLeft = 5;
@@ -690,6 +735,7 @@
       }
     }, 1000);
   }
+
   learnMoreBtn.addEventListener("click", () => {
     const isOpen = learnMoreWrap.style.display === "block";
     learnMoreWrap.style.display = isOpen ? "none" : "block";
