@@ -498,6 +498,14 @@ speedBtns.forEach(btn => {
     });
 });
 
+// Disclaimer toggle
+const disclaimerBtn  = document.getElementById('disclaimerBtn');
+const disclaimerText = document.getElementById('disclaimerText');
+disclaimerBtn.addEventListener('click', () => {
+    const isVisible = disclaimerText.classList.toggle('visible');
+    disclaimerBtn.textContent = isVisible ? 'Hide Disclaimer' : 'View Disclaimer';
+});
+
 // Reset button
 const resetBtn = document.getElementById('resetBtn');
 resetBtn.addEventListener('click', () => {

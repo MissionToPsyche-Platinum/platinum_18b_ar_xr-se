@@ -548,6 +548,41 @@ input[type="range"]#orbitSlider::-moz-range-progress {
     background: rgba(226, 185, 59, 0.12);
     box-shadow: 0 0 10px var(--gold-glow);
 }
+/* Disclaimer */
+.disclaimer-btn {
+    width: 100%;
+    padding: 8px 0;
+    background: var(--toggle-off);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.disclaimer-btn:hover {
+    border-color: rgba(226, 185, 59, 0.4);
+    color: var(--text-primary);
+}
+
+.disclaimer-text {
+    display: none;
+    margin-top: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11.5px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+}
+
+.disclaimer-text.visible {
+    display: block;
+}
+
 .reset-btn {
     width: 100%;
     padding: 8px 0;
