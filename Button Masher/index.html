@@ -377,6 +377,7 @@
   <audio id="cameraSound2" src="assets/camera sound 2.mp3" preload="auto"></audio>
   <audio id="congratsSfx" src="assets/congratulations.mp3" preload="auto"></audio>
   <audio id="dingSfx" src="assets/ding.mp3" preload="auto"></audio>
+  <audio id="bgMusic" src="assets/background_music.mp3" preload="auto" loop></audio>
 
   <main id="pageGame" class="wrap page active">
     <section class="topbar" aria-label="Progress">
@@ -459,6 +460,7 @@
   const orbitEl = document.getElementById("orbit");
 
   const mashSfx = document.getElementById("mashSfx");
+  const bgMusic = document.getElementById("bgMusic");
   const cameraSound1 = document.getElementById("cameraSound1");
   const cameraSound2 = document.getElementById("cameraSound2");
   const congratsSfx = document.getElementById("congratsSfx");
@@ -468,8 +470,7 @@
   let isMuted = false;
 
 function applyMuteState() {
-  const allAudio = [mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx];
-
+const allAudio = [bgMusic, mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx];
   allAudio.forEach(audio => {
     audio.muted = isMuted;
   });
@@ -485,7 +486,13 @@ muteBtn.addEventListener("click", () => {
 
 // initialize state
 applyMuteState();
+startBgMusic();
 
+document.addEventListener("click", () => {
+  if (!timerStarted && pageGame.classList.contains("active")) {
+    startBgMusic();
+  }
+}, { once: true });
   const progressFill = document.getElementById("progressFill");
 
   const MAX_PROGRESS_PRESSES = 33;
@@ -511,6 +518,18 @@ applyMuteState();
     if (score <= 30) return 3.6;
     return 2.0;
   }
+
+  function startBgMusic() {
+  if (!bgMusic) return;
+  bgMusic.play().catch(() => {});
+}
+
+  function stopBgMusic() {
+  if (!bgMusic) return;
+  bgMusic.pause();
+  bgMusic.currentTime = 0;
+}
+applyMuteState();
 
   function startMashAudio() {
     if (!mashSfx) return;
@@ -611,6 +630,7 @@ applyMuteState();
     factsList.innerHTML = "";
     learnMoreBtn.textContent = "LEARN MORE";
     showPage("game");
+    startBgMusic();
   }
   const allFacts = [
     "Psyche was the 16th asteroid ever discovered.",
@@ -692,6 +712,7 @@ applyMuteState();
   }
   function endGame() {
     stopMashAudio();
+    stopBgMusic();
 
     btn.classList.add("disabled");
 
@@ -708,19 +729,20 @@ applyMuteState();
     animWrap.style.display = "flex";
 
     resultsTimeoutId = setTimeout(() => {
-      stopCameraSounds();
+  stopCameraSounds();
+  startBgMusic();
 
-      animWrap.style.display = "none";
-      funFactEl.style.display = "block";
-      
-      learnMoreBtn.style.display = "inline-block";
-      learnMoreWrap.style.display = "none";
-      renderAllFacts();
+  animWrap.style.display = "none";
+  funFactEl.style.display = "block";
+  
+  learnMoreBtn.style.display = "inline-block";
+  learnMoreWrap.style.display = "none";
+  renderAllFacts();
 
-      if (getEndMessage(count).includes("100%")) {
-        playCongrats();
-      }
-    }, 5000);
+  if (getEndMessage(count).includes("100%")) {
+    playCongrats();
+  }
+}, 5000);
   }
 
   function startTimer() {
@@ -743,12 +765,14 @@ applyMuteState();
   });
   btn.addEventListener("pointerdown", (e) => {
     e.preventDefault();
+    e.stopPropagation();
 
     if (btn.classList.contains("disabled")) return;
 
     if (!timerStarted) {
       timerStarted = true;
       btn.textContent = "TAP!";
+      stopBgMusic();
       startMashAudio();
       startTimer();
     }
