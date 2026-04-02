@@ -364,6 +364,56 @@
       margin-top: 10px;
       display: none;
     }
+
+    .score-line {
+  margin-top: 8px;
+}
+
+#finalScore {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: clamp(44px, 8vw, 72px);
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+
+  background: linear-gradient(
+    180deg,
+    #fff3a6 0%,
+    #f9a000 35%,
+    #f47c33 70%,
+    #ef5966 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  text-shadow:
+    0 0 10px rgba(249,160,0,0.28),
+    0 0 22px rgba(244,124,51,0.22);
+
+  filter: drop-shadow(0 4px 16px rgba(249,160,0,0.28));
+  transform-origin: center;
+}
+
+.score-pop {
+  animation: none;
+}
+
+.score-pop.bump {
+  animation: scoreBump 160ms ease-out;
+}
+
+@keyframes scoreBump {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+.score-line {
+  color: rgba(255,255,255,0.9);
+  font-size: 18px;
+  font-weight: 700;
+}
   </style>
 </head>
 
@@ -394,7 +444,7 @@
 <button id="mashBtn" class="btn" type="button">
   Psyche's spacecraft will take many pictures of the asteroid's surface.<br>
   Mash the button as many times as you can to see how many pictures you can snap of the asteroid!<br>
-  PRESS THE BUTTON TO START.
+  PRESS HERE TO START.
 </button>    <button id="resetBtn" class="btn reset" type="button">RESET</button>
     <div class="hint">Mash as fast as you can</div>
   </main>
@@ -402,8 +452,11 @@
   <main id="pageResults" class="results page">
     <div class="card">
       <p class="big">Scanning complete</p>
-      <p class="sub">Your presses: <span id="finalScore">0</span></p>
 
+<p class="sub score-line">
+  Asteroid pictures taken:
+  <span id="finalScore" class="score-pop">0</span>
+</p>
       <div id="animWrap" class="satellite-wrap" aria-hidden="true">
 
   <!-- Rooted asteroid (does NOT spin) -->
@@ -467,7 +520,7 @@
   const dingSfx = document.getElementById("dingSfx");
   const muteBtn = document.getElementById("muteBtn");
 
-  let isMuted = false;
+  let isMuted = true;
 
 function applyMuteState() {
 const allAudio = [bgMusic, mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx];
@@ -543,14 +596,31 @@ applyMuteState();
     mashSfx.currentTime = 0;
   }
 
-  function startCameraSounds() {
-    stopCameraSounds();
-    cameraSoundInterval = setInterval(() => {
-      const sound = Math.random() < 0.5 ? cameraSound1 : cameraSound2;
-      sound.currentTime = 0;
-      sound.play().catch(() => {});
-    }, 400 + Math.random() * 600);
+ function playOneCameraShot() {
+  const shot = cameraSound1.cloneNode();
+  shot.muted = isMuted;
+  shot.currentTime = 0;
+  shot.play().catch(() => {});
+}
+
+function animatePicturesTaken(totalShots) {
+  finalScoreEl.textContent = "0";
+
+  const shots = Math.min(totalShots, 99);
+  let shownScore = 0;
+
+  for (let i = 0; i < shots; i++) {
+    setTimeout(() => {
+      playOneCameraShot();
+      shownScore++;
+finalScoreEl.textContent = String(shownScore);
+
+finalScoreEl.classList.remove("bump");
+void finalScoreEl.offsetWidth; // restart animation
+finalScoreEl.classList.add("bump");
+    }, i * 90);
   }
+}
 
   function stopCameraSounds() {
     if (cameraSoundInterval !== null) {
@@ -617,7 +687,7 @@ applyMuteState();
     timeEl.textContent = timeLeft;
 
     btn.classList.remove("disabled");
-    btn.textContent = "\nPsyche's spacecraft will take many pictures of the asteroid's surface.\n\nMash the button as many times as you can to see how many pictures you can snap of the asteroid!\n\nPRESS THE BUTTON TO START.";
+    btn.textContent = "\nPsyche's spacecraft will take many pictures of the asteroid's surface.\n\nMash the button as many times as you can to see how many pictures you can snap of the asteroid!\n\nPRESS HERE TO START.";
 
     finalScoreEl.textContent = "0";
     funFactEl.style.display = "none";
@@ -716,13 +786,13 @@ applyMuteState();
 
     btn.classList.add("disabled");
 
-    finalScoreEl.textContent = String(count);
 
     const orbitSeconds = scoreToOrbitSeconds(count);
     orbitEl.style.setProperty("--orbitDur", orbitSeconds + "s");
 
     showPage("results");
-    startCameraSounds();
+
+animatePicturesTaken(count);
 
     funFactEl.textContent = getEndMessage(count);
     funFactEl.style.display = "none";
