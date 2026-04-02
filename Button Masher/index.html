@@ -606,20 +606,40 @@ applyMuteState();
 function animatePicturesTaken(totalShots) {
   finalScoreEl.textContent = "0";
 
-  const shots = Math.min(totalShots, 99);
   let shownScore = 0;
+  const duration = 2200; // total count-up time in ms
+  const fps = 30;        // lower than 60 helps phones
+  const intervalMs = 1000 / fps;
+  const steps = Math.max(1, Math.round(duration / intervalMs));
+  const increment = totalShots / steps;
 
-  for (let i = 0; i < shots; i++) {
-    setTimeout(() => {
-      playOneCameraShot();
-      shownScore++;
-finalScoreEl.textContent = String(shownScore);
+  let accumulated = 0;
 
-finalScoreEl.classList.remove("bump");
-void finalScoreEl.offsetWidth; // restart animation
-finalScoreEl.classList.add("bump");
-    }, i * 90);
-  }
+  const intervalId = setInterval(() => {
+    accumulated += increment;
+    const nextScore = Math.min(totalShots, Math.round(accumulated));
+
+    if (nextScore !== shownScore) {
+      shownScore = nextScore;
+      finalScoreEl.textContent = String(shownScore);
+
+      // only bump every few numbers so mobile doesn't struggle
+      if (shownScore % 3 === 0 || shownScore === totalShots) {
+        finalScoreEl.classList.remove("bump");
+        void finalScoreEl.offsetWidth;
+        finalScoreEl.classList.add("bump");
+      }
+
+      // don't play sound for every single number
+      if (shownScore % 2 === 0 || shownScore === totalShots) {
+        playOneCameraShot();
+      }
+    }
+
+    if (shownScore >= totalShots) {
+      clearInterval(intervalId);
+    }
+  }, intervalMs);
 }
 
   function stopCameraSounds() {
