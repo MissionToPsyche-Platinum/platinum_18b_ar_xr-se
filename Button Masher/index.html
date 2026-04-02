@@ -607,8 +607,8 @@ function animatePicturesTaken(totalShots) {
   finalScoreEl.textContent = "0";
 
   let shownScore = 0;
-  const duration = 2200; // total count-up time in ms
-  const fps = 30;        // lower than 60 helps phones
+  const duration = 4400; // total count-up time in ms
+  const fps = 15;        // lower than 60 helps phones
   const intervalMs = 1000 / fps;
   const steps = Math.max(1, Math.round(duration / intervalMs));
   const increment = totalShots / steps;
@@ -832,7 +832,7 @@ animatePicturesTaken(count);
   if (getEndMessage(count).includes("100%")) {
     playCongrats();
   }
-}, 5000);
+}, 10000);
   }
 
   function startTimer() {
