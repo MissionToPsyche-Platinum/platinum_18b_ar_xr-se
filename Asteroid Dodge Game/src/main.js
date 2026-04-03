@@ -23,6 +23,10 @@ const ctx = canvas.getContext('2d');
 let gameOverFade = 0;
 let isPaused = false;
 effects.playerRef = player;
+let lives = 3;
+let invincibleTimer = 0;
+const INVINCIBLE_DURATION = 1.5;
+
 
 const uiButtons = {
   size: 56,
@@ -363,6 +367,8 @@ function startGame() {
   elapsedTime = 0;
   difficulty = 1;
   isPaused = false;
+  lives = 3;
+  invincibleTimer = 0;
 
   // reset start hint each run
   startHintTimer = 0;
@@ -424,6 +430,9 @@ function update(dt) {
     return;
   }
 
+  // tick down invincibility
+  if (invincibleTimer > 0) invincibleTimer -= dt;
+
   // world + score and facts update
   updateStars(canvas);
   elapsedTime += dt;
@@ -460,24 +469,29 @@ function update(dt) {
     activePowerUps,
     () => {
       if (gameState !== "gameover") {
+        lives--;
+        invincibleTimer = INVINCIBLE_DURATION;
         effects.triggerExplosion(player.x + player.w / 2, player.y + player.h / 2);
         effects.triggerFlash();
         effects.triggerShake();
-        vibrate([60, 30, 60]); // game over vibration
+        vibrate(40);
 
-        sounds.bg.pause();
-        updateHighScore();
-
-        setTimeout(() => {
-          gameState = "gameover";
-        }, 1300);
+        if (lives <= 0) {
+          sounds.bg.pause();
+          sounds.gameover.play();
+          updateHighScore();
+          setTimeout(() => {
+            gameState = "gameover";
+          }, 1300);
+        }
       }
     },
     () => {
       // Near-miss feedback
       effects.triggerNearMiss(player);
       vibrate(15);
-    }
+    },
+    invincibleTimer
   );
 
   // power-ups
@@ -516,6 +530,7 @@ function draw() {
 
     ctx.textAlign = "left";
     ctx.fillText(`Score: ${score}`, 20, safeTop + 24);
+    ctx.fillText(`Lives: ${lives}`, 20, safeTop + 50);
 
     // --- Start hint overlay ---
     if (startHintAlpha > 0) {
