@@ -161,6 +161,56 @@
       overflow: hidden;
     }
 
+    .progress-track{
+  height: 42px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.14);
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-scene {
+  padding: 0 10px;
+}
+
+.progress-fill{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--psyche-mustard), var(--psyche-coral));
+  transition: width 80ms linear;
+  z-index: 1;
+}
+
+.progress-satellite{
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  width: 34px;
+  height: auto;
+  transform: translate(0, -50%) rotate(12deg);
+  z-index: 3;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35));
+  transition: left 80ms linear, transform 80ms linear;
+}
+
+.progress-asteroid{
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  width: 30px;
+  height: auto;
+  transform: translateY(-50%);
+  z-index: 4;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35));
+}
+
     .progress-fill{
       height: 100%;
       width: 0%;
@@ -431,10 +481,25 @@
 
   <main id="pageGame" class="wrap page active">
     <section class="topbar" aria-label="Progress">
-      <div class="progress-track">
-        <div id="progressFill" class="progress-fill" style="width:0%"></div>
-      </div>
-    </section>
+  <div class="progress-track progress-scene">
+    <div id="progressFill" class="progress-fill" style="width:0%"></div>
+
+    <img
+      id="progressSatellite"
+      class="progress-satellite"
+      src="assets/satellite.png"
+      alt=""
+      aria-hidden="true"
+    />
+
+    <img
+      class="progress-asteroid"
+      src="assets/asteroid.png"
+      alt=""
+      aria-hidden="true"
+    />
+  </div>
+</section>
 
     <div class="sr-only">
       <span id="time">5</span>
@@ -519,6 +584,8 @@
   const congratsSfx = document.getElementById("congratsSfx");
   const dingSfx = document.getElementById("dingSfx");
   const muteBtn = document.getElementById("muteBtn");
+
+  const progressSatellite = document.getElementById("progressSatellite");
 
   let isMuted = true;
 
@@ -674,6 +741,24 @@ function animatePicturesTaken(totalShots) {
   const percent = (progressPresses / MAX_PROGRESS_PRESSES) * 100;
   progressFill.style.width = percent + "%";
 
+  const track = progressFill.parentElement;
+  const trackWidth = track.clientWidth;
+  const leftPadding = 10;
+  const rightReserved = 42; // room for asteroid on the right
+  const satelliteWidth = 34;
+
+  const minX = leftPadding;
+  const maxX = trackWidth - rightReserved - satelliteWidth;
+  const x = minX + ((maxX - minX) * percent / 100);
+
+  progressSatellite.style.left = x + "px";
+
+  // tiny boost wiggle each mash
+  progressSatellite.style.transform = "translate(0, -50%) rotate(20deg) scale(1.06)";
+  setTimeout(() => {
+    progressSatellite.style.transform = "translate(0, -50%) rotate(12deg) scale(1)";
+  }, 70);
+
   if (count >= MAX_PROGRESS_PRESSES) {
     playDing();
   }
@@ -689,6 +774,10 @@ function animatePicturesTaken(totalShots) {
     stopCameraSounds();
     stopCongrats();
     progressFill.style.width = "0%";
+    if (progressSatellite) {
+  progressSatellite.style.left = "10px";
+  progressSatellite.style.transform = "translate(0, -50%) rotate(12deg) scale(1)";
+}
 
     if (timerId !== null) {
       clearInterval(timerId);
