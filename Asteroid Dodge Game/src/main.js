@@ -26,6 +26,11 @@ effects.playerRef = player;
 let lives = 3;
 let invincibleTimer = 0;
 const INVINCIBLE_DURATION = 1.5;
+let comboCount = 0;
+let comboTimer = 0;
+let comboScore = 0;
+const COMBO_DECAY_TIME = 3;
+const COMBO_BASE_BONUS = 50;
 
 
 const uiButtons = {
@@ -369,6 +374,9 @@ function startGame() {
   isPaused = false;
   lives = 3;
   invincibleTimer = 0;
+  comboCount = 0;
+  comboTimer = 0;
+  comboScore = 0;
 
   // reset start hint each run
   startHintTimer = 0;
@@ -433,10 +441,19 @@ function update(dt) {
   // tick down invincibility
   if (invincibleTimer > 0) invincibleTimer -= dt;
 
+  // tick down combo decay
+  if (comboCount > 0) {
+    comboTimer -= dt;
+    if (comboTimer <= 0) {
+      comboCount = 0;
+      comboTimer = 0;
+    }
+  }
+
   // world + score and facts update
   updateStars(canvas);
   elapsedTime += dt;
-  score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? SCORING.SCORE_BOOST_MULTIPLIER : 1));
+  score = Math.floor(elapsedTime * (activePowerUps.scoreBoost ? SCORING.SCORE_BOOST_MULTIPLIER : 1)) + comboScore;
   difficulty = easedDifficulty(elapsedTime, SCORING.DIFFICULTY_RAMP_TIME, SCORING.DIFFICULTY_CAP);
   facts.update(dt, elapsedTime, score);
 
@@ -471,6 +488,8 @@ function update(dt) {
       if (gameState !== "gameover") {
         lives--;
         invincibleTimer = INVINCIBLE_DURATION;
+        comboCount = 0;
+        comboTimer = 0;
         effects.triggerExplosion(player.x + player.w / 2, player.y + player.h / 2);
         effects.triggerFlash();
         effects.triggerShake();
@@ -478,7 +497,6 @@ function update(dt) {
 
         if (lives <= 0) {
           sounds.bg.pause();
-          sounds.gameover.play();
           updateHighScore();
           setTimeout(() => {
             gameState = "gameover";
@@ -488,6 +506,9 @@ function update(dt) {
     },
     () => {
       // Near-miss feedback
+      comboCount++;
+      comboTimer = COMBO_DECAY_TIME;
+      comboScore += comboCount * COMBO_BASE_BONUS;
       effects.triggerNearMiss(player);
       vibrate(15);
     },
@@ -531,6 +552,10 @@ function draw() {
     ctx.textAlign = "left";
     ctx.fillText(`Score: ${score}`, 20, safeTop + 24);
     ctx.fillText(`Lives: ${lives}`, 20, safeTop + 50);
+    if (comboCount > 0) {
+      ctx.fillStyle = "orange";
+      ctx.fillText(`Combo: x${comboCount}`, 20, safeTop + 76);
+    }
 
     // --- Start hint overlay ---
     if (startHintAlpha > 0) {
