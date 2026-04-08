@@ -11,14 +11,108 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Menu button -->
+<button class="menu-btn" id="menuBtn" aria-label="Open menu">
+    <span></span>
+    <span></span>
+    <span></span>
+</button>
+
+<!-- Menu overlay -->
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- Menu panel -->
+<div class="menu-panel" id="menuPanel">
+
+    <div class="menu-header">
+        <span class="menu-title">orbit_facts</span>
+        <button class="menu-close" id="menuClose" aria-label="Close menu">✕</button>
+    </div>
+
+    <!-- About -->
+    <div class="menu-section">
+        <span class="menu-section-label">About</span>
+        <p class="menu-about-text">
+            This module visualizes the orbit of 16 Psyche, a metallic asteroid in the main asteroid belt.
+            NASA's Psyche mission launched in October 2023 to explore this unique world, which may be
+            the exposed iron-nickel core of a planetesimal.
+        </p>
+    </div>
+
+    <!-- Settings -->
+    <div class="menu-section">
+        <span class="menu-section-label">Settings</span>
+
+        <!-- Scale toggle (mirrored from main UI) -->
+        <div class="menu-setting">
+            <span class="menu-setting-label">View Scale</span>
+            <div class="menu-toggle-row">
+                <span class="toggle-label">Enlarged</span>
+                <div class="toggle-switch" id="menuViewToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+                <span class="toggle-label">To Scale</span>
+            </div>
+        </div>
+
+        <!-- Reset -->
+        <div class="menu-setting">
+            <span class="menu-setting-label">Reset Simulation</span>
+            <button class="reset-btn" id="resetBtn">Reset to Start</button>
+        </div>
+
+        <!-- Autoplay speed -->
+        <div class="menu-setting">
+            <span class="menu-setting-label">Autoplay Speed</span>
+            <div class="menu-speed-btns">
+                <button class="speed-btn active" data-speed="10">Slow</button>
+                <button class="speed-btn" data-speed="25">Medium</button>
+                <button class="speed-btn" data-speed="50">Fast</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module links -->
+    <div class="menu-section">
+        <span class="menu-section-label">Other Modules</span>
+        <nav class="menu-links">
+            <a class="menu-link" href="https://missiontopsyche-platinum.github.io/platinum_18b_ar_xr-se/Button%20Masher/index.html" target="_blank">Button Masher</a>
+            <a class="menu-link" href="https://missiontopsyche-platinum.github.io/platinum_18b_ar_xr-se/Asteroid%20Dodge%20Game/index.html" target="_blank">Asteroid Dodge</a>
+            <a class="menu-link" href="https://missiontopsyche-platinum.github.io/platinum_18b_ar_xr-se/Metal%20Activity/asteroid.html" target="_blank">Metal Activity</a>
+        </nav>
+    </div>
+
+    <!-- NASA Link -->
+    <div class="menu-section">
+        <span class="menu-section-label">Learn More</span>
+        <a class="menu-link menu-link--featured" href="https://science.nasa.gov/mission/psyche/" target="_blank">🔗 NASA Psyche Mission</a>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="menu-section">
+        <span class="menu-section-label">Disclaimer</span>
+        <button class="disclaimer-btn" id="disclaimerBtn">View Disclaimer</button>
+        <div class="disclaimer-text" id="disclaimerText">
+            This work was created in partial fulfillment of Arizona State University Capstone Course SER 401 and 402. The work is a result of the Psyche Student Collaborations component of NASA's Psyche Mission (https://psyche.ssl.berkeley.edu). "Psyche: A Journey to a Metal World" [Contract number NNM16AA09C] is part of the NASA Discovery Program mission to solar system targets. Trade names and trademarks of ASU and NASA are used in this work for identification only. Their usage does not constitute an official endorsement, either expressed or implied, by Arizona State University or National Aeronautics and Space Administration. The content is solely the responsibility of the authors and does not necessarily represent the official views of ASU or NASA.
+        </div>
+    </div>
+
+</div>
+
+<!-- Starfield canvas -->
+<canvas id="star-canvas"></canvas>
+
+<!-- View scale toggle -->
 <div class="view-toggle">
-    <span class="toggle-label">Enlarged View</span>
+    <span class="toggle-label">Enlarged</span>
     <div class="toggle-switch" id="viewToggle">
         <div class="toggle-slider"></div>
     </div>
     <span class="toggle-label">To Scale</span>
 </div>
 
+<!-- Autoplay toggle -->
 <div class="autoplay-toggle">
     <span class="toggle-label">Manual</span>
     <div class="toggle-switch" id="autoplayToggle">
@@ -27,6 +121,7 @@
     <span class="toggle-label">Auto Play</span>
 </div>
 
+<!-- Main simulation space -->
 <div class="space">
     <div class="sun"></div>
     <div class="orbit">
@@ -35,14 +130,80 @@
     </div>
 </div>
 
-<div class="info-box" id="infoBox">
-    Fun Fact: Psyche has an axial tilt of approximately 98°, leading to extreme seasonal variations!
+<!-- Info + controls wrapper (stacks on mobile) -->
+<div class="info-panels-wrapper">
+
+    <!-- Seasonal / fun facts panel -->
+    <div class="info-box" id="infoBox">
+        <span class="info-box-label">Seasonal Fact</span>
+        <div class="info-box-body">
+            Psyche's axial tilt of ~95° causes extreme seasons, where poles face the Sun directly during parts of the orbit.
+        </div>
+    </div>
+
+    <!-- General facts panel -->
+    <div class="info-box" id="generalInfoBox">
+        <span class="info-box-label">Mission Data</span>
+        <div class="info-box-body">
+            Psyche is one of the largest metallic asteroids in the solar system.
+        </div>
+    </div>
+
+    <!-- Orbit slider -->
+    <div class="controls">
+        <span class="slider-label">Orbital Position</span>
+        <input type="range" id="orbitSlider" min="0" max="3600" value="0" step="1">
+    </div>
+
 </div>
 
-<div class="controls">
-    <input type="range" id="orbitSlider" min="0" max="3600" value="0" step="1">
-</div>
+<script src="Script.js"></script>   <!-- shared state + scene -->
+<script src="facts.js"></script>    <!-- facts arrays + updateFacts -->
+<script src="orbit.js"></script>    <!-- camera, orbit line, updatePosition -->
+<script src="models.js"></script>   <!-- GLTF model loading -->
+<script src="ui.js"></script>       <!-- slider, toggles, autoplay, resize -->
+<script src="Menu.js"></script>     <!-- menu, speed, disclaimer, reset -->
+<script src="tests.js"></script>    <!-- console test suite -->
 
-<script src="script.js"></script>
+<script>
+    // Initialise once all JS files are loaded
+    initThreeSize();
+    updatePosition(0);
+</script>
+
+<!-- Starfield generator -->
+<script>
+    (function() {
+        const canvas = document.getElementById('star-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawStars();
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const count = Math.floor((canvas.width * canvas.height) / 3200);
+            for (let i = 0; i < count; i++) {
+                const x    = Math.random() * canvas.width;
+                const y    = Math.random() * canvas.height;
+                const r    = Math.random() * 1.1;
+                const a    = 0.25 + Math.random() * 0.75;
+                const warm = Math.random() > 0.5;
+                const hue  = warm ? `rgba(255,245,220,${a})` : `rgba(200,225,255,${a})`;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fillStyle = hue;
+                ctx.fill();
+            }
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+    })();
+</script>
+
 </body>
 </html>
