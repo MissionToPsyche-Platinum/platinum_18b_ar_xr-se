@@ -464,6 +464,18 @@
   font-size: 18px;
   font-weight: 700;
 }
+
+#mashText {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+#mashText.big {
+  font-size: clamp(80px, 18vw, 160px);
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
   </style>
 </head>
 
@@ -507,10 +519,12 @@
     </div>
 
 <button id="mashBtn" class="btn" type="button">
-  Psyche's spacecraft will take many pictures of the asteroid's surface.<br>
-  Mash the button as many times as you can to see how many pictures you can snap of the asteroid!<br>
-  PRESS HERE TO START.
-</button>    <button id="resetBtn" class="btn reset" type="button">RESET</button>
+  <span id="mashText">
+    Psyche's spacecraft will take many pictures of the asteroid's surface.<br>
+    Mash the button as many times as you can to see how many pictures you can snap of the asteroid!<br>
+    PRESS HERE TO START.
+  </span>
+</button>   <button id="resetBtn" class="btn reset" type="button">RESET</button>
     <div class="hint">Mash as fast as you can</div>
   </main>
 
@@ -587,8 +601,41 @@
 
   const progressSatellite = document.getElementById("progressSatellite");
 
+let mashText = document.getElementById("mashText");
   let isMuted = true;
+function startCountdownThenGame() {
+  let countdown = ["3", "2", "1", "TAP!"];
+  let index = 0;
 
+  btn.classList.add("disabled");
+
+  // 🔥 STOP MUSIC IMMEDIATELY
+  stopBgMusic();
+
+  const countdownInterval = setInterval(() => {
+    mashText.textContent = countdown[index];
+    mashText.classList.add("big");
+
+    mashText.style.transform = "scale(1.3)";
+    setTimeout(() => {
+      mashText.style.transform = "scale(1)";
+    }, 150);
+
+    index++;
+
+    if (index >= countdown.length) {
+      clearInterval(countdownInterval);
+
+      mashText.classList.remove("big");
+
+      btn.classList.remove("disabled");
+      timerStarted = true;
+
+      startMashAudio();
+      startTimer();
+    }
+  }, 700);
+}
 function applyMuteState() {
 const allAudio = [bgMusic, mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx];
   allAudio.forEach(audio => {
@@ -796,8 +843,14 @@ function animatePicturesTaken(totalShots) {
     timeEl.textContent = timeLeft;
 
     btn.classList.remove("disabled");
-    btn.textContent = "\nPsyche's spacecraft will take many pictures of the asteroid's surface.\n\nMash the button as many times as you can to see how many pictures you can snap of the asteroid!\n\nPRESS HERE TO START.";
-
+btn.innerHTML = `
+  <span id="mashText">
+    Psyche's spacecraft will take many pictures of the asteroid's surface.<br>
+    Mash the button as many times as you can to see how many pictures you can snap of the asteroid!<br>
+    PRESS HERE TO START.
+  </span>
+`;
+mashText = document.getElementById("mashText");
     finalScoreEl.textContent = "0";
     funFactEl.style.display = "none";
     funFactEl.textContent = "";
@@ -847,6 +900,12 @@ function animatePicturesTaken(totalShots) {
     "Italian astronomer Annibale de Gasparis discovered Psyche in 1852."
   ];
   function getEndMessage(score) {
+
+  // 🔥 NEW: random fact for high score
+  if (score >= 34) {
+    const randomFact = allFacts[Math.floor(Math.random() * allFacts.length)];
+    return "You scanned 100% of Psyche's surface!\n\n" + randomFact;
+  }
     if (score < 2) return "You scanned 3% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
     if (score < 3) return "You scanned 6% of Psyche's surface!\n\nThe satellite that NASA sent to Psyche is about the size of a singles tennis court.";
     if (score < 4) return "You scanned 9% of Psyche's surface!\n\nThe Psyche satellite has unique plus shaped solar panels.";
@@ -949,12 +1008,9 @@ animatePicturesTaken(count);
     if (btn.classList.contains("disabled")) return;
 
     if (!timerStarted) {
-      timerStarted = true;
-      btn.textContent = "TAP!";
-      stopBgMusic();
-      startMashAudio();
-      startTimer();
-    }
+  startCountdownThenGame();
+  return;
+}
 
     if (timeLeft > 0) {
       count++;
