@@ -157,10 +157,19 @@
 
 </div>
 
-<script src="script.js"></script>
+<script src="Script.js"></script>   <!-- shared state + scene -->
+<script src="facts.js"></script>    <!-- facts arrays + updateFacts -->
+<script src="orbit.js"></script>    <!-- camera, orbit line, updatePosition -->
+<script src="models.js"></script>   <!-- GLTF model loading -->
+<script src="ui.js"></script>       <!-- slider, toggles, autoplay, resize -->
+<script src="Menu.js"></script>     <!-- menu, speed, disclaimer, reset -->
+<script src="tests.js"></script>    <!-- console test suite -->
 
-<!-- Comment this out to remove tests from production code -->
-<script src="tests.js"></script>
+<script>
+    // Initialise once all JS files are loaded
+    initThreeSize();
+    updatePosition(0);
+</script>
 
 <!-- Starfield generator -->
 <script>
