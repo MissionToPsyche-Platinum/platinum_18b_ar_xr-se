@@ -1,0 +1,28 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="100"
+  height="100"
+  viewBox="0 0 100 100"
+>
+  <style>
+    .key {
+      fill: #0a1630; /* deep blue-gray background */
+      stroke: white;
+      stroke-width: 3;
+      rx: 10;
+      ry: 10;
+    }
+    .label {
+      fill: white;
+      font-family: 'Segoe UI', sans-serif;
+      font-weight: 600;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      font-size: 32px;
+    }
+  </style>
+
+  <!-- Left Arrow Key -->
+  <rect x="10" y="20" width="80" height="60" class="key"/>
+  <text x="50" y="50" class="label">D</text>
+</svg>
