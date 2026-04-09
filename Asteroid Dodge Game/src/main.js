@@ -12,6 +12,7 @@ import { startMenu } from './start.js';
 import { effects } from './effects.js';
 import { CONSTANTS } from "./constants.js";
 import { facts } from "./facts.js";
+import { saveScore, drawLeaderboard } from "./leaderboard.js";
 
 export let gameState = "start";
 let prevState;
@@ -498,6 +499,7 @@ function update(dt) {
         if (lives <= 0) {
           sounds.bg.pause();
           updateHighScore();
+          saveScore(score);          // ← NEW: persist to leaderboard
           setTimeout(() => {
             gameState = "gameover";
           }, 1300);
@@ -644,17 +646,18 @@ function draw() {
 
     // --- GAME OVER UI ---
     ctx.font = fontPx(26, "sans-serif");
-    const lineGap = Math.round(36 * getUiScale()); 
-
-    ctx.fillStyle = "gold";
-    ctx.fillText(`🏆 High Score: ${highScore}`, W / 2, H / 2);
-
+    const lineGap = Math.round(36 * getUiScale());
+ 
     ctx.fillStyle = "white";
-    ctx.fillText(`💫 Your Score: ${score}`, W / 2, H / 2 + lineGap);
-
-    ctx.font = fontPx(20, "sans-serif");
+    ctx.fillText(`💫 Your Score: ${score}`, W / 2, H / 2 - 10);
+ 
+    // Draw top-5 leaderboard below the score
+    drawLeaderboard(ctx, W, H, score, fontPx);
+ 
+    ctx.font = fontPx(18, "sans-serif");
     ctx.fillStyle = "lightgray";
-    ctx.fillText("Tap to Restart", W / 2, H / 2 + lineGap * 2);
+    ctx.textAlign = "center";
+    ctx.fillText("Tap to Restart", W / 2, H - 40);
   }
 }
 
