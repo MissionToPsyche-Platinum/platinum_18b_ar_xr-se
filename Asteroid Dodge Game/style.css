@@ -447,3 +447,47 @@ canvas {
     from { transform: translateX(0); }
     to { transform: translateX(calc(-1 * var(--scroll-distance))); }
 }
+
+.leaderboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+ 
+.lb-list {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+ 
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-family: monospace;
+  font-size: 16px;
+  color: white;
+}
+ 
+.lb-row.lb-first {
+  background: rgba(255, 215, 0, 0.18);
+  border: 1px solid rgba(255, 215, 0, 0.45);
+}
+ 
+.lb-rank  { width: 32px; font-size: 18px; }
+.lb-score { flex: 1; font-weight: bold; font-size: 18px; }
+.lb-date  { font-size: 13px; color: rgba(255,255,255,0.55); }
+ 
+.lb-empty {
+  color: rgba(255,255,255,0.5);
+  font-style: italic;
+  text-align: center;
+  padding: 20px 0;
+}
