@@ -14,13 +14,11 @@
    Gold                rgba(244, 124, 51, 1)
    Mustard             rgba(249, 160, 0, 1) */
 
-   .mute-btn{
-  position: fixed;
-  right: 12px;
-  bottom: 12px;
-  z-index: 9999;
-
-  padding: 10px 14px;
+.mute-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.18);
   background: rgba(18, 3, 29, 0.85);
@@ -94,8 +92,10 @@
 
 .mobile-top-actions{
   display: flex;
-  justify-content: flex-start;
-  margin-bottom: 2px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
 }
 
     :root {
@@ -484,7 +484,6 @@
 
 <body>
 
-<button id="muteBtn" class="mute-btn" type="button" aria-pressed="false">🔊 Sound On</button>
 
   <audio id="mashSfx" src="assets/mash-loop.mp3" preload="auto" loop></audio>
   <audio id="cameraSound1" src="assets/camera sound 1.mp3" preload="auto"></audio>
@@ -495,8 +494,9 @@
 
   <main id="pageGame" class="wrap page active">
   <div class="mobile-top-actions">
-    <a id="returnToHub" href="#" aria-label="Return to Hub">← Hub</a>
-  </div>
+  <a id="returnToHub" href="#" aria-label="Return to Hub">← Hub</a>
+  <button id="muteBtn" class="mute-btn" type="button" aria-pressed="false">🔊 Sound On</button>
+</div>
 
   <section class="topbar" aria-label="Progress">
     <div class="progress-track progress-scene">
