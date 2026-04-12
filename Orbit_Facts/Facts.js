@@ -12,7 +12,7 @@ const facts = [
     },
     {
         range: [900, 1350],
-        text: "Due to the high tilt, one pole experiences continuous sunlight for about 2.5 Earth years, mimicking a 2.5 year long summer day."
+        text: "Due to the high tilt one pole experiences an extended summer while the other experiences an extended winter."
     },
     {
         range: [1350, 1800],
