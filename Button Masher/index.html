@@ -491,6 +491,7 @@
   <audio id="congratsSfx" src="assets/congratulations.mp3" preload="auto"></audio>
   <audio id="dingSfx" src="assets/ding.mp3" preload="auto"></audio>
   <audio id="bgMusic" src="assets/background_music.mp3" preload="auto" loop></audio>
+  <audio id="failureSfx" src="assets/failure.mp3" preload="auto"></audio>
 
   <main id="pageGame" class="wrap page active">
   <div class="mobile-top-actions">
@@ -607,6 +608,8 @@
 
   const progressSatellite = document.getElementById("progressSatellite");
 
+  const failureSfx = document.getElementById("failureSfx");
+
 let mashText = document.getElementById("mashText");
   let isMuted = true;
 function startCountdownThenGame() {
@@ -643,13 +646,18 @@ function startCountdownThenGame() {
   }, 700);
 }
 function applyMuteState() {
-const allAudio = [bgMusic, mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx];
-  allAudio.forEach(audio => {
+const allAudio = [bgMusic, mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx, failureSfx];  allAudio.forEach(audio => {
     audio.muted = isMuted;
   });
 
   muteBtn.textContent = isMuted ? "🔇 Sound Off" : "🔊 Sound On";
   muteBtn.setAttribute("aria-pressed", String(isMuted));
+}
+
+function playFailure() {
+  if (!failureSfx) return;
+  failureSfx.currentTime = 0;
+  failureSfx.play().catch(() => {});
 }
 
 muteBtn.addEventListener("click", () => {
@@ -912,6 +920,7 @@ mashText = document.getElementById("mashText");
     const randomFact = allFacts[Math.floor(Math.random() * allFacts.length)];
     return "You scanned 100% of Psyche's surface!\n\n" + randomFact;
   }
+    if (score < 1) return "You scanned 0% of Psyche's surface!";
     if (score < 2) return "You scanned 3% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
     if (score < 3) return "You scanned 6% of Psyche's surface!\n\nThe satellite that NASA sent to Psyche is about the size of a singles tennis court.";
     if (score < 4) return "You scanned 9% of Psyche's surface!\n\nThe Psyche satellite has unique plus shaped solar panels.";
@@ -982,6 +991,10 @@ animatePicturesTaken(count);
   learnMoreBtn.style.display = "inline-block";
   learnMoreWrap.style.display = "none";
   renderAllFacts();
+
+if (count >= 0 && count <= 7) {
+  playFailure();
+}
 
   if (getEndMessage(count).includes("100%")) {
     playCongrats();
