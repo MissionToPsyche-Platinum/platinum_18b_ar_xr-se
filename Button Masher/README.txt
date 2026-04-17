@@ -21,3 +21,8 @@ Creator: VoiceBosch
 Background Music
 https://pixabay.com/music/modern-classical-relaxing-ambient-music-for-tiktok-videos-312506/
 Creator: Clavier-Music
+
+Failure Sound
+https://pixabay.com/sound-effects/musical-brass-fail-8-a-207130/
+Creator: floraphonic
+
