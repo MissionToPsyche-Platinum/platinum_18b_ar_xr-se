@@ -6,6 +6,27 @@
     const hudShots = document.getElementById("shots");
     const msg = document.getElementById("msg");
 
+    
+    const levels = [
+        {
+            ship: { x: 200, y: 300 },
+            asteroid: { x: 1000, y: 300, r: 40 },
+            gravityWell: { x: null, y: null, r: 50, mu: 12000000, soften: 1500 }
+        },
+        {
+            ship: { x: 180, y:200 },
+            asteroid: { x: 1050, y: 300, r: 40 },
+            gravityWell: { x: null, y: null, r: 50, mu: 14000000, soften: 1500 }
+        },
+        {
+            ship: { x: 220, y: 550 },
+            asteroid: { x: 980, y: 180, r: 40 },
+            gravityWell: { x: null, y: null, r: 55, mu: 16000000, soften: 1500 }
+        }
+    ];
+    
+    let currentLevel = 0;
+
     const shipImg = new Image();
     shipImg.src = "ship.png";
     const marsImg = new Image();
