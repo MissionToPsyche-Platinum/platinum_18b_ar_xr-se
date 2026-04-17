@@ -13,6 +13,8 @@ import { effects } from './effects.js';
 import { CONSTANTS } from "./constants.js";
 import { facts } from "./facts.js";
 import { saveScore, drawLeaderboard } from "./leaderboard.js";
+import { checkAchievements, resetSessionUnlocks } from "./achievements.js"
+
 
 export let gameState = "start";
 let prevState;
@@ -30,6 +32,7 @@ const INVINCIBLE_DURATION = 1.5;
 let comboCount = 0;
 let comboTimer = 0;
 let comboScore = 0;
+let livesLost = 0;
 const COMBO_DECAY_TIME = 3;
 const COMBO_BASE_BONUS = 50;
 
@@ -378,6 +381,7 @@ function startGame() {
   comboCount = 0;
   comboTimer = 0;
   comboScore = 0;
+  
 
   // reset start hint each run
   startHintTimer = 0;
@@ -387,6 +391,8 @@ function startGame() {
   resetPowerUps();
   effects.reset();
   facts.reset();
+  resetSessionUnlocks();
+  livesLost = 0; 
 
   // reset player position each run
   player.x = W / 2 - player.w / 2;
@@ -435,6 +441,14 @@ function update(dt) {
     if (isPaused || isMenuVisible()) {
     // Keep background alive
     updateStars(canvas);
+    checkAchievements({
+    elapsedTime,
+    comboCount,
+    score,
+    lives,
+    nearMiss: false,   // frame-level tick — near miss fires separately below
+    gameOver: false
+  });
     effects.update(dt);
     return;
   }
@@ -488,6 +502,7 @@ function update(dt) {
     () => {
       if (gameState !== "gameover") {
         lives--;
+        livesLost++;
         invincibleTimer = INVINCIBLE_DURATION;
         comboCount = 0;
         comboTimer = 0;
@@ -496,23 +511,40 @@ function update(dt) {
         effects.triggerShake();
         vibrate(40);
 
-        if (lives <= 0) {
+          if (lives <= 0) {
           sounds.bg.pause();
           updateHighScore();
-          saveScore(score);          // ← NEW: persist to leaderboard
+          saveScore(score);
+          checkAchievements({ 
+            elapsedTime,
+            comboCount,
+            score,
+            livesLost,
+            nearMiss: false,
+            gameOver: true
+          });
+
           setTimeout(() => {
             gameState = "gameover";
           }, 1300);
         }
       }
     },
-    () => {
+     () => {
       // Near-miss feedback
       comboCount++;
       comboTimer = COMBO_DECAY_TIME;
       comboScore += comboCount * COMBO_BASE_BONUS;
       effects.triggerNearMiss(player);
       vibrate(15);
+      checkAchievements({        // ← NEW
+        elapsedTime,
+        comboCount,
+        score,
+        lives,
+        nearMiss: true,
+        gameOver: false
+      });
     },
     invincibleTimer
   );
