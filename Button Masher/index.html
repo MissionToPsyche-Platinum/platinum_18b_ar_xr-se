@@ -492,6 +492,7 @@
   <audio id="dingSfx" src="assets/ding.mp3" preload="auto"></audio>
   <audio id="bgMusic" src="assets/background_music.mp3" preload="auto" loop></audio>
   <audio id="failureSfx" src="assets/failure.mp3" preload="auto"></audio>
+  <audio id="countdownSfx" src="assets/countdown.mp3" preload="auto"></audio>
 
   <main id="pageGame" class="wrap page active">
   <div class="mobile-top-actions">
@@ -605,6 +606,7 @@
   const congratsSfx = document.getElementById("congratsSfx");
   const dingSfx = document.getElementById("dingSfx");
   const muteBtn = document.getElementById("muteBtn");
+  const countdownSfx = document.getElementById("countdownSfx");
 
   const progressSatellite = document.getElementById("progressSatellite");
 
@@ -621,6 +623,12 @@ function startCountdownThenGame() {
   // 🔥 STOP MUSIC IMMEDIATELY
   stopBgMusic();
 
+  // 🔊 PLAY COUNTDOWN SOUND
+  if (countdownSfx) {
+    countdownSfx.currentTime = 0;
+    countdownSfx.play().catch(() => {});
+  }
+
   const countdownInterval = setInterval(() => {
     mashText.textContent = countdown[index];
     mashText.classList.add("big");
@@ -633,20 +641,26 @@ function startCountdownThenGame() {
     index++;
 
     if (index >= countdown.length) {
-      clearInterval(countdownInterval);
+  clearInterval(countdownInterval);
 
-      mashText.classList.remove("big");
+  mashText.classList.remove("big");
 
-      btn.classList.remove("disabled");
-      timerStarted = true;
+  // 🔇 STOP COUNTDOWN SOUND
+  if (countdownSfx) {
+    countdownSfx.pause();
+    countdownSfx.currentTime = 0;
+  }
 
-      startMashAudio();
-      startTimer();
-    }
+  btn.classList.remove("disabled");
+  timerStarted = true;
+
+  startMashAudio();
+  startTimer();
+}
   }, 700);
 }
 function applyMuteState() {
-const allAudio = [bgMusic, mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx, failureSfx];  allAudio.forEach(audio => {
+const allAudio = [bgMusic, mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx, failureSfx, countdownSfx];  allAudio.forEach(audio => {
     audio.muted = isMuted;
   });
 
