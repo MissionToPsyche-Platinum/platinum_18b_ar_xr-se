@@ -988,6 +988,7 @@ mashText = document.getElementById("mashText");
     orbitEl.style.setProperty("--orbitDur", orbitSeconds + "s");
 
     showPage("results");
+playAgainBtn.style.display = "none";
 
 animatePicturesTaken(count);
 
@@ -995,25 +996,29 @@ animatePicturesTaken(count);
     funFactEl.style.display = "none";
     animWrap.style.display = "flex";
 
-    resultsTimeoutId = setTimeout(() => {
+   resultsTimeoutId = setTimeout(() => {
   stopCameraSounds();
   startBgMusic();
 
   animWrap.style.display = "none";
   funFactEl.style.display = "block";
-  
+
   learnMoreBtn.style.display = "inline-block";
   learnMoreWrap.style.display = "none";
   renderAllFacts();
 
-if (count >= 0 && count <= 7) {
-  playFailure();
-}
+  if (count >= 0 && count <= 7) {
+    playFailure();
+  }
 
   if (getEndMessage(count).includes("100%")) {
     playCongrats();
   }
-}, 10000);
+
+  // 👇 show button AFTER animation is done
+  playAgainBtn.style.display = "inline-block";
+
+}, 7000);
   }
 
   function startTimer() {
