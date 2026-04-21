@@ -23,10 +23,11 @@
     body {
       margin: 0;
       padding: 0;
-      height: 100%;
-      overflow: hidden;
+      min-height: 100%;
       font-family: system-ui, sans-serif;
       color: var(--text-main);
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     .bg-sky {
@@ -56,22 +57,23 @@
     .content {
       position: relative;
       z-index: 2;
-      min-height: 100%;
+      min-height: 100vh;
       width: 100%;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      padding: 24px;
+      padding: 20px 16px 32px;
       box-sizing: border-box;
       text-align: center;
     }
 
     .hub-card {
       width: min(95vw, 900px);
+      margin-top: 10px;
       background: var(--panel-bg);
       border: 1px solid var(--border-soft);
       border-radius: 24px;
-      padding: 32px 24px;
+      padding: 24px 18px;
       box-shadow:
         0 0 30px rgba(0, 0, 0, 0.35),
         0 0 24px rgba(244, 124, 51, 0.12);
@@ -79,30 +81,30 @@
     }
 
     h1 {
-      margin: 0 0 12px;
-      font-size: clamp(2rem, 4vw, 2.8rem);
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
       line-height: 1.15;
       color: var(--psyche-mustard);
       text-shadow: 0 0 14px rgba(249, 160, 0, 0.35);
     }
 
     p {
-      margin: 0.35rem 0 1.2rem;
-      font-size: 1rem;
+      margin: 0.35rem 0 1rem;
+      font-size: 0.98rem;
       color: var(--text-soft);
     }
 
     .game-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-      margin-top: 24px;
+      gap: 14px;
+      margin-top: 18px;
     }
 
     .game-tile {
       display: block;
       text-decoration: none;
-      border-radius: 20px;
+      border-radius: 18px;
       overflow: hidden;
       border: 2px solid rgba(249, 160, 0, 0.18);
       background: rgba(89, 38, 81, 0.45);
@@ -121,14 +123,14 @@
     .game-tile img {
       display: block;
       width: 100%;
-      aspect-ratio: 16 / 10;
+      aspect-ratio: 16 / 9;
       object-fit: cover;
       background: #1a1024;
     }
 
     .game-label {
-      padding: 12px 10px;
-      font-size: 1rem;
+      padding: 10px 8px;
+      font-size: 0.95rem;
       font-weight: 700;
       color: var(--text-main);
       background: linear-gradient(
@@ -139,18 +141,47 @@
     }
 
     .footer {
-      margin-top: 26px;
-      font-size: 0.92rem;
+      margin-top: 20px;
+      font-size: 0.88rem;
       color: #d8b6a7;
     }
 
-    @media (max-width: 700px) {
-      .game-grid {
-        grid-template-columns: 1fr;
+    @media (max-width: 600px) {
+      .content {
+        padding: 14px 10px 24px;
       }
 
       .hub-card {
-        padding: 24px 16px;
+        padding: 18px 12px;
+        border-radius: 18px;
+      }
+
+      h1 {
+        font-size: 1.55rem;
+      }
+
+      p {
+        font-size: 0.92rem;
+        margin-bottom: 0.8rem;
+      }
+
+      .game-grid {
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .game-tile img {
+        aspect-ratio: 16 / 8;
+      }
+
+      .game-label {
+        padding: 8px 6px;
+        font-size: 0.82rem;
+      }
+
+      .footer {
+        margin-top: 14px;
+        font-size: 0.8rem;
       }
     }
   </style>
@@ -180,7 +211,7 @@
           <div class="game-label">Button Masher</div>
         </a>
 
-        <a class="game-tile" href="../Orbit_Facts/index.html" target="_blank">
+        <a class="game-tile" href="../Orbit Facts/index.html" target="_blank">
           <img src="Assets/Orbit_Facts.png" alt="Orbit Facts" />
           <div class="game-label">Orbit Facts</div>
         </a>
