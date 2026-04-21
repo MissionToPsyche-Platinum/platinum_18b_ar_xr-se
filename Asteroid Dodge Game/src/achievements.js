@@ -1,5 +1,4 @@
 // achievements.js
-// Day 1 — Data layer, localStorage persistence, unlock logic
 
 const STORAGE_KEY = "meteoroid_achievements";
 
@@ -44,10 +43,16 @@ export const ACHIEVEMENT_LIST = [
 ];
 
 // ── Notification Queue ───────────────────────────────────────────────────────
-// Toasts are queued here and drawn one at a time by drawNotification() (Day 2)
 export const notificationQueue = [];
-
-// ── Persistence ─────────────────────────────────────────────────────────────
+ 
+// Toast timing constants
+const TOAST_FADE_IN  = 0.3;   // seconds
+const TOAST_HOLD     = 2.0;   // seconds
+const TOAST_FADE_OUT = 0.5;   // seconds
+const TOAST_TOTAL    = TOAST_FADE_IN + TOAST_HOLD + TOAST_FADE_OUT;
+ 
+// Active toast state (one at a time)
+let activeToast = null;   
 
 /**
  * Returns a Set of unlocked achievement ids from localStorage.
@@ -109,6 +114,114 @@ export function getSessionUnlocks() {
 export function resetSessionUnlocks() {
   sessionUnlocks = [];
 }
+
+export function updateNotification(dt) {
+  if (!activeToast) {
+    if (notificationQueue.length === 0) return;
+    activeToast = { ...notificationQueue.shift(), timer: 0 };
+  }
+ 
+  activeToast.timer += dt;
+ 
+  if (activeToast.timer >= TOAST_TOTAL) {
+    activeToast = null;
+  }
+}
+
+
+export function drawNotification(ctx, W, H) {
+  if (!activeToast) return;
+ 
+  const t = activeToast.timer;
+ 
+  // Calculate alpha based on phase
+  let alpha = 1;
+  if (t < TOAST_FADE_IN) {
+    alpha = t / TOAST_FADE_IN;
+  } else if (t > TOAST_FADE_IN + TOAST_HOLD) {
+    alpha = 1 - (t - TOAST_FADE_IN - TOAST_HOLD) / TOAST_FADE_OUT;
+  }
+  alpha = Math.max(0, Math.min(1, alpha));
+ 
+  // Slide in from top
+  const slideRange = 24;
+  let slideY = 0;
+  if (t < TOAST_FADE_IN) {
+    slideY = slideRange * (1 - t / TOAST_FADE_IN);
+  }
+ 
+  ctx.save();
+  ctx.globalAlpha = alpha;
+ 
+  // Toast dimensions
+  const padX = 18;
+  const padY = 12;
+  const iconSize = 28;
+  const gap = 10;
+ 
+  ctx.font = "bold 15px sans-serif";
+  const nameW = ctx.measureText(activeToast.name).width;
+  ctx.font = "13px sans-serif";
+  const descW = ctx.measureText(activeToast.desc).width;
+ 
+  const textW = Math.max(nameW, descW);
+  const boxW = padX + iconSize + gap + textW + padX;
+  const boxH = padY + iconSize + padY;
+ 
+  const x = W / 2 - boxW / 2;
+  const y = 18 + slideY;
+  const r = 10;
+ 
+  // Background pill
+  ctx.fillStyle = "rgba(0, 0, 0, 0.78)";
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + boxW, y,         x + boxW, y + boxH, r);
+  ctx.arcTo(x + boxW, y + boxH,  x,        y + boxH, r);
+  ctx.arcTo(x,        y + boxH,  x,        y,        r);
+  ctx.arcTo(x,        y,         x + boxW, y,        r);
+  ctx.closePath();
+  ctx.fill();
+ 
+  // Gold left border accent
+  ctx.fillStyle = "gold";
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + 4, y,        x + 4, y + boxH, r);
+  ctx.arcTo(x + 4, y + boxH, x,     y + boxH, r);
+  ctx.arcTo(x,     y + boxH, x,     y,        r);
+  ctx.arcTo(x,     y,        x + 4, y,        r);
+  ctx.closePath();
+  ctx.fill();
+ 
+  // Icon (emoji)
+  const iconX = x + padX;
+  const iconY = y + padY;
+  ctx.font = `${iconSize}px sans-serif`;
+  ctx.textBaseline = "top";
+  ctx.fillText(activeToast.icon, iconX, iconY);
+ 
+  // "Achievement Unlocked!" label
+  const textX = iconX + iconSize + gap;
+  ctx.font = "bold 11px sans-serif";
+  ctx.fillStyle = "gold";
+  ctx.textBaseline = "top";
+  ctx.fillText("Achievement Unlocked!", textX, iconY);
+ 
+  // Achievement name
+  ctx.font = "bold 15px sans-serif";
+  ctx.fillStyle = "white";
+  ctx.fillText(activeToast.name, textX, iconY + 14);
+ 
+  // Achievement desc
+  ctx.font = "13px sans-serif";
+  ctx.fillStyle = "rgba(255,255,255,0.65)";
+  ctx.fillText(activeToast.desc, textX, iconY + 32);
+ 
+  ctx.restore();
+}
+
+
 
 // ── Unlock Logic ─────────────────────────────────────────────────────────────
 /**
