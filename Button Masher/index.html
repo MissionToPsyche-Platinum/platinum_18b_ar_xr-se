@@ -14,6 +14,90 @@
    Gold                rgba(244, 124, 51, 1)
    Mustard             rgba(249, 160, 0, 1) */
 
+.mute-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(18, 3, 29, 0.85);
+  color: #e8eaf0;
+  font: 600 14px/1 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+.mute-btn:active{
+  transform: scale(0.98);
+}
+
+       .learn-more-wrap {
+      margin-top: 12px;
+      display: none;
+      text-align: left;
+    }
+
+    .facts-panel {
+      margin-top: 12px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      text-align: left;
+    }
+
+    .facts-panel h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .facts-list {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .facts-list li {
+      margin-bottom: 10px;
+    }
+
+.results-buttons {
+  display: flex;
+  justify-content: center;   /* center them instead of spreading */
+  gap: 64px;                 /* space BETWEEN buttons */
+  margin-top: 18px;
+}
+
+   #returnToHub{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  font: 600 14px/1 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: rgba(18, 3, 29, 0.85);
+  color: #e8eaf0;
+  border: 1px solid rgba(255,255,255,0.18);
+  backdrop-filter: blur(6px);
+}
+
+#returnToHub:active{
+  transform: scale(0.98);
+}
+
+.mobile-top-actions{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
     :root {
       --border-soft: rgba(255,255,255,0.12);
       --glow: 0 18px 42px rgba(0,0,0,0.35);
@@ -79,6 +163,56 @@
       border: 1px solid rgba(255,255,255,0.14);
       overflow: hidden;
     }
+
+    .progress-track{
+  height: 42px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.14);
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-scene {
+  padding: 0 10px;
+}
+
+.progress-fill{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--psyche-mustard), var(--psyche-coral));
+  transition: width 80ms linear;
+  z-index: 1;
+}
+
+.progress-satellite{
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  width: 34px;
+  height: auto;
+  transform: translate(0, -50%) rotate(12deg);
+  z-index: 3;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35));
+  transition: left 80ms linear, transform 80ms linear;
+}
+
+.progress-asteroid{
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  width: 30px;
+  height: auto;
+  transform: translateY(-50%);
+  z-index: 4;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35));
+}
 
     .progress-fill{
       height: 100%;
@@ -283,37 +417,133 @@
       margin-top: 10px;
       display: none;
     }
+
+    .score-line {
+  margin-top: 8px;
+}
+
+#finalScore {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: clamp(44px, 8vw, 72px);
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+
+  background: linear-gradient(
+    180deg,
+    #fff3a6 0%,
+    #f9a000 35%,
+    #f47c33 70%,
+    #ef5966 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  text-shadow:
+    0 0 10px rgba(249,160,0,0.28),
+    0 0 22px rgba(244,124,51,0.22);
+
+  filter: drop-shadow(0 4px 16px rgba(249,160,0,0.28));
+  transform-origin: center;
+}
+
+.score-pop {
+  animation: none;
+}
+
+.score-pop.bump {
+  animation: scoreBump 160ms ease-out;
+}
+
+@keyframes scoreBump {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+.score-line {
+  color: rgba(255,255,255,0.9);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#mashText {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+#mashText.big {
+  font-size: clamp(80px, 18vw, 160px);
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
   </style>
 </head>
 
 <body>
+
+
   <audio id="mashSfx" src="assets/mash-loop.mp3" preload="auto" loop></audio>
   <audio id="cameraSound1" src="assets/camera sound 1.mp3" preload="auto"></audio>
   <audio id="cameraSound2" src="assets/camera sound 2.mp3" preload="auto"></audio>
   <audio id="congratsSfx" src="assets/congratulations.mp3" preload="auto"></audio>
+  <audio id="dingSfx" src="assets/ding.mp3" preload="auto"></audio>
+  <audio id="bgMusic" src="assets/background_music.mp3" preload="auto" loop></audio>
+  <audio id="failureSfx" src="assets/failure.mp3" preload="auto"></audio>
+  <audio id="countdownSfx" src="assets/countdown.mp3" preload="auto"></audio>
 
   <main id="pageGame" class="wrap page active">
-    <section class="topbar" aria-label="Progress">
-      <div class="progress-track">
-        <div id="progressFill" class="progress-fill" style="width:0%"></div>
-      </div>
-    </section>
+  <div class="mobile-top-actions">
+  <a id="returnToHub" href="#" aria-label="Return to Hub">← Hub</a>
+  <button id="muteBtn" class="mute-btn" type="button" aria-pressed="false">🔊 Sound On</button>
+</div>
+
+  <section class="topbar" aria-label="Progress">
+    <div class="progress-track progress-scene">
+      <div id="progressFill" class="progress-fill" style="width:0%"></div>
+
+      <img
+        id="progressSatellite"
+        class="progress-satellite"
+        src="assets/satellite.png"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <img
+        class="progress-asteroid"
+        src="assets/asteroid.png"
+        alt=""
+        aria-hidden="true"
+      />
+    </div>
+  </section>
 
     <div class="sr-only">
       <span id="time">5</span>
       <span id="count">0</span>
     </div>
 
-    <button id="mashBtn" class="btn" type="button">PRESS THE BUTTON TO START</button>
-    <button id="resetBtn" class="btn reset" type="button">RESET</button>
+<button id="mashBtn" class="btn" type="button">
+  <span id="mashText">
+    Psyche's spacecraft will take many pictures of the asteroid's surface.<br>
+    Mash the button as many times as you can to see how many pictures you can snap of the asteroid!<br>
+    PRESS HERE TO START.
+  </span>
+</button>   <button id="resetBtn" class="btn reset" type="button">RESET</button>
     <div class="hint">Mash as fast as you can</div>
   </main>
 
   <main id="pageResults" class="results page">
     <div class="card">
       <p class="big">Scanning complete</p>
-      <p class="sub">Your presses: <span id="finalScore">0</span></p>
 
+<p class="sub score-line">
+  Asteroid pictures taken:
+  <span id="finalScore" class="score-pop">0</span>
+</p>
       <div id="animWrap" class="satellite-wrap" aria-hidden="true">
 
   <!-- Rooted asteroid (does NOT spin) -->
@@ -327,232 +557,508 @@
 </div>
 
       <div id="funFact"></div>
+<div class="results-buttons">
+  <button id="playAgainBtn" class="btn reset" type="button">
+    PLAY AGAIN
+  </button>
 
-      <button id="playAgainBtn" class="btn reset" type="button" style="margin-top:14px;">
-        PLAY AGAIN
-      </button>
+  <button id="learnMoreBtn" class="btn reset" type="button" style="display:none;">
+    LEARN MORE
+  </button>
+</div>
+
+<div id="learnMoreWrap" class="learn-more-wrap">
+  <div class="facts-panel">
+    <h3>More Psyche Facts</h3>
+    <ol id="factsList" class="facts-list"></ol>
+  </div>
+</div>
+
     </div>
   </main>
 
   <script>
-    const pageGame = document.getElementById("pageGame");
-    const pageResults = document.getElementById("pageResults");
+  (function () {
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    const repoRoot = parts.length ? `/${parts[0]}/` : '/';
+    document.getElementById('returnToHub').href = repoRoot;
+  })();
 
-    const countEl = document.getElementById("count");
-    const timeEl = document.getElementById("time");
-    const btn = document.getElementById("mashBtn");
-    const resetBtn = document.getElementById("resetBtn");
+  const pageGame = document.getElementById("pageGame");
+  const pageResults = document.getElementById("pageResults");
 
-    const finalScoreEl = document.getElementById("finalScore");
-    const animWrap = document.getElementById("animWrap");
-    const funFactEl = document.getElementById("funFact");
-    const playAgainBtn = document.getElementById("playAgainBtn");
+  const countEl = document.getElementById("count");
+  const timeEl = document.getElementById("time");
+  const btn = document.getElementById("mashBtn");
+  const resetBtn = document.getElementById("resetBtn");
 
-    const orbitEl = document.getElementById("orbit");
+  const finalScoreEl = document.getElementById("finalScore");
+  const animWrap = document.getElementById("animWrap");
+  const funFactEl = document.getElementById("funFact");
+  const playAgainBtn = document.getElementById("playAgainBtn");
 
-    const mashSfx = document.getElementById("mashSfx");
-    const cameraSound1 = document.getElementById("cameraSound1");
-    const cameraSound2 = document.getElementById("cameraSound2");
-    const congratsSfx = document.getElementById("congratsSfx");
-    const progressFill = document.getElementById("progressFill");
+  const orbitEl = document.getElementById("orbit");
 
-    let cameraSoundInterval = null;
-    let count = 0;
-    let timeLeft = 5;
-    let timerStarted = false;
-    let timerId = null;
-    let resultsTimeoutId = null;
+  const mashSfx = document.getElementById("mashSfx");
+  const bgMusic = document.getElementById("bgMusic");
+  const cameraSound1 = document.getElementById("cameraSound1");
+  const cameraSound2 = document.getElementById("cameraSound2");
+  const congratsSfx = document.getElementById("congratsSfx");
+  const dingSfx = document.getElementById("dingSfx");
+  const muteBtn = document.getElementById("muteBtn");
+  const countdownSfx = document.getElementById("countdownSfx");
 
-    function scoreToOrbitSeconds(score) {
-      if (score <= 5) return 9.0;
-      if (score <= 10) return 7.5;
-      if (score <= 15) return 6.0;
-      if (score <= 20) return 5.0;
-      if (score <= 25) return 4.2;
-      if (score <= 30) return 3.6;
-      return 2.0;
-    }
+  const progressSatellite = document.getElementById("progressSatellite");
 
-    function startMashAudio() {
-      if (!mashSfx) return;
-      mashSfx.currentTime = 0;
-      mashSfx.play().catch(() => {});
-    }
+  const failureSfx = document.getElementById("failureSfx");
 
-    function stopMashAudio() {
-      if (!mashSfx) return;
-      mashSfx.pause();
-      mashSfx.currentTime = 0;
-    }
+let mashText = document.getElementById("mashText");
+  let isMuted = true;
+function startCountdownThenGame() {
+  let countdown = ["3", "2", "1", "TAP!"];
+  let index = 0;
 
-    function startCameraSounds() {
-      stopCameraSounds();
-      cameraSoundInterval = setInterval(() => {
-        const sound = Math.random() < 0.5 ? cameraSound1 : cameraSound2;
-        sound.currentTime = 0;
-        sound.play().catch(() => {});
-      }, 400 + Math.random() * 600);
-    }
+  btn.classList.add("disabled");
 
-    function stopCameraSounds() {
-      if (cameraSoundInterval !== null) {
-        clearInterval(cameraSoundInterval);
-        cameraSoundInterval = null;
+  // 🔥 STOP MUSIC IMMEDIATELY
+  stopBgMusic();
+
+  // 🔊 PLAY COUNTDOWN SOUND
+  if (countdownSfx) {
+    countdownSfx.currentTime = 0;
+    countdownSfx.play().catch(() => {});
+  }
+
+  const countdownInterval = setInterval(() => {
+    mashText.textContent = countdown[index];
+    mashText.classList.add("big");
+
+    mashText.style.transform = "scale(1.3)";
+    setTimeout(() => {
+      mashText.style.transform = "scale(1)";
+    }, 150);
+
+    index++;
+
+    if (index >= countdown.length) {
+  clearInterval(countdownInterval);
+
+  mashText.classList.remove("big");
+
+  // 🔇 STOP COUNTDOWN SOUND
+  if (countdownSfx) {
+    countdownSfx.pause();
+    countdownSfx.currentTime = 0;
+  }
+
+  btn.classList.remove("disabled");
+  timerStarted = true;
+
+  startMashAudio();
+  startTimer();
+}
+  }, 700);
+}
+function applyMuteState() {
+const allAudio = [bgMusic, mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx, failureSfx, countdownSfx];  allAudio.forEach(audio => {
+    audio.muted = isMuted;
+  });
+
+  muteBtn.textContent = isMuted ? "🔇 Sound Off" : "🔊 Sound On";
+  muteBtn.setAttribute("aria-pressed", String(isMuted));
+}
+
+function playFailure() {
+  if (!failureSfx) return;
+  failureSfx.currentTime = 0;
+  failureSfx.play().catch(() => {});
+}
+
+muteBtn.addEventListener("click", () => {
+  isMuted = !isMuted;
+  applyMuteState();
+});
+
+// initialize state
+applyMuteState();
+startBgMusic();
+
+document.addEventListener("click", () => {
+  if (!timerStarted && pageGame.classList.contains("active")) {
+    startBgMusic();
+  }
+}, { once: true });
+  const progressFill = document.getElementById("progressFill");
+
+  const MAX_PROGRESS_PRESSES = 33;
+
+  const learnMoreBtn = document.getElementById("learnMoreBtn");
+  const learnMoreWrap = document.getElementById("learnMoreWrap");
+  const factsList = document.getElementById("factsList");
+
+  
+  let cameraSoundInterval = null;
+  let count = 0;
+  let timeLeft = 5;
+  let timerStarted = false;
+  let timerId = null;
+  let resultsTimeoutId = null;
+
+  function scoreToOrbitSeconds(score) {
+    if (score <= 5) return 9.0;
+    if (score <= 10) return 7.5;
+    if (score <= 15) return 6.0;
+    if (score <= 20) return 5.0;
+    if (score <= 25) return 4.2;
+    if (score <= 30) return 3.6;
+    return 2.0;
+  }
+
+  function startBgMusic() {
+  if (!bgMusic) return;
+  bgMusic.play().catch(() => {});
+}
+
+  function stopBgMusic() {
+  if (!bgMusic) return;
+  bgMusic.pause();
+  bgMusic.currentTime = 0;
+}
+applyMuteState();
+
+  function startMashAudio() {
+    if (!mashSfx) return;
+    mashSfx.currentTime = 0;
+    mashSfx.play().catch(() => {});
+  }
+
+  function stopMashAudio() {
+    if (!mashSfx) return;
+    mashSfx.pause();
+    mashSfx.currentTime = 0;
+  }
+
+ function playOneCameraShot() {
+  const shot = cameraSound1.cloneNode();
+  shot.muted = isMuted;
+  shot.currentTime = 0;
+  shot.play().catch(() => {});
+}
+
+function animatePicturesTaken(totalShots) {
+  finalScoreEl.textContent = "0";
+
+  let shownScore = 0;
+  const duration = 4400; // total count-up time in ms
+  const fps = 15;        // lower than 60 helps phones
+  const intervalMs = 1000 / fps;
+  const steps = Math.max(1, Math.round(duration / intervalMs));
+  const increment = totalShots / steps;
+
+  let accumulated = 0;
+
+  const intervalId = setInterval(() => {
+    accumulated += increment;
+    const nextScore = Math.min(totalShots, Math.round(accumulated));
+
+    if (nextScore !== shownScore) {
+      shownScore = nextScore;
+      finalScoreEl.textContent = String(shownScore);
+
+      // only bump every few numbers so mobile doesn't struggle
+      if (shownScore % 3 === 0 || shownScore === totalShots) {
+        finalScoreEl.classList.remove("bump");
+        void finalScoreEl.offsetWidth;
+        finalScoreEl.classList.add("bump");
       }
-      cameraSound1.pause();
-      cameraSound2.pause();
-    }
 
-    function playCongrats() {
-      if (!congratsSfx) return;
-      congratsSfx.currentTime = 0;
-      congratsSfx.play().catch(() => {});
-    }
-
-    function stopCongrats() {
-      if (!congratsSfx) return;
-      congratsSfx.pause();
-      congratsSfx.currentTime = 0;
-    }
-
-    function showPage(which) {
-      pageGame.classList.toggle("active", which === "game");
-      pageResults.classList.toggle("active", which === "results");
-    }
-
-    function resetGame() {
-      stopMashAudio();
-      stopCameraSounds();
-      stopCongrats();
-      progressFill.style.width = "0%";
-
-      if (timerId !== null) {
-        clearInterval(timerId);
-        timerId = null;
+      // don't play sound for every single number
+      if (shownScore % 2 === 0 || shownScore === totalShots) {
+        playOneCameraShot();
       }
-      if (resultsTimeoutId !== null) {
-        clearTimeout(resultsTimeoutId);
-        resultsTimeoutId = null;
-      }
+    }
 
-      count = 0;
-      timeLeft = 5;
-      timerStarted = false;
+    if (shownScore >= totalShots) {
+      clearInterval(intervalId);
+    }
+  }, intervalMs);
+}
 
-      countEl.textContent = count;
+  function stopCameraSounds() {
+    if (cameraSoundInterval !== null) {
+      clearInterval(cameraSoundInterval);
+      cameraSoundInterval = null;
+    }
+    cameraSound1.pause();
+    cameraSound2.pause();
+  }
+
+  function playCongrats() {
+    if (!congratsSfx) return;
+    congratsSfx.currentTime = 0;
+    congratsSfx.play().catch(() => {});
+  }
+
+  function stopCongrats() {
+    if (!congratsSfx) return;
+    congratsSfx.pause();
+    congratsSfx.currentTime = 0;
+  }
+
+  function playDing() {
+    if (!dingSfx) return;
+    dingSfx.currentTime = 0;
+    dingSfx.play().catch(() => {});
+  }
+
+  function updateProgress() {
+  const progressPresses = Math.min(count, MAX_PROGRESS_PRESSES);
+  const percent = (progressPresses / MAX_PROGRESS_PRESSES) * 100;
+  progressFill.style.width = percent + "%";
+
+  const track = progressFill.parentElement;
+  const trackWidth = track.clientWidth;
+  const leftPadding = 10;
+  const rightReserved = 42; // room for asteroid on the right
+  const satelliteWidth = 34;
+
+  const minX = leftPadding;
+  const maxX = trackWidth - rightReserved - satelliteWidth;
+  const x = minX + ((maxX - minX) * percent / 100);
+
+  progressSatellite.style.left = x + "px";
+
+  // tiny boost wiggle each mash
+  progressSatellite.style.transform = "translate(0, -50%) rotate(20deg) scale(1.06)";
+  setTimeout(() => {
+    progressSatellite.style.transform = "translate(0, -50%) rotate(12deg) scale(1)";
+  }, 70);
+
+  if (count >= MAX_PROGRESS_PRESSES) {
+    playDing();
+  }
+}
+
+  function showPage(which) {
+    pageGame.classList.toggle("active", which === "game");
+    pageResults.classList.toggle("active", which === "results");
+  }
+
+  function resetGame() {
+    stopMashAudio();
+    stopCameraSounds();
+    stopCongrats();
+    progressFill.style.width = "0%";
+    if (progressSatellite) {
+  progressSatellite.style.left = "10px";
+  progressSatellite.style.transform = "translate(0, -50%) rotate(12deg) scale(1)";
+}
+
+    if (timerId !== null) {
+      clearInterval(timerId);
+      timerId = null;
+    }
+    if (resultsTimeoutId !== null) {
+      clearTimeout(resultsTimeoutId);
+      resultsTimeoutId = null;
+    }
+
+    count = 0;
+    timeLeft = 5;
+    timerStarted = false;
+
+    countEl.textContent = count;
+    timeEl.textContent = timeLeft;
+
+    btn.classList.remove("disabled");
+btn.innerHTML = `
+  <span id="mashText">
+    Psyche's spacecraft will take many pictures of the asteroid's surface.<br>
+    Mash the button as many times as you can to see how many pictures you can snap of the asteroid!<br>
+    PRESS HERE TO START.
+  </span>
+`;
+mashText = document.getElementById("mashText");
+    finalScoreEl.textContent = "0";
+    funFactEl.style.display = "none";
+    funFactEl.textContent = "";
+    animWrap.style.display = "flex";
+
+    orbitEl.style.setProperty("--orbitDur", "6s");
+    learnMoreBtn.style.display = "none";
+    learnMoreWrap.style.display = "none";
+    factsList.innerHTML = "";
+    learnMoreBtn.textContent = "LEARN MORE";
+    showPage("game");
+    startBgMusic();
+  }
+  const allFacts = [
+    "Psyche was the 16th asteroid ever discovered.",
+    "The satellite that NASA sent to Psyche is about the size of a singles tennis court.",
+    "The Psyche satellite has unique plus shaped solar panels.",
+    "The satellite will reach the asteroid using low-thrust solar electric propulsion.",
+    "The spacecraft headed for Psyche launched on October 13, 2023.",
+    "The Psyche satellite will reach the asteroid in mid-2029.",
+    "NASA plans to have the satellite orbit Psyche for over 2 years.",
+    "Psyche is roughly the size of Massachusetts.",
+    "Psyche is the name of the asteroid, mission, and spacecraft.",
+    "The spacecraft sent to Psyche will only orbit the asteroid, not land on it.",
+    "Psyche is named after the goddess of the soul from Greek mythology.",
+    "Psyche resides in the asteroid belt, between Mars and Jupiter.",
+    "Psyche may be as high as 60% metal.",
+    "The metal richness may indicate that Psyche was once a planetesimal core.",
+    "Scientists believe Psyche may be an early building block of our sun's planetary system.",
+    "Psyche's surface area is roughly 64,000 square miles.",
+    "A Gamma-Ray and Neutron Spectrometer will be used by the satellite to detect certain elements.",
+    "A Multispectral Imager will be used to take images of Psyche, including UV images.",
+    "A Magnetometer will be used by the spacecraft to measure Psyche's magnetic fields.",
+    "The spacecraft is equipped with an X-band radio telecommunications system to relay info to and from Earth.",
+    "The Psyche spacecraft contains an experimental device to communicate with Earth using lasers.",
+    "Psyche has enough mass that it has a gravitational force on other asteroids.",
+    "Psyche is very tilted and has very long winter and summer seasons.",
+    "Psyche rotates on its side, with an axial tilt of about 98 degrees. Earth's tilt is roughly 23 degrees.",
+    "Psyche is not pure metal, it is a mix of metal and rock.",
+    "So far, it seems Psyche's density is too low to be solid iron, it may be a fragmented metal core.",
+    "Scientists have estimated Psyche's shape using radar and telescopes.",
+    "There are no clear images of Psyche yet, only computer renderings.",
+    "Psyche's mix of rock and metal may be caused by collisions with other asteroids.",
+    "Scientists have evidence that Psyche has water related minerals, which may have been delivered from past collisions with asteroids.",
+    "The mission to Psyche was first proposed to NASA in 2014.",
+    "The Psyche spacecraft is set to use Mars as a gravity slingshot to accelerate towards the asteroid in May 2026.",
+    "Italian astronomer Annibale de Gasparis discovered Psyche in 1852."
+  ];
+  function getEndMessage(score) {
+
+  // 🔥 NEW: random fact for high score
+  if (score >= 34) {
+    const randomFact = allFacts[Math.floor(Math.random() * allFacts.length)];
+    return "You scanned 100% of Psyche's surface!\n\n" + randomFact;
+  }
+    if (score < 1) return "You scanned 0% of Psyche's surface!";
+    if (score < 2) return "You scanned 3% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
+    if (score < 3) return "You scanned 6% of Psyche's surface!\n\nThe satellite that NASA sent to Psyche is about the size of a singles tennis court.";
+    if (score < 4) return "You scanned 9% of Psyche's surface!\n\nThe Psyche satellite has unique plus shaped solar panels.";
+    if (score < 5) return "You scanned 12% of Psyche's surface!\n\nThe satellite will reach the asteroid using low-thrust solar electric propulsion.";
+    if (score < 6) return "You scanned 15% of Psyche's surface!\n\nThe spacecraft headed for Psyche launched on October 13, 2023.";
+    if (score < 7) return "You scanned 18% of Psyche's surface!\n\nThe Psyche satellite will reach the asteroid in mid-2029.";
+    if (score < 8) return "You scanned 21% of Psyche's surface!\n\nNASA plans to have the satellite orbit Psyche for over 2 years.";
+    if (score < 9) return "You scanned 24% of Psyche's surface!\n\nPsyche is roughly the size of Massachusetts.";
+    if (score < 10) return "You scanned 27% of Psyche's surface!\n\nPsyche is the name of the asteroid, mission, and spacecraft.";
+    if (score < 11) return "You scanned 30% of Psyche's surface!\n\nThe spacecraft sent to Psyche will only orbit the asteroid, not land on it.";
+    if (score < 12) return "You scanned 33% of Psyche's surface!\n\nPsyche is named after the goddess of the soul from Greek mythology.";
+    if (score < 13) return "You scanned 36% of Psyche's surface!\n\nPsyche resides in the asteroid belt, between Mars and Jupiter.";
+    if (score < 14) return "You scanned 39% of Psyche's surface!\n\nPsyche may be as high as 60% metal.";
+    if (score < 15) return "You scanned 42% of Psyche's surface!\n\nThe metal richness may indicate that Psyche was once a planetesimal core.";
+    if (score < 16) return "You scanned 45% of Psyche's surface!\n\nScientists believe Psyche may be an early building block of our sun's planetary system.";
+    if (score < 17) return "You scanned 48% of Psyche's surface!\n\nPsyche's surface area is roughly 64,000 square miles.";
+    if (score < 18) return "You scanned 51% of Psyche's surface!\n\nA Gamma-Ray and Neutron Spectrometer will be used by the satellite to detect certain elements.";
+    if (score < 19) return "You scanned 54% of Psyche's surface!\n\nA Multispectral Imager will be used to take images of Psyche, including UV images. ";
+    if (score < 20) return "You scanned 57% of Psyche's surface!\n\nA Magnetometer will be used by the spacecraft to measure Psyche's magnetic fields.";
+    if (score < 21) return "You scanned 60% of Psyche's surface!\n\nThe spacecraft is equipped with an X-band radio telecommunications system to relay info to and from Earth.";
+    if (score < 22) return "You scanned 63% of Psyche's surface!\n\nThe Psyche spacecraft contains an experimental device to communicate with Earth using lasers.";
+    if (score < 23) return "You scanned 66% of Psyche's surface!\n\nPsyche has enough mass that it has a gravitational force on other asteroids.";
+    if (score < 24) return "You scanned 69% of Psyche's surface!\n\nPsyche is very tilted and has very long winter and summer seasons.";
+    if (score < 25) return "You scanned 72% of Psyche's surface!\n\nPsyche rotates on its side, with an axial tilt of about 98 degrees. Earth's tilt is roughly 23 degrees.";
+    if (score < 26) return "You scanned 75% of Psyche's surface!\n\nPsyche is not pure metal, it is a mix of metal and rock.";
+    if (score < 27) return "You scanned 78% of Psyche's surface!\n\nSo far, it seems Psyche's density is too low to be solid iron, it may be a fragmented metal core.";
+    if (score < 28) return "You scanned 81% of Psyche's surface!\n\nScientists have estimated Psyche's shape using radar and telescopes.";
+    if (score < 29) return "You scanned 84% of Psyche's surface!\n\nThere are no clear images of Psyche yet, only computer renderings.";
+    if (score < 30) return "You scanned 87% of Psyche's surface!\n\nPsyche's mix of rock and metal may be caused by collisions with other asteroids.";
+    if (score < 31) return "You scanned 90% of Psyche's surface!\n\nScientists have evidence that Psyche has water related minerals, which may have been delivered from past collisions with asteroids.";
+    if (score < 32) return "You scanned 93% of Psyche's surface!\n\nThe mission to Psyche was first proposed to NASA in 2014.";
+    if (score < 33) return "You scanned 96% of Psyche's surface!\n\nThe Psyche spacecraft is set to use Mars as a gravity slingshot to accelerate towards the asteroid in May 2026.";
+    return "You scanned 100% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
+  }
+  function renderAllFacts() {
+    factsList.innerHTML = "";
+    allFacts.forEach((fact) => {
+      const li = document.createElement("li");
+      li.textContent = fact;
+      factsList.appendChild(li);
+    });
+  }
+  function endGame() {
+    stopMashAudio();
+    stopBgMusic();
+
+    btn.classList.add("disabled");
+
+
+    const orbitSeconds = scoreToOrbitSeconds(count);
+    orbitEl.style.setProperty("--orbitDur", orbitSeconds + "s");
+
+    showPage("results");
+playAgainBtn.style.display = "none";
+
+animatePicturesTaken(count);
+
+    funFactEl.textContent = getEndMessage(count);
+    funFactEl.style.display = "none";
+    animWrap.style.display = "flex";
+
+   resultsTimeoutId = setTimeout(() => {
+  stopCameraSounds();
+  startBgMusic();
+
+  animWrap.style.display = "none";
+  funFactEl.style.display = "block";
+
+  learnMoreBtn.style.display = "inline-block";
+  learnMoreWrap.style.display = "none";
+  renderAllFacts();
+
+  if (count >= 0 && count <= 7) {
+    playFailure();
+  }
+
+  if (getEndMessage(count).includes("100%")) {
+    playCongrats();
+  }
+
+  // 👇 show button AFTER animation is done
+  playAgainBtn.style.display = "inline-block";
+
+}, 7000);
+  }
+
+  function startTimer() {
+    timerId = setInterval(() => {
+      timeLeft--;
       timeEl.textContent = timeLeft;
 
-      btn.classList.remove("disabled");
-      btn.textContent = "PRESS THE BUTTON TO START";
-
-      finalScoreEl.textContent = "0";
-      funFactEl.style.display = "none";
-      funFactEl.textContent = "";
-      animWrap.style.display = "flex";
-
-      orbitEl.style.setProperty("--orbitDur", "6s");
-
-      showPage("game");
-    }
-
-    function getEndMessage(score) {
-      if (score < 2) return "You scanned 3% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
-      if (score < 3) return "You scanned 6% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
-      if (score < 4) return "You scanned 9% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered";
-      if (score < 5) return "You scanned 12% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered";
-      if (score < 6) return "You scanned 15% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered";
-      if (score < 7) return "You scanned 18% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 8) return "You scanned 21% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 9) return "You scanned 24% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 10) return "You scanned 27% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 11) return "You scanned 30% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 12) return "You scanned 33% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 13) return "You scanned 36% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 14) return "You scanned 39% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 15) return "You scanned 42% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 16) return "You scanned 45% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 17) return "You scanned 48% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 18) return "You scanned 51% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 19) return "You scanned 54% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 20) return "You scanned 57% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 21) return "You scanned 60% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 22) return "You scanned 63% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 23) return "You scanned 66% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 24) return "You scanned 69% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 25) return "You scanned 72% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 26) return "You scanned 75% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 27) return "You scanned 78% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 28) return "You scanned 81% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 29) return "You scanned 84% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 30) return "You scanned 87% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 31) return "You scanned 90% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 32) return "You scanned 93% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      if (score < 33) return "You scanned 96% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-      return "You scanned 100% of Psyche's surface!\n\nItalian astronomer Annibale de Gasparis discovered Psyche in 1852.";
-    }
-
-    function endGame() {
-      stopMashAudio();
-
-      btn.classList.add("disabled");
-
-      finalScoreEl.textContent = String(count);
-
-      const orbitSeconds = scoreToOrbitSeconds(count);
-      orbitEl.style.setProperty("--orbitDur", orbitSeconds + "s");
-
-      showPage("results");
-      startCameraSounds();
-
-      funFactEl.textContent = getEndMessage(count);
-      funFactEl.style.display = "none";
-      animWrap.style.display = "flex";
-
-      resultsTimeoutId = setTimeout(() => {
-        stopCameraSounds();
-
-        animWrap.style.display = "none";
-        funFactEl.style.display = "block";
-
-        if (getEndMessage(count).includes("100%")) {
-          playCongrats();
-        }
-      }, 5000);
-    }
-
-    function startTimer() {
-      timerId = setInterval(() => {
-        timeLeft--;
-        timeEl.textContent = timeLeft;
-
-        if (timeLeft <= 0) {
-          clearInterval(timerId);
-          timerId = null;
-          endGame();
-        }
-      }, 1000);
-    }
-
-    btn.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-
-      if (btn.classList.contains("disabled")) return;
-
-      if (!timerStarted) {
-        timerStarted = true;
-        btn.textContent = "TAP!";
-        startMashAudio();
-        startTimer();
+      if (timeLeft <= 0) {
+        clearInterval(timerId);
+        timerId = null;
+        endGame();
       }
+    }, 1000);
+  }
 
-      if (timeLeft > 0) {
-        count++;
-        countEl.textContent = count;
-      }
-    }, { passive: false });
+  learnMoreBtn.addEventListener("click", () => {
+    const isOpen = learnMoreWrap.style.display === "block";
+    learnMoreWrap.style.display = isOpen ? "none" : "block";
+    learnMoreBtn.textContent = isOpen ? "LEARN MORE" : "HIDE FACTS";
+  });
+  btn.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-    resetBtn.addEventListener("click", resetGame);
-    playAgainBtn.addEventListener("click", resetGame);
-  </script>
+    if (btn.classList.contains("disabled")) return;
+
+    if (!timerStarted) {
+  startCountdownThenGame();
+  return;
+}
+
+    if (timeLeft > 0) {
+      count++;
+      countEl.textContent = count;
+      updateProgress();
+    }
+  }, { passive: false });
+
+  resetBtn.addEventListener("click", resetGame);
+  playAgainBtn.addEventListener("click", resetGame);
+</script>
 </body>
 </html>

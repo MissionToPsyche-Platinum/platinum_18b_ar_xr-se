@@ -10,6 +10,7 @@ export const asteroids = [];
 let spawnTimer = 0;
 const spawnInterval = ASTEROIDS.SPAWN_INTERVAL;
 
+
 function isAABBColliding(a, b) {
   return (
     a.x < b.x + b.w &&
@@ -38,7 +39,7 @@ for (let i = 1; i <= 2; i++) {
   asteroidImgs.push(img);
 }
 
-export function updateAsteroids(dt, player, W, H, difficulty, activePowerUps, onGameOver, onNearMiss)
+export function updateAsteroids(dt, player, W, H, difficulty, activePowerUps, onGameOver, onNearMiss, invincibleTimer)
  {
   spawnTimer += dt;
   if (spawnTimer > spawnInterval / difficulty) {
@@ -73,14 +74,12 @@ export function updateAsteroids(dt, player, W, H, difficulty, activePowerUps, on
     }
 
     // Collision detection
-    if (isColliding(a, player)) {
+    if (isColliding(a, player) && invincibleTimer <= 0) {
       if (activePowerUps.shield) {
         activePowerUps.shield = false;
         asteroids.splice(i, 1);
       } else {
-        sounds.bg.pause();
-        sounds.gameover.currentTime = 0;
-        sounds.gameover.play();
+        asteroids.splice(i, 1);
         onGameOver();
         break;
       }
@@ -101,7 +100,7 @@ export function drawAsteroids(ctx) {
     if (a.img && a.img.complete && a.img.naturalWidth > 0) {
       ctx.drawImage(a.img, -a.w / 2, -a.h / 2, a.w, a.h);
     } else {
-      // red rectangle if image hasn’t loaded yet
+      // red rectangle if image hasn't loaded yet
       ctx.fillStyle = "#f00";
       ctx.fillRect(-a.w / 2, -a.h / 2, a.w, a.h);
     }
