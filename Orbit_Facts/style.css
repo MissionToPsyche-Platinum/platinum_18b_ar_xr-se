@@ -56,6 +56,20 @@ body::after {
             radial-gradient(ellipse at 30% 70%, rgba(60, 30, 80, 0.06) 0%, transparent 45%);
 }
 
+/* ─── Disclaimer Notice ─────────────────────────────────────── */
+.disclaimer-notice {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
 /* ─── Star canvas layer (injected via JS) ───────────────────── */
 #star-canvas {
     position: fixed;
@@ -79,19 +93,15 @@ body::after {
 /* ─── Sun glow ──────────────────────────────────────────────── */
 .sun {
     position: absolute;
-    width: clamp(80px, 10vmin, 140px);
-    height: clamp(80px, 10vmin, 140px);
+    width: 0;
+    height: 0;
     border-radius: 50%;
-    background: radial-gradient(circle at center,
-    rgba(255, 245, 180, 0.90) 0%,
-    rgba(255, 210,  80, 0.70) 40%,
-    rgba(255, 160,  30, 0.30) 70%,
-    transparent 100%
-    );
     box-shadow:
-            0 0 40px 16px rgba(255, 210, 80, 0.55),
-            0 0 100px 40px rgba(255, 160, 30, 0.30),
-            0 0 180px 80px rgba(255, 120, 10, 0.12);
+            0 0 30px  15px  rgba(255, 250, 200, 0.95),
+            0 0 70px  35px  rgba(255, 220, 80,  0.75),
+            0 0 130px 60px  rgba(255, 170, 30,  0.45),
+            0 0 200px 90px  rgba(255, 120, 10,  0.20),
+            0 0 280px 120px rgba(255, 80,  0,   0.08);
     pointer-events: none;
     z-index: 1;
 }
@@ -305,11 +315,11 @@ input[type="range"]#orbitSlider::-moz-range-progress {
 }
 
 .view-toggle {
-    top: 20px;
+    top: 44px;
 }
 
 .autoplay-toggle {
-    top: 70px;
+    top: 94px;
 }
 
 /* Toggle switch track */
@@ -688,7 +698,7 @@ input[type="range"]#orbitSlider::-moz-range-progress {
     .autoplay-toggle {
         left: 10px;
         right: auto;
-        top: 56px;
+        top: 80px;
     }
 
     .toggle-label {
