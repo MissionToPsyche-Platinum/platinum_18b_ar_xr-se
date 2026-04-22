@@ -1,6 +1,7 @@
 import { audioState, toggleMaster, toggleMusic, toggleSfx, isMuted } from "./audio.js";
 import { powerUpDescriptions } from "./powerups.js";
 import { DEFAULT_FACTS } from "./facts.js";
+import { getLeaderboard, clearLeaderboard } from "./leaderboard.js";
 
 let showMenu = false;
 
@@ -206,12 +207,55 @@ function renderControlsMenu() {
     updateMenuContent(container);
 }
 
+function renderLeaderboardMenu() {
+    const board = getLeaderboard();
+ 
+    const medals = ["🥇", "🥈", "🥉", "4.", "5."];
+ 
+    const rowsHTML = board.length === 0
+        ? `<p class="lb-empty">No scores yet — play a game!</p>`
+        : board.map((entry, i) => `
+            <div class="lb-row ${i === 0 ? "lb-first" : ""}">
+                <span class="lb-rank">${medals[i]}</span>
+                <span class="lb-score">${entry.score.toLocaleString()}</span>
+                <span class="lb-date">${entry.date}</span>
+            </div>
+          `).join("");
+ 
+    const container = document.createElement("div");
+    container.className = "leaderboard-container";
+    container.innerHTML = `
+    <h2 class="panel-title">Leaderboard</h2>
+    <div class="lb-list">
+        ${rowsHTML}
+    </div>
+    <div class="controls-footer" style="gap:12px;display:flex;justify-content:center;">
+        <button id="lb-clear-btn" class="c-return-btn" style="background:rgba(180,0,0,0.5);">Clear</button>
+        <button id="lb-return-btn" class="c-return-btn">Return</button>
+    </div>
+    `;
+ 
+    container.querySelector("#lb-return-btn").addEventListener("click", () => {
+        renderMainMenu();
+    });
+ 
+    container.querySelector("#lb-clear-btn").addEventListener("click", () => {
+        if (confirm("Clear all scores?")) {
+            clearLeaderboard();
+            renderLeaderboardMenu(); // re-render with empty state
+        }
+    });
+ 
+    updateMenuContent(container);
+}
+
 function renderMainMenu() {
     const container = document.createElement("div");
     container.className = "menu-container";
     container.innerHTML = `
     <div class="menu-buttons">
         <button id="controls-btn">Options</button>
+        <button id="leaderboard-btn">Leaderboard</button>
         <button id="credits-btn">Credits</button>
         <button id="exit-btn">Exit</button>
     </div>
@@ -219,6 +263,10 @@ function renderMainMenu() {
 
     container.querySelector("#controls-btn").addEventListener("click", () => {
         renderControlsMenu();
+    });
+
+    container.querySelector("#leaderboard-btn").addEventListener("click", () => {
+        renderLeaderboardMenu();
     });
 
     container.querySelector("#credits-btn").addEventListener("click", () => {
