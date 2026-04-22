@@ -1,4 +1,4 @@
-// ─── Menu.js ─────────────────────────────────────────────────
+// ─── menu.js ─────────────────────────────────────────────────
 // Menu open/close, speed buttons, disclaimer toggle, reset button
 
 const menuBtn        = document.getElementById('menuBtn');

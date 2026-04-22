@@ -1,4 +1,4 @@
-// ─── Script.js ────────────────────────────────────────────────
+// ─── script.js ────────────────────────────────────────────────
 //Global variables
 
 const slider        = document.querySelector('#orbitSlider');

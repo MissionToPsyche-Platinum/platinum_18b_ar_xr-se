@@ -1,4 +1,4 @@
-// ─── Orbit.js ────────────────────────────────────────────────
+// ─── orbit.js ────────────────────────────────────────────────
 // Camera setup, orbit line, sun glow positioning, and position updates
 
 function initThreeSize() {
