@@ -1,6 +1,7 @@
 (() => {
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
+    const hudLevel = document.getElementById("level");
     const hudAngle = document.getElementById("angle");
     const hudPower = document.getElementById("power");
     const hudShots = document.getElementById("shots");
@@ -45,8 +46,7 @@
     function resize() {
         canvas.width = innerWidth;
         canvas.height = innerHeight;
-        gravityWell.x = canvas.width / 2;
-        gravityWell.y = canvas.height / 2;
+        loadLevel(currentLevel);
     }
     window.addEventListener("resize", resize);
     resize();
@@ -82,6 +82,36 @@
 
     function isShipMoving() {
         return Math.hypot(ship.vx, ship.vy) > STOP_EPS;
+    }
+
+    function loadLevel(index) {
+        
+        const level = levels[index];
+
+        ship.x = level.ship.x;
+        ship.y = level.ship.y <= 1 ? canvas.heigh * level.ship.y : level.ship.y;
+        ship.vx = 0;
+        ship.vy = 0;
+        ship.angle = 0;
+
+        asteroid.r = level.asteroid.r;
+        asteroid.x = level.asteroid.x < 0 ? canvas.width + level.asteroid.x : level.asteroid.x;
+
+        if ("y" in level.asteroid) {
+            asteroid.y = level.asteroid.y <= 1 ? canvas.height * level.asteroid.y : level.asteroid.y;
+        } else {
+            const minY = level.asteroid.yMin >= 0 ? level.asteroid.yMin : canvas.height + level.asteroid.yMin;
+            const maxY = level.asteroid.yMax >= 0 ? level.asteroid.yMax : canvas.heigh + level.asteroid.yMax;
+            asteroid.y = Math.random() * (maxY - minY) + minY;
+        }
+
+        gravityWell.x = level.gravityWell.x <= 1 ? canvas.width * level.gravityWell.x : level.gravityWell.x;
+        gravityWell.y = level.gravityWell.y <= 1 ? canvas.height * level.gravityWell.y : level.gravityWell.y:
+        gravityWell.r = level.gravityWell.r;
+        gravityWell.mu = level.gravityWell.mu;
+        gravityWell.soften = level.gravityWell.soften;
+
+        hudLevel.textContent = String(index + 1);
     }
 
     function placeStart() {
