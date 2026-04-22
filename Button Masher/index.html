@@ -14,13 +14,11 @@
    Gold                rgba(244, 124, 51, 1)
    Mustard             rgba(249, 160, 0, 1) */
 
-   .mute-btn{
-  position: fixed;
-  right: 12px;
-  bottom: 12px;
-  z-index: 9999;
-
-  padding: 10px 14px;
+.mute-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.18);
   background: rgba(18, 3, 29, 0.85);
@@ -75,16 +73,13 @@
 }
 
    #returnToHub{
-  position: fixed;
-  top: 12px;
-  left: 12px;
-  z-index: 9999;
-
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 10px 12px;
   border-radius: 999px;
   text-decoration: none;
   font: 600 14px/1 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-
   background: rgba(18, 3, 29, 0.85);
   color: #e8eaf0;
   border: 1px solid rgba(255,255,255,0.18);
@@ -93,6 +88,14 @@
 
 #returnToHub:active{
   transform: scale(0.98);
+}
+
+.mobile-top-actions{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
 }
 
     :root {
@@ -464,13 +467,23 @@
   font-size: 18px;
   font-weight: 700;
 }
+
+#mashText {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+#mashText.big {
+  font-size: clamp(80px, 18vw, 160px);
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
   </style>
 </head>
 
 <body>
 
-<a id="returnToHub" href="#" aria-label="Return to Hub">← Hub</a>
-<button id="muteBtn" class="mute-btn" type="button" aria-pressed="false">🔊 Sound On</button>
 
   <audio id="mashSfx" src="assets/mash-loop.mp3" preload="auto" loop></audio>
   <audio id="cameraSound1" src="assets/camera sound 1.mp3" preload="auto"></audio>
@@ -478,28 +491,35 @@
   <audio id="congratsSfx" src="assets/congratulations.mp3" preload="auto"></audio>
   <audio id="dingSfx" src="assets/ding.mp3" preload="auto"></audio>
   <audio id="bgMusic" src="assets/background_music.mp3" preload="auto" loop></audio>
+  <audio id="failureSfx" src="assets/failure.mp3" preload="auto"></audio>
+  <audio id="countdownSfx" src="assets/countdown.mp3" preload="auto"></audio>
 
   <main id="pageGame" class="wrap page active">
-    <section class="topbar" aria-label="Progress">
-  <div class="progress-track progress-scene">
-    <div id="progressFill" class="progress-fill" style="width:0%"></div>
+  <div class="mobile-top-actions">
+  <a id="returnToHub" href="#" aria-label="Return to Hub">← Hub</a>
+  <button id="muteBtn" class="mute-btn" type="button" aria-pressed="false">🔊 Sound On</button>
+</div>
 
-    <img
-      id="progressSatellite"
-      class="progress-satellite"
-      src="assets/satellite.png"
-      alt=""
-      aria-hidden="true"
-    />
+  <section class="topbar" aria-label="Progress">
+    <div class="progress-track progress-scene">
+      <div id="progressFill" class="progress-fill" style="width:0%"></div>
 
-    <img
-      class="progress-asteroid"
-      src="assets/asteroid.png"
-      alt=""
-      aria-hidden="true"
-    />
-  </div>
-</section>
+      <img
+        id="progressSatellite"
+        class="progress-satellite"
+        src="assets/satellite.png"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <img
+        class="progress-asteroid"
+        src="assets/asteroid.png"
+        alt=""
+        aria-hidden="true"
+      />
+    </div>
+  </section>
 
     <div class="sr-only">
       <span id="time">5</span>
@@ -507,10 +527,12 @@
     </div>
 
 <button id="mashBtn" class="btn" type="button">
-  Psyche's spacecraft will take many pictures of the asteroid's surface.<br>
-  Mash the button as many times as you can to see how many pictures you can snap of the asteroid!<br>
-  PRESS HERE TO START.
-</button>    <button id="resetBtn" class="btn reset" type="button">RESET</button>
+  <span id="mashText">
+    Psyche's spacecraft will take many pictures of the asteroid's surface.<br>
+    Mash the button as many times as you can to see how many pictures you can snap of the asteroid!<br>
+    PRESS HERE TO START.
+  </span>
+</button>   <button id="resetBtn" class="btn reset" type="button">RESET</button>
     <div class="hint">Mash as fast as you can</div>
   </main>
 
@@ -584,19 +606,72 @@
   const congratsSfx = document.getElementById("congratsSfx");
   const dingSfx = document.getElementById("dingSfx");
   const muteBtn = document.getElementById("muteBtn");
+  const countdownSfx = document.getElementById("countdownSfx");
 
   const progressSatellite = document.getElementById("progressSatellite");
 
-  let isMuted = true;
+  const failureSfx = document.getElementById("failureSfx");
 
+let mashText = document.getElementById("mashText");
+  let isMuted = true;
+function startCountdownThenGame() {
+  let countdown = ["3", "2", "1", "TAP!"];
+  let index = 0;
+
+  btn.classList.add("disabled");
+
+  // 🔥 STOP MUSIC IMMEDIATELY
+  stopBgMusic();
+
+  // 🔊 PLAY COUNTDOWN SOUND
+  if (countdownSfx) {
+    countdownSfx.currentTime = 0;
+    countdownSfx.play().catch(() => {});
+  }
+
+  const countdownInterval = setInterval(() => {
+    mashText.textContent = countdown[index];
+    mashText.classList.add("big");
+
+    mashText.style.transform = "scale(1.3)";
+    setTimeout(() => {
+      mashText.style.transform = "scale(1)";
+    }, 150);
+
+    index++;
+
+    if (index >= countdown.length) {
+  clearInterval(countdownInterval);
+
+  mashText.classList.remove("big");
+
+  // 🔇 STOP COUNTDOWN SOUND
+  if (countdownSfx) {
+    countdownSfx.pause();
+    countdownSfx.currentTime = 0;
+  }
+
+  btn.classList.remove("disabled");
+  timerStarted = true;
+
+  startMashAudio();
+  startTimer();
+}
+  }, 700);
+}
 function applyMuteState() {
-const allAudio = [bgMusic, mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx];
-  allAudio.forEach(audio => {
+const allAudio = [bgMusic, mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx, failureSfx, countdownSfx];  allAudio.forEach(audio => {
     audio.muted = isMuted;
   });
 
   muteBtn.textContent = isMuted ? "🔇 Sound Off" : "🔊 Sound On";
   muteBtn.setAttribute("aria-pressed", String(isMuted));
+}
+
+function playFailure() {
+  if (!failureSfx) return;
+  failureSfx.currentTime = 0;
+  failureSfx.play().catch(() => {});
 }
 
 muteBtn.addEventListener("click", () => {
@@ -796,8 +871,14 @@ function animatePicturesTaken(totalShots) {
     timeEl.textContent = timeLeft;
 
     btn.classList.remove("disabled");
-    btn.textContent = "\nPsyche's spacecraft will take many pictures of the asteroid's surface.\n\nMash the button as many times as you can to see how many pictures you can snap of the asteroid!\n\nPRESS HERE TO START.";
-
+btn.innerHTML = `
+  <span id="mashText">
+    Psyche's spacecraft will take many pictures of the asteroid's surface.<br>
+    Mash the button as many times as you can to see how many pictures you can snap of the asteroid!<br>
+    PRESS HERE TO START.
+  </span>
+`;
+mashText = document.getElementById("mashText");
     finalScoreEl.textContent = "0";
     funFactEl.style.display = "none";
     funFactEl.textContent = "";
@@ -847,6 +928,13 @@ function animatePicturesTaken(totalShots) {
     "Italian astronomer Annibale de Gasparis discovered Psyche in 1852."
   ];
   function getEndMessage(score) {
+
+  // 🔥 NEW: random fact for high score
+  if (score >= 34) {
+    const randomFact = allFacts[Math.floor(Math.random() * allFacts.length)];
+    return "You scanned 100% of Psyche's surface!\n\n" + randomFact;
+  }
+    if (score < 1) return "You scanned 0% of Psyche's surface!";
     if (score < 2) return "You scanned 3% of Psyche's surface!\n\nPsyche was the 16th asteroid ever discovered.";
     if (score < 3) return "You scanned 6% of Psyche's surface!\n\nThe satellite that NASA sent to Psyche is about the size of a singles tennis court.";
     if (score < 4) return "You scanned 9% of Psyche's surface!\n\nThe Psyche satellite has unique plus shaped solar panels.";
@@ -900,6 +988,7 @@ function animatePicturesTaken(totalShots) {
     orbitEl.style.setProperty("--orbitDur", orbitSeconds + "s");
 
     showPage("results");
+playAgainBtn.style.display = "none";
 
 animatePicturesTaken(count);
 
@@ -907,21 +996,29 @@ animatePicturesTaken(count);
     funFactEl.style.display = "none";
     animWrap.style.display = "flex";
 
-    resultsTimeoutId = setTimeout(() => {
+   resultsTimeoutId = setTimeout(() => {
   stopCameraSounds();
   startBgMusic();
 
   animWrap.style.display = "none";
   funFactEl.style.display = "block";
-  
+
   learnMoreBtn.style.display = "inline-block";
   learnMoreWrap.style.display = "none";
   renderAllFacts();
 
+  if (count >= 0 && count <= 7) {
+    playFailure();
+  }
+
   if (getEndMessage(count).includes("100%")) {
     playCongrats();
   }
-}, 10000);
+
+  // 👇 show button AFTER animation is done
+  playAgainBtn.style.display = "inline-block";
+
+}, 7000);
   }
 
   function startTimer() {
@@ -949,12 +1046,9 @@ animatePicturesTaken(count);
     if (btn.classList.contains("disabled")) return;
 
     if (!timerStarted) {
-      timerStarted = true;
-      btn.textContent = "TAP!";
-      stopBgMusic();
-      startMashAudio();
-      startTimer();
-    }
+  startCountdownThenGame();
+  return;
+}
 
     if (timeLeft > 0) {
       count++;

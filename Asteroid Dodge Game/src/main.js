@@ -12,6 +12,8 @@ import { startMenu } from './start.js';
 import { effects } from './effects.js';
 import { CONSTANTS } from "./constants.js";
 import { facts } from "./facts.js";
+import { saveScore, drawLeaderboard } from "./leaderboard.js";
+import { checkAchievements, resetSessionUnlocks, updateNotification, drawNotification } from "./achievements.js";
 
 export let gameState = "start";
 let prevState;
@@ -24,6 +26,7 @@ let gameOverFade = 0;
 let isPaused = false;
 effects.playerRef = player;
 let lives = 3;
+let livesLost = 0;
 let invincibleTimer = 0;
 const INVINCIBLE_DURATION = 1.5;
 let comboCount = 0;
@@ -72,23 +75,20 @@ let H = canvas.height;
 
 // --- UI scaling helpers ---
 function getUiScale() {
-  // 390x844 scale down/up smoothly
   return Math.min(W / 390, H / 844);
 }
 
 function fontPx(px, family = "sans-serif", weight = "") {
-  const size = Math.max(12, Math.round(px * getUiScale())); // never too tiny
+  const size = Math.max(12, Math.round(px * getUiScale()));
   return `${weight ? weight + " " : ""}${size}px ${family}`;
 }
 
 // --- Safe area ---
 function getSafeTop() {
-  // visualViewport offset helps on mobile browsers 
   const vv = window.visualViewport;
   const top = vv ? Math.max(0, vv.offsetTop) : 0;
-  return top + 16; // add small margin so HUD isn't hugging the edge
+  return top + 16;
 }
-
 
 // --- Mobile haptics (safe fallback) ---
 function vibrate(pattern) {
@@ -149,9 +149,6 @@ document.addEventListener("visibilitychange", () => {
 
 // ==============================
 //       Touch (Mobile) 
-// Supports BOTH:
-//   Tap/hold left-right zones for movement
-//   Swipe/drag to reposition the ship
 // ==============================
 let touchStartX = null;
 let touchMoved = false;
@@ -163,7 +160,7 @@ canvas.addEventListener(
 
     const t = e.touches[0];
     const x = t.clientX;
-    const y = t. clientY;
+    const y = t.clientY;
 
     touchStartX = x;
     touchMoved = false;
@@ -191,7 +188,6 @@ canvas.addEventListener(
       return;
     }
 
-    // Tap zones: left half = left, right half = right
     keys.left = x < W / 2;
     keys.right = x >= W / 2;
   },
@@ -209,7 +205,6 @@ canvas.addEventListener(
     const delta = x - touchStartX;
     touchStartX = x;
 
-    // If the finger actually moves, treat it as swipe control
     if (Math.abs(delta) > 2) {
       touchMoved = true;
       keys.left = false;
@@ -217,7 +212,6 @@ canvas.addEventListener(
 
       player.x += delta;
 
-      // keep player in bounds
       if (player.x < 0) player.x = 0;
       if (player.x + player.w > W) player.x = W - player.w;
     }
@@ -231,8 +225,6 @@ canvas.addEventListener(
     e.preventDefault();
     touchStartX = null;
     touchMoved = false;
-
-    // stop tap-zone movement when finger lifts
     keys.left = false;
     keys.right = false;
   },
@@ -257,6 +249,7 @@ function updateHighScore() {
 }
 
 startMenu.init(canvas);
+
 // ==============================
 //  Tap to Start / Restart 
 // ==============================
@@ -288,7 +281,6 @@ canvas.addEventListener(
       return;
     }
 
-    // Only handle start/restart taps. Otherwise let pointer be used for movement logic.
     if (gameState === "start") {
       e.preventDefault();
       startGame();
@@ -307,14 +299,11 @@ canvas.addEventListener(
 // ==============================
 // Mobile Orientation Handling
 // ==============================
-
-// Function that checks if device is likely a mobile device so this message doesn't appear on desktop
 function isProbablyPhone() {
   if (navigator.userAgentData && typeof navigator.userAgentData.mobile === "boolean") {
     return navigator.userAgentData.mobile;
   }
 
-  // Fallback
   const hasTouch = 
     ("maxTouchPoints" in navigator && navigator.maxTouchPoints > 0) ||
     ("ontouchstart" in window);
@@ -322,7 +311,6 @@ function isProbablyPhone() {
   const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
   const smallScreen = Math.min(window.innerWidth, window.innerHeight) <= 820;
 
-  // Probably phone if has touch capabilities, has coarse pointers and has a smallish screen
   return hasTouch && coarsePointer && smallScreen;
 }
 
@@ -353,7 +341,6 @@ function handleOrientation() {
 
   showRotateOverlay(landscape && enforce);
 
-  // auto-pause when landscape
   if (enforce && landscape && gameState === "playing") {
     isPaused = true;
     keys.left = false;
@@ -373,6 +360,7 @@ function startGame() {
   difficulty = 1;
   isPaused = false;
   lives = 3;
+  livesLost = 0;
   invincibleTimer = 0;
   comboCount = 0;
   comboTimer = 0;
@@ -386,6 +374,7 @@ function startGame() {
   resetPowerUps();
   effects.reset();
   facts.reset();
+  resetSessionUnlocks();
 
   // reset player position each run
   player.x = W / 2 - player.w / 2;
@@ -430,9 +419,10 @@ function update(dt) {
     return;
   }
 
-  if (gameState !== "playing" &&  prevState !== "playing") return;
-    if (isPaused || isMenuVisible()) {
-    // Keep background alive
+  if (gameState !== "playing" && prevState !== "playing") return;
+
+  if (isPaused || isMenuVisible()) {
+    // Keep background alive while paused/menu open
     updateStars(canvas);
     effects.update(dt);
     return;
@@ -465,7 +455,7 @@ function update(dt) {
   if (startHintTimer <= hintHold) {
     startHintAlpha = 1;
   } else if (startHintTimer <= hintHold + hintFade) {
-    const t = (startHintTimer - hintHold) / hintFade; // 0..1
+    const t = (startHintTimer - hintHold) / hintFade;
     startHintAlpha = 1 - t;
   } else {
     startHintAlpha = 0;
@@ -485,8 +475,10 @@ function update(dt) {
     difficulty,
     activePowerUps,
     () => {
+      // Hit callback
       if (gameState !== "gameover") {
         lives--;
+        livesLost++;
         invincibleTimer = INVINCIBLE_DURATION;
         comboCount = 0;
         comboTimer = 0;
@@ -498,6 +490,15 @@ function update(dt) {
         if (lives <= 0) {
           sounds.bg.pause();
           updateHighScore();
+          saveScore(score);
+          checkAchievements({
+            elapsedTime,
+            comboCount,
+            score,
+            livesLost,
+            nearMiss: false,
+            gameOver: true
+          });
           setTimeout(() => {
             gameState = "gameover";
           }, 1300);
@@ -505,18 +506,37 @@ function update(dt) {
       }
     },
     () => {
-      // Near-miss feedback
+      // Near-miss callback
       comboCount++;
       comboTimer = COMBO_DECAY_TIME;
       comboScore += comboCount * COMBO_BASE_BONUS;
       effects.triggerNearMiss(player);
       vibrate(15);
+      checkAchievements({
+        elapsedTime,
+        comboCount,
+        score,
+        livesLost,
+        nearMiss: true,
+        gameOver: false
+      });
     },
     invincibleTimer
   );
 
   // power-ups
   updatePowerUps(dt, player, W, H);
+
+  // achievements + notification update (every active gameplay frame)
+  checkAchievements({
+    elapsedTime,
+    comboCount,
+    score,
+    livesLost,
+    nearMiss: false,
+    gameOver: false
+  });
+  updateNotification(dt);
 
   // effects update
   effects.update(dt);
@@ -574,7 +594,7 @@ function draw() {
       const boxH = 22 + padY * 2;
 
       const x = W / 2;
-    const y = safeTop + 85;
+      const y = safeTop + 85;
 
       ctx.fillStyle = "rgba(0,0,0,0.55)";
       ctx.fillRect(x - boxW / 2, y - boxH / 2, boxW, boxH);
@@ -610,25 +630,25 @@ function draw() {
     }
 
     facts.draw(ctx, W);
+    drawNotification(ctx, W, H);
   }
 
-  //freeze frame when paused
-    if (isPaused || (isMenuVisible() && prevState != "gameover")) {
-      ctx.fillStyle = "rgba(0,0,0,0.55)";
-      ctx.fillRect(0, 0, W, H);
+  // freeze frame when paused
+  if (isPaused || (isMenuVisible() && prevState != "gameover")) {
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.fillRect(0, 0, W, H);
 
-      ctx.textAlign = "center";
-      ctx.fillStyle = "white";
-      ctx.font = "bold 60px sans-serif";
-      ctx.fillText("PAUSED", W / 2, H / 5 -  10);
+    ctx.textAlign = "center";
+    ctx.fillStyle = "white";
+    ctx.font = "bold 60px sans-serif";
+    ctx.fillText("PAUSED", W / 2, H / 5 - 10);
 
-      ctx.font = "22px sans-serif";
-      ctx.fillStyle = "lightgray";
+    ctx.font = "22px sans-serif";
+    ctx.fillStyle = "lightgray";
 
-      if (isPaused) ctx.fillText("Press P to Resume", W / 2, H / 5 * 4  + 30);
-      if (isMenuVisible()) ctx.fillText("Press Esc to Resume", W / 2, H / 5 * 4 + 30);
-
-    }
+    if (isPaused) ctx.fillText("Press P to Resume", W / 2, H / 5 * 4 + 30);
+    if (isMenuVisible()) ctx.fillText("Press Esc to Resume", W / 2, H / 5 * 4 + 30);
+  }
 
   effects.draw(ctx, W, H);
   
@@ -644,17 +664,18 @@ function draw() {
 
     // --- GAME OVER UI ---
     ctx.font = fontPx(26, "sans-serif");
-    const lineGap = Math.round(36 * getUiScale()); 
-
-    ctx.fillStyle = "gold";
-    ctx.fillText(`🏆 High Score: ${highScore}`, W / 2, H / 2);
+    const lineGap = Math.round(36 * getUiScale());
 
     ctx.fillStyle = "white";
-    ctx.fillText(`💫 Your Score: ${score}`, W / 2, H / 2 + lineGap);
+    ctx.fillText(`💫 Your Score: ${score}`, W / 2, H / 2 - 10);
 
-    ctx.font = fontPx(20, "sans-serif");
+    // Draw top-5 leaderboard
+    drawLeaderboard(ctx, W, H, score, fontPx);
+
+    ctx.font = fontPx(18, "sans-serif");
     ctx.fillStyle = "lightgray";
-    ctx.fillText("Tap to Restart", W / 2, H / 2 + lineGap * 2);
+    ctx.textAlign = "center";
+    ctx.fillText("Tap to Restart", W / 2, H - 40);
   }
 }
 
@@ -746,7 +767,6 @@ function drawPlayIcon(ctx, btn) {
   ctx.closePath();
   ctx.fill();
   ctx.restore();
-
 }
 
 function openMenu() {
