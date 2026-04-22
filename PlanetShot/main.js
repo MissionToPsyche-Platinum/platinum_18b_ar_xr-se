@@ -330,7 +330,12 @@
         if (!won && !lost && d < asteroid.r - ship.r / 2) {
             won = true;
             ship.vx = ship.vy = 0;
-            msg.innerHTML = `🚀 Direct hit in ${shots} ${shots === 1 ? "shot" : "shots"}!<br><small>Press [Space] to reset.</small>`;
+
+            if (currentLevel < levels.length - 1) {
+                msg.innerHTML = `🚀 Direct hit in ${shots} ${shots === 1 ? "shot" : "shots"}!<br><small>Press [Space] for next level.</small>`
+            } else {
+                msg.innerHTML = `🏆 You beat all ${levels.length} levels in ${shots} ${shots === 1 ? "shot" : "shots"}!<br><small>Press [Space] to restart.</small>`;
+            }
         }
 
         const deg = ((ship.angle * 180) / Math.PI + 360) % 360;
@@ -403,15 +408,18 @@
         if (e.code === "Space") resetGame();
     });
 
-    function resetGame() {
-        placeStart();
+    function resetGame(fullRestart = false) {
+        if (fullRestart) currentLevel = 0;
+
         shots = 0;
         power = 0;
         won = false;
         lost = false;
         msg.innerHTML = "";
         hudShots.textContent = "0";
+
+        loadLevel(currentLevel);
     }
 
-    placeStart();
+    resetGame(true);
 })();
