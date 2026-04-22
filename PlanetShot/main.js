@@ -5,6 +5,7 @@
     const hudAngle = document.getElementById("angle");
     const hudPower = document.getElementById("power");
     const hudShots = document.getElementById("shots");
+    const hudTotalShots = document.getElementById("totalShots");
     const msg = document.getElementById("msg");
 
     
@@ -70,7 +71,8 @@
 
     let charging = false;
     let power = 0;
-    let shots = 0;
+    let shotsThisLevel = 0;
+    let totalShots = 0;
     let won = false;
     let lost = false;
 
@@ -136,7 +138,10 @@
         const speed = power * SPEED_SCALE;
         ship.vx = Math.cos(ship.angle) * speed;
         ship.vy = Math.sin(ship.angle) * speed;
-        shots++;
+        shotsThisLevel++;
+        totalShots++;
+        hudShots.textContent = shotsThisLevel;
+        hudTotalShots.textContent = totalShots;
         hudShots.textContent = shots;
         power = 0;
     });
@@ -332,9 +337,9 @@
             ship.vx = ship.vy = 0;
 
             if (currentLevel < levels.length - 1) {
-                msg.innerHTML = `🚀 Direct hit in ${shots} ${shots === 1 ? "shot" : "shots"}!<br><small>Press [Space] for next level.</small>`
+                msg.innerHTML = `🚀 Direct hit in ${shotsThisLevel} ${shotsThisLevel === 1 ? "shot" : "shots"} this level!<br><small>Total shots: ${totalShots}. Press [Space] for next level.</small>`
             } else {
-                msg.innerHTML = `🏆 You beat all ${levels.length} levels in ${shots} ${shots === 1 ? "shot" : "shots"}!<br><small>Press [Space] to restart.</small>`;
+                msg.innerHTML = `🏆 Course complete! Level shots: ${shotsThisLevel}.<br><small>Total shots across all levels: ${totalShots}. Press [Space] to restart.</small>`;
             }
         }
 
@@ -409,9 +414,13 @@
     });
 
     function resetGame(fullRestart = false) {
-        if (fullRestart) currentLevel = 0;
+        if (fullRestart) {
+            currentLevel = 0;
+            totalShots = 0;
+            hudTotalShots.textContent = "0";
+        }    
 
-        shots = 0;
+        shotsThisLevel = 0;
         power = 0;
         won = false;
         lost = false;
