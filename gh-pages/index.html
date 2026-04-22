@@ -184,6 +184,22 @@
         font-size: 0.8rem;
       }
     }
+
+    .learn-link {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--psyche-mustard);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(249, 160, 0, 0.4);
+  transition: all 0.2s ease;
+}
+
+.learn-link:hover {
+  color: var(--psyche-gold);
+  border-bottom: 1px solid var(--psyche-gold);
+  text-shadow: 0 0 8px rgba(244, 124, 51, 0.5);
+}
   </style>
 </head>
 <body>
@@ -217,9 +233,12 @@
         </a>
       </div>
 
-      <p class="footer">Currently a work in progress.</p>
-    </section>
-  </main>
+      <p class="footer">
+  Created by Alex, Mitchell, John, Brayden, and Bryce.<br><br>
+  <a href="https://science.nasa.gov/mission/psyche/" target="_blank" class="learn-link">
+    Learn more about the Psyche mission!
+  </a>
+</p>
 
   <script>
     const canvas = document.getElementById("stars");
