@@ -29,3 +29,7 @@ Creator: floraphonic
 Countdown Sound
 https://pixabay.com/sound-effects/film-special-effects-321-go-8-bit-video-game-sound-version-1-145007/
 Creator: Make_More_Sound
+
+Success Sound
+https://pixabay.com/sound-effects/film-special-effects-success-fanfare-trumpets-6185/
+Creator: FunWithSound (Freesound)
