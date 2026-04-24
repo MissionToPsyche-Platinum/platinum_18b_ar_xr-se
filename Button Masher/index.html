@@ -493,6 +493,7 @@
   <audio id="bgMusic" src="assets/background_music.mp3" preload="auto" loop></audio>
   <audio id="failureSfx" src="assets/failure.mp3" preload="auto"></audio>
   <audio id="countdownSfx" src="assets/countdown.mp3" preload="auto"></audio>
+  <audio id="successSfx" src="assets/success.mp3" preload="auto"></audio>
 
   <main id="pageGame" class="wrap page active">
   <div class="mobile-top-actions">
@@ -612,6 +613,8 @@
 
   const failureSfx = document.getElementById("failureSfx");
 
+  const successSfx = document.getElementById("successSfx");
+
 let mashText = document.getElementById("mashText");
   let isMuted = true;
 function startCountdownThenGame() {
@@ -660,7 +663,19 @@ function startCountdownThenGame() {
   }, 700);
 }
 function applyMuteState() {
-const allAudio = [bgMusic, mashSfx, cameraSound1, cameraSound2, congratsSfx, dingSfx, failureSfx, countdownSfx];  allAudio.forEach(audio => {
+  const allAudio = [
+    bgMusic,
+    mashSfx,
+    cameraSound1,
+    cameraSound2,
+    congratsSfx,
+    dingSfx,
+    failureSfx,
+    successSfx,
+    countdownSfx
+  ];
+
+  allAudio.forEach(audio => {
     audio.muted = isMuted;
   });
 
@@ -672,6 +687,12 @@ function playFailure() {
   if (!failureSfx) return;
   failureSfx.currentTime = 0;
   failureSfx.play().catch(() => {});
+}
+
+function playSuccess() {
+  if (!successSfx) return;
+  successSfx.currentTime = 0;
+  successSfx.play().catch(() => {});
 }
 
 muteBtn.addEventListener("click", () => {
@@ -1007,13 +1028,13 @@ animatePicturesTaken(count);
   learnMoreWrap.style.display = "none";
   renderAllFacts();
 
-  if (count >= 0 && count <= 7) {
-    playFailure();
-  }
-
-  if (getEndMessage(count).includes("100%")) {
-    playCongrats();
-  }
+if (count >= 0 && count <= 7) {
+  playFailure();
+} else if (getEndMessage(count).includes("100%")) {
+  playCongrats();
+} else {
+  playSuccess();
+}
 
   // 👇 show button AFTER animation is done
   playAgainBtn.style.display = "inline-block";
