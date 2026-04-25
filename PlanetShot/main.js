@@ -8,6 +8,23 @@
     const hudTotalShots = document.getElementById("totalShots");
     const msg = document.getElementById("msg");
 
+    const celestialCatalog = {
+        mars: {
+            name: "Mars",
+            r: 50,
+            mu: 12000000,
+            soften: 1500,
+            image: null
+        },
+        jupiter: {
+            name: "Jupiter",
+            r: 80,
+            mu: 26000000,
+            soften: 2500,
+            image: null
+        }
+    }
+
     
     const levels = [
         {
@@ -43,14 +60,6 @@
         mu: 12000000,
         soften: 1500
     };
-
-    function resize() {
-        canvas.width = innerWidth;
-        canvas.height = innerHeight;
-        loadLevel(currentLevel);
-    }
-    window.addEventListener("resize", resize);
-    resize();
 
     const ship = {
         x: 200,
@@ -91,7 +100,7 @@
         const level = levels[index];
 
         ship.x = level.ship.x;
-        ship.y = level.ship.y <= 1 ? canvas.heigh * level.ship.y : level.ship.y;
+        ship.y = level.ship.y <= 1 ? canvas.height * level.ship.y : level.ship.y;
         ship.vx = 0;
         ship.vy = 0;
         ship.angle = 0;
@@ -103,7 +112,7 @@
             asteroid.y = level.asteroid.y <= 1 ? canvas.height * level.asteroid.y : level.asteroid.y;
         } else {
             const minY = level.asteroid.yMin >= 0 ? level.asteroid.yMin : canvas.height + level.asteroid.yMin;
-            const maxY = level.asteroid.yMax >= 0 ? level.asteroid.yMax : canvas.heigh + level.asteroid.yMax;
+            const maxY = level.asteroid.yMax >= 0 ? level.asteroid.yMax : canvas.height + level.asteroid.yMax;
             asteroid.y = Math.random() * (maxY - minY) + minY;
         }
 
@@ -115,6 +124,14 @@
 
         hudLevel.textContent = String(index + 1);
     }
+
+    function resize() {
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
+        loadLevel(currentLevel);
+    }
+    window.addEventListener("resize", resize);
+    resize();
 
     function placeStart() {
         ship.x = 200;
@@ -142,7 +159,6 @@
         totalShots++;
         hudShots.textContent = shotsThisLevel;
         hudTotalShots.textContent = totalShots;
-        hudShots.textContent = shots;
         power = 0;
     });
 
