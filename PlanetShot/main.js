@@ -108,7 +108,7 @@
         }
 
         gravityWell.x = level.gravityWell.x <= 1 ? canvas.width * level.gravityWell.x : level.gravityWell.x;
-        gravityWell.y = level.gravityWell.y <= 1 ? canvas.height * level.gravityWell.y : level.gravityWell.y:
+        gravityWell.y = level.gravityWell.y <= 1 ? canvas.height * level.gravityWell.y : level.gravityWell.y;
         gravityWell.r = level.gravityWell.r;
         gravityWell.mu = level.gravityWell.mu;
         gravityWell.soften = level.gravityWell.soften;
