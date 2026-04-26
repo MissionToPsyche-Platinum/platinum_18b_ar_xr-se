@@ -93,23 +93,23 @@
     
     const levels = [
         {
-            ship: { x: 200, y: 300 },
-            asteroid: { x: 1000, y: 300, r: 40 },
+            ship: { x: 0.12, y: 0.5 },
+            asteroid: { x: 0.86, y: 0.5, r: 40 },
             bodies: [
                 { type: "mars", x: 0.5, y: 0.5 }
             ]
         },
         {
-            ship: { x: 180, y:200 },
-            asteroid: { x: 1050, y: 300, r: 40 },
+            ship: { x: 0.20, y: 0.8 },
+            asteroid: { x: 0.9, y: 0.2, r: 40 },
             bodies: [
                 { type: "venus", x: 0.42, y: 0.45 },
                 { type: "mercury", x: 0.72, y: 0.62}
             ]
         },
         {
-            ship: { x: 220, y: 550 },
-            asteroid: { x: 980, y: 180, r: 40 },
+            ship: { x: 0.16, y: 0.2 },
+            asteroid: { x: 0.78, y: 0.8, r: 40 },
             bodies: [
                 { type: "jupiter", x: 0.5, y:0.5 }
             ]
@@ -169,15 +169,8 @@
         ship.angle = 0;
 
         asteroid.r = level.asteroid.r;
-        asteroid.x = level.asteroid.x < 0 ? canvas.width + level.asteroid.x : level.asteroid.x;
-
-        if ("y" in level.asteroid) {
-            asteroid.y = level.asteroid.y <= 1 ? canvas.height * level.asteroid.y : level.asteroid.y;
-        } else {
-            const minY = level.asteroid.yMin >= 0 ? level.asteroid.yMin : canvas.height + level.asteroid.yMin;
-            const maxY = level.asteroid.yMax >= 0 ? level.asteroid.yMax : canvas.height + level.asteroid.yMax;
-            asteroid.y = Math.random() * (maxY - minY) + minY;
-        }
+        asteroid.x = level.asteroid.x <= 1 ? canvas.width * level.asteroid.x : level.asteroid.x;
+        asteroid.y = level.asteroid.y <= 1 ? canvas.height * level.asteroid.y : level.asteroid.y;
 
         activeBodies = level.bodies.map((bodyDef) => {
             const base = celestialCatalog[bodyDef.type];
@@ -312,7 +305,7 @@
         ctx.restore();
     }
 
-    function drawGravityWell() {
+    function drawBodies() {
         
         if (activeBodies.length === 0) return;
 
@@ -332,7 +325,7 @@
                     body.y,
                     body.r
                 );
-                g.addColorStop(0, #ffe680);
+                g.addColorStop(0, "#ffe680");
                 g.addColorStop(1, "#b38f00");
                 ctx.fillStyle = g;
                 ctx.beginPath();
