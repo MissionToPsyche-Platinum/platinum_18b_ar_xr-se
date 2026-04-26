@@ -158,11 +158,6 @@
         return value <=1 ? value * max : value;
     }
 
-    //Temporary workaround since current program design only expects one gravity well.
-    function getPrimaryBody() {
-        return activeBodies[0];
-    }
-
     function loadLevel(index) {
         
         const level = levels[index];
@@ -318,34 +313,37 @@
     }
 
     function drawGravityWell() {
-        const gravityWell = getPrimaryBody();
-        if(!gravityWell) return;
+        
+        if (activeBodies.length === 0) return;
 
-        ctx.save();
-        const size = gravityWell.r * 2;
-        if (gravityWell.image.complete && gravityWell.image.naturalWidth > 0) {
-            ctx.translate(gravityWell.x, gravityWell.y);
-            ctx.drawImage(gravityWell.image, -size / 2, -size / 2, size, size);
-        } else {
-            const g = ctx.createRadialGradient(
-                gravityWell.x - 6,
-                gravityWell.y - 6,
-                6,
-                gravityWell.x,
-                gravityWell.y,
-                gravityWell.r
-            );
-            g.addColorStop(0, "#ffe680");
-            g.addColorStop(1, "#b38f00");
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(gravityWell.x, gravityWell.y, gravityWell.r, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = "#ffd24d";
-            ctx.lineWidth = 2;
-            ctx.stroke();
+        for ( const body of activeBodies) {
+            ctx.save();
+            const size = body.r * 2;
+
+            if (body.image && body.image.complete && body.image.naturalWidth > 0) {
+                ctx.translate(body.x, body.y);
+                ctx.drawImage(body.image, -size / 2, -size / 2, size, size);
+            } else {
+                const g = ctx.createRadialGradient(
+                    body.x - 6,
+                    body.y - 6,
+                    6,
+                    body.x,
+                    body.y,
+                    body.r
+                );
+                g.addColorStop(0, #ffe680);
+                g.addColorStop(1, "#b38f00");
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(body.x, body.y, body.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = "#ffd24d";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            ctx.restore();
         }
-        ctx.restore();
     }
 
     function applyGravity(dtMs) {
@@ -513,7 +511,7 @@
             ctx.fillRect(x, y, 2, 2);
         }
         ctx.restore();
-        drawGravityWell();
+        drawBodies();
         drawAsteroid();
         drawTrajectoryPreview();
         drawShip();
