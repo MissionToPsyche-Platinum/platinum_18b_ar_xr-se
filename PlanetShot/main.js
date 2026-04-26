@@ -103,14 +103,15 @@
             ship: { x: 180, y:200 },
             asteroid: { x: 1050, y: 300, r: 40 },
             bodies: [
-                { types: "venus", x: 0.5, y: 0.5 }
+                { type: "venus", x: 0.42, y: 0.45 },
+                { type: "mercury", x: 0.72, y: 0.62}
             ]
         },
         {
             ship: { x: 220, y: 550 },
             asteroid: { x: 980, y: 180, r: 40 },
             bodies: [
-                { types: "jupiter", x: 0.5, y:0.5 }
+                { type: "jupiter", x: 0.5, y:0.5 }
             ]
         }
     ];
@@ -185,6 +186,10 @@
 
         activeBodies = level.bodies.map((bodyDef) => {
             const base = celestialCatalog[bodyDef.type];
+
+            if (!base) {
+                throw new Error(`Unknown celestial body type: ${bodyDef.type}`);
+            }
 
             return {
                 type: bodyDef.type,
@@ -318,9 +323,9 @@
 
         ctx.save();
         const size = gravityWell.r * 2;
-        if (marsImg.complete && marsImg.naturalWidth > 0) {
+        if (gravityWell.image.complete && gravityWell.image.naturalWidth > 0) {
             ctx.translate(gravityWell.x, gravityWell.y);
-            ctx.drawImage(marsImg, -size / 2, -size / 2, size, size);
+            ctx.drawImage(gravityWell.image, -size / 2, -size / 2, size, size);
         } else {
             const g = ctx.createRadialGradient(
                 gravityWell.x - 6,
@@ -344,24 +349,31 @@
     }
 
     function applyGravity(dtMs) {
-        const gravityWell = getPrimaryBody();
-        if (!gravityWell) return;
+        if (activeBodies.length === 0) return;
 
-        const dx = gravityWell.x - ship.x;
-        const dy = gravityWell.y - ship.y;
-        const r2 = dx * dx + dy * dy + gravityWell.soften;
-        const r = Math.sqrt(r2);
-        const a = gravityWell.mu / r2;
-        const ax = (dx / r) * a;
-        const ay = (dy / r) * a;
         const dt = dtMs / 1000;
-        ship.vx += ax * dt;
-        ship.vy += ay * dt;
+        let totalAx = 0;
+        let totalAy = 0;
+
+        for (const body of activeBodies) {
+            const dx = body.x - ship.x;
+            const dy = body.y - ship.y;
+            const r2 = dx * dx + dy * dy + body.soften;
+            const r = Math.sqrt(r2);
+
+            if (r === 0) continue;
+
+            const a = body.mu / r2;
+            totalAx += (dx / r) * a;
+            totalAy += (dy / r) * a;
+        }
+
+        ship.vx += totalAx * dt;
+        ship.vy += totalAy * dt;
     }
 
     function computeTrajectory(angle, powerValue) {
-        const gravityWell = getPrimaryBody();
-        if(!gravityWell) return;
+        if (activeBodies.length === 0) return [];
 
         const points = [];
         let x = ship.x;
@@ -369,30 +381,46 @@
         const speed = powerValue * SPEED_SCALE;
         let vx = Math.cos(angle) * speed;
         let vy = Math.sin(angle) * speed;
+
         const dtMs = 16;
         const dt = dtMs / 1000;
         const maxSteps = 1200;
+
         for (let i = 0; i < maxSteps; i++) {
             points.push({ x, y });
+
             if (x < -50 || x > canvas.width + 50 || y < -50 || y > canvas.height + 50) break;
+
             const dAst = Math.hypot(x - asteroid.x, y - asteroid.y);
             if (dAst < asteroid.r) {
                 points.push({ x: asteroid.x, y: asteroid.y });
                 break;
             }
-            const dx = gravityWell.x - x;
-            const dy = gravityWell.y - y;
-            const r2 = dx * dx + dy * dy + gravityWell.soften;
-            const r = Math.sqrt(r2);
-            const a = gravityWell.mu / r2;
-            const ax = (dx / r) * a;
-            const ay = (dy / r) * a;
-            vx += ax * dt;
-            vy += ay * dt;
+
+            let totalAx = 0;
+            let totalAy = 0;
+
+            for (const body of activeBodies) {
+                const dx = body.x - x;
+                const dy = body.y - y;
+                const r2 = dx * dx + dy * dy + body.soften;
+                const r = Math.sqrt(r2);
+
+                if (r === 0) continue;
+
+                const a = body.mu / r2;
+                totalAx += (dx / r) * a;
+                totalAy += (dy / r) * a;
+            }
+
+            vx += totalAx * dt;
+            vy += totalAy * dt;
             x += vx * dt;
             y += vy * dt;
+
             if (Math.hypot(vx, vy) <= STOP_EPS) break;
         }
+
         return points;
     }
 
@@ -515,7 +543,18 @@
     requestAnimationFrame(loop);
 
     window.addEventListener("keydown", (e) => {
-        if (e.code === "Space") resetGame();
+        if (e.code !== "Space") return;
+
+        if (won) {
+            if (currentLevel < levels.length - 1) {
+                currentLevel++;
+                resetGame(false);
+            } else {
+                resetGame(true);
+            }
+        } else {
+            resetGame(false);
+        }
     });
 
     function resetGame(fullRestart = false) {
