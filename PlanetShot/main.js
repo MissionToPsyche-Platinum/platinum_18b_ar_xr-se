@@ -20,7 +20,7 @@
     const earthImg = new Image();
     earthImg.src = "earth.svg";
     const marsImg = new Image();
-    marsImg.src = marsImg.src = "mars.svg";
+    marsImg.src = "mars.svg";
     const jupiterImg = new Image();
     jupiterImg.src = "jupiter.svg";
     const saturnImg = new Image();
@@ -95,31 +95,28 @@
         {
             ship: { x: 200, y: 300 },
             asteroid: { x: 1000, y: 300, r: 40 },
-            gravityWell: { x: null, y: null, r: 50, mu: 12000000, soften: 1500 }
+            bodies: [
+                { type: "mars", x: 0.5, y: 0.5 }
+            ]
         },
         {
             ship: { x: 180, y:200 },
             asteroid: { x: 1050, y: 300, r: 40 },
-            gravityWell: { x: null, y: null, r: 50, mu: 14000000, soften: 1500 }
+            bodies: [
+                { types: "venus", x: 0.5, y: 0.5 }
+            ]
         },
         {
             ship: { x: 220, y: 550 },
             asteroid: { x: 980, y: 180, r: 40 },
-            gravityWell: { x: null, y: null, r: 55, mu: 16000000, soften: 1500 }
+            bodies: [
+                { types: "jupiter", x: 0.5, y:0.5 }
+            ]
         }
     ];
     
     let currentLevel = 0;
-
-
-
-    const gravityWell = {
-        x: 0,
-        y: 0,
-        r: 50,
-        mu: 12000000,
-        soften: 1500
-    };
+    let activeBodies = [];
 
     const ship = {
         x: 200,
@@ -155,11 +152,21 @@
         return Math.hypot(ship.vx, ship.vy) > STOP_EPS;
     }
 
+    function resolveCoord(value, max) {
+        if (value == null) return max / 2;
+        return value <=1 ? value * max : value;
+    }
+
+    //Temporary workaround since current program design only expects one gravity well.
+    function getPrimaryBody() {
+        return activeBodies[0];
+    }
+
     function loadLevel(index) {
         
         const level = levels[index];
 
-        ship.x = level.ship.x;
+        ship.x = level.ship.x <= 1 ? canvas.width * level.ship.x : level.ship.x;
         ship.y = level.ship.y <= 1 ? canvas.height * level.ship.y : level.ship.y;
         ship.vx = 0;
         ship.vy = 0;
@@ -176,11 +183,24 @@
             asteroid.y = Math.random() * (maxY - minY) + minY;
         }
 
-        gravityWell.x = level.gravityWell.x <= 1 ? canvas.width * level.gravityWell.x : level.gravityWell.x;
-        gravityWell.y = level.gravityWell.y <= 1 ? canvas.height * level.gravityWell.y : level.gravityWell.y;
-        gravityWell.r = level.gravityWell.r;
-        gravityWell.mu = level.gravityWell.mu;
-        gravityWell.soften = level.gravityWell.soften;
+        activeBodies = level.bodies.map((bodyDef) => {
+            const base = celestialCatalog[bodyDef.type];
+
+            return {
+                type: bodyDef.type,
+                name: base.name,
+                x: resolveCoord(bodyDef.x, canvas.width),
+                y: resolveCoord(bodyDef.y, canvas.height),
+                r: bodyDef.r ?? base.r,
+                mu: bodyDef.mu ?? base.mu,
+                soften: bodyDef.soften ?? base.soften,
+                image: base.image
+            };
+        });
+
+        if (activeBodies.length === 0) {
+            throw new Error("Level must contain at least one body.");
+        }
 
         hudLevel.textContent = String(index + 1);
     }
@@ -293,6 +313,9 @@
     }
 
     function drawGravityWell() {
+        const gravityWell = getPrimaryBody();
+        if(!gravityWell) return;
+
         ctx.save();
         const size = gravityWell.r * 2;
         if (marsImg.complete && marsImg.naturalWidth > 0) {
@@ -321,6 +344,9 @@
     }
 
     function applyGravity(dtMs) {
+        const gravityWell = getPrimaryBody();
+        if (!gravityWell) return;
+
         const dx = gravityWell.x - ship.x;
         const dy = gravityWell.y - ship.y;
         const r2 = dx * dx + dy * dy + gravityWell.soften;
@@ -334,6 +360,9 @@
     }
 
     function computeTrajectory(angle, powerValue) {
+        const gravityWell = getPrimaryBody();
+        if(!gravityWell) return;
+
         const points = [];
         let x = ship.x;
         let y = ship.y;
