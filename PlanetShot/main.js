@@ -9,18 +9,53 @@
     const msg = document.getElementById("msg");
 
     const celestialCatalog = {
+        mercrury: {
+            name: "Mercury",
+            r: 36,
+            mu: 10500000,
+            soften: 900,
+            image: null
+        },
+        venus: {
+            name: "Venus",
+            r: 58,
+            mu: 18000000,
+            soften: 1700,
+            image: null
+        },
         mars: {
             name: "Mars",
-            r: 50,
-            mu: 12000000,
-            soften: 1500,
-            image: null
+            r: 42,
+            mu: 11000000,
+            soften: 1100,
+            image: marsImg
         },
         jupiter: {
             name: "Jupiter",
-            r: 80,
-            mu: 26000000,
-            soften: 2500,
+            r: 82,
+            mu: 28000000,
+            soften: 2600,
+            image: null
+        },
+        saturn: {
+            name: "Saturn",
+            r: 74,
+            mu: 24000000,
+            soften: 2300,
+            image: null
+        },
+        uranus: {
+            name: "Uranus",
+            r: 66,
+            mu: 21000000,
+            soften: 2000,
+            image: null
+        },
+        neptune: {
+            name: "Neptune",
+            r: 68,
+            mu: 22000000,
+            soften: 2050,
             image: null
         }
     }
