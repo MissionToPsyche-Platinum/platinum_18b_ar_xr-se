@@ -8,20 +8,50 @@
     const hudTotalShots = document.getElementById("totalShots");
     const msg = document.getElementById("msg");
 
+    const shipImg = new Image();
+    shipImg.src = "ship.png";
+    const psycheImg = new Image();
+    psycheImg.src = "asteroid.png";
+
+    const mercuryImg = new Image();
+    mercuryImg.src = "mercury.svg";
+    const venusImg = new Image();
+    venusImg.src = "venus.svg";
+    const earthImg = new Image();
+    earthImg.src = "earth.svg";
+    const marsImg = new Image();
+    marsImg.src = marsImg.src = "mars.svg";
+    const jupiterImg = new Image();
+    jupiterImg.src = "jupiter.svg";
+    const saturnImg = new Image();
+    saturnImg.src = "saturn.svg";
+    const uranusImg = new Image();
+    uranusImg.src = "uranus.svg";
+    const neptuneImg = new Image();
+    neptuneImg.src = "neptune.svg";
+    
+
     const celestialCatalog = {
-        mercrury: {
+        mercury: {
             name: "Mercury",
             r: 36,
             mu: 10500000,
             soften: 900,
-            image: null
+            image: mercuryImg
         },
         venus: {
             name: "Venus",
             r: 58,
             mu: 18000000,
             soften: 1700,
-            image: null
+            image: venusImg
+        },
+        earth: {
+            name: "Earth",
+            r: 60,
+            mu: 20000000,
+            soften: 1800,
+            image: earthImg
         },
         mars: {
             name: "Mars",
@@ -35,28 +65,28 @@
             r: 82,
             mu: 28000000,
             soften: 2600,
-            image: null
+            image: jupiterImg
         },
         saturn: {
             name: "Saturn",
             r: 74,
             mu: 24000000,
             soften: 2300,
-            image: null
+            image: saturnImg
         },
         uranus: {
             name: "Uranus",
             r: 66,
             mu: 21000000,
             soften: 2000,
-            image: null
+            image: uranusImg
         },
         neptune: {
             name: "Neptune",
             r: 68,
             mu: 22000000,
             soften: 2050,
-            image: null
+            image: neptuneImg
         }
     }
 
@@ -81,12 +111,7 @@
     
     let currentLevel = 0;
 
-    const shipImg = new Image();
-    shipImg.src = "ship.png";
-    const marsImg = new Image();
-    marsImg.src = "mars.png";
-    const psycheImg = new Image();
-    psycheImg.src = "asteroid.png";
+
 
     const gravityWell = {
         x: 0,
