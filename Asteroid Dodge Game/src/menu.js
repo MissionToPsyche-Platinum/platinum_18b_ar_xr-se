@@ -2,6 +2,7 @@ import { audioState, toggleMaster, toggleMusic, toggleSfx, isMuted } from "./aud
 import { powerUpDescriptions } from "./powerups.js";
 import { DEFAULT_FACTS } from "./facts.js";
 import { getLeaderboard, clearLeaderboard } from "./leaderboard.js";
+import { ACHIEVEMENT_LIST, getUnlockedIds, clearAchievements } from "./achievements.js";
 
 let showMenu = false;
 
@@ -249,13 +250,62 @@ function renderLeaderboardMenu() {
     updateMenuContent(container);
 }
 
+function renderAchievementsMenu() {
+    const unlocked = getUnlockedIds();
+ 
+    const rowsHTML = ACHIEVEMENT_LIST.map(a => {
+        const isUnlocked = unlocked.has(a.id);
+        return `
+        <div class="ach-row ${isUnlocked ? "ach-unlocked" : "ach-locked"}">
+            <span class="ach-icon">${isUnlocked ? a.icon : "🔒"}</span>
+            <div class="ach-meta">
+                <div class="ach-name">${a.name}</div>
+                <div class="ach-desc">${a.desc}</div>
+            </div>
+            ${isUnlocked ? '<span class="ach-badge">✔</span>' : ''}
+        </div>
+        `;
+    }).join("");
+ 
+    const unlockedCount = unlocked.size;
+    const total = ACHIEVEMENT_LIST.length;
+ 
+    const container = document.createElement("div");
+    container.className = "achievements-container";
+    container.innerHTML = `
+    <h2 class="panel-title">Achievements</h2>
+    <div class="ach-progress">${unlockedCount} / ${total} Unlocked</div>
+    <div class="ach-list">
+        ${rowsHTML}
+    </div>
+    <div class="controls-footer" style="gap:12px;display:flex;justify-content:center;">
+        <button id="ach-clear-btn" class="c-return-btn" style="background:rgba(180,0,0,0.5);">Reset</button>
+        <button id="ach-return-btn" class="c-return-btn">Return</button>
+    </div>
+    `;
+ 
+    container.querySelector("#ach-return-btn").addEventListener("click", () => {
+        renderMainMenu();
+    });
+ 
+    container.querySelector("#ach-clear-btn").addEventListener("click", () => {
+        if (confirm("Reset all achievements?")) {
+            clearAchievements();
+            renderAchievementsMenu();
+        }
+    });
+ 
+    updateMenuContent(container);
+}
+
 function renderMainMenu() {
     const container = document.createElement("div");
     container.className = "menu-container";
     container.innerHTML = `
-    <div class="menu-buttons">
+     <div class="menu-buttons">
         <button id="controls-btn">Options</button>
         <button id="leaderboard-btn">Leaderboard</button>
+        <button id="achievements-btn">Achievements</button>
         <button id="credits-btn">Credits</button>
         <button id="exit-btn">Exit</button>
     </div>
@@ -267,6 +317,10 @@ function renderMainMenu() {
 
     container.querySelector("#leaderboard-btn").addEventListener("click", () => {
         renderLeaderboardMenu();
+    });
+
+    container.querySelector("#achievements-btn").addEventListener("click", () => {
+        renderAchievementsMenu();
     });
 
     container.querySelector("#credits-btn").addEventListener("click", () => {
