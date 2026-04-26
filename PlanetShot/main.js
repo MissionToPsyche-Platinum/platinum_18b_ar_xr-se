@@ -136,18 +136,24 @@
         r: 40
     };
 
+    const MIN_POWER = 0.1
+    const MAX_POWER = 2.0;
+    const POWER_STEP = 0.1;
+    const POWER_RATE = 1.5;
+    const SPEED_SCALE = 380;
+    const FRICTION = 0.0;
+    const STOP_EPS = 0.05;
+
     let charging = false;
-    let power = 0;
+    let power = MIN_POWER;
     let shotsThisLevel = 0;
     let totalShots = 0;
     let won = false;
     let lost = false;
 
-    const MAX_POWER = 2.0;
-    const POWER_RATE = 1.5;
-    const SPEED_SCALE = 380;
-    const FRICTION = 0.0;
-    const STOP_EPS = 0.05;
+    function clampPower(value) {
+        return Math.max(MIN_POWER, Math.min(MAX_POWER, value));
+    }
 
     function isShipMoving() {
         return Math.hypot(ship.vx, ship.vy) > STOP_EPS;
@@ -218,8 +224,15 @@
     canvas.addEventListener("mousedown", () => {
         if (won || lost) return;
         if (isShipMoving()) return; // no new shot while in flight
-        charging = true;
-        power = 0;
+        
+        const speed = power * SPEED_SCALE;
+        ship.vx = Math.cos(ship.angle) * speed;
+        ship.vy = Math.sin(ship.angle) * speed;
+
+        shotsThisLevel++;
+        totalShots++;
+        hudShots.textContent = shotsThisLevel;
+        hudTotalShots.textContent = totalShots;
     });
 
     window.addEventListener("mouseup", () => {
@@ -242,6 +255,34 @@
         const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
         const my = (e.clientY - rect.top) * (canvas.height / rect.height);
         ship.angle = Math.atan2(my - ship.y, mx - ship.x);
+    });
+
+    canvas.addEventListener("wheel", (e) => {
+        if (won || lost) return;
+        if (isShipMoving()) return;
+
+        e.preventDefault();
+
+        if (e.deltaY < 0) {
+            power = clampPower(power + POWER_STEP);
+        } else {
+            power = clampPower(power - POWER_STEP);
+        }
+
+        hudPower.textContent = Math.round((power / MAX_POWER) * 100) + "%";
+    }, { passive: false });
+
+    window.addEventListener("keydown", (e) => {
+        if (won || lost) return;
+        if (isShipMoving()) return;
+
+        if (e.code === "KeyE") {
+            power = clampPower(power + POWER_STEP);
+        } else if (e.code === "KeyQ") {
+            power = clampPower(power - POWER_STEP);
+        }
+
+        hudPower.textContent = Math.round((power / MAX_POWER) * 100) + "%";
     });
 
     function drawShip() {
@@ -416,10 +457,6 @@
     }
 
     function step(dt) {
-        if (charging && !won && !lost) {
-            power = Math.min(MAX_POWER, power + POWER_RATE * (dt / 1000));
-        }
-        hudPower.textContent = Math.round(power * 100) + "%";
 
         if (!won && !lost && isShipMoving()) {
             applyGravity(dt);
@@ -472,7 +509,8 @@
     }
 
     function drawTrajectoryPreview() {
-        if (!charging) return;
+        if (won || lost) return;
+        if (isShipMoving()) return;
         const points = computeTrajectory(ship.angle, power);
         if (!points || points.length < 2) return;
         ctx.save();
@@ -556,7 +594,8 @@
         }    
 
         shotsThisLevel = 0;
-        power = 0;
+        power = MIN_POWER;
+        hudPower.textContent = Math.round((power / MAX_POWER) * 100) + "%";
         won = false;
         lost = false;
         msg.innerHTML = "";
