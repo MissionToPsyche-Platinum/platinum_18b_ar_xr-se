@@ -6,6 +6,7 @@
     const hudPower = document.getElementById("power");
     const hudShots = document.getElementById("shots");
     const hudTotalShots = document.getElementById("totalShots");
+    const hudScoreToPar = document.getElementById("scoreToPar");
     const msg = document.getElementById("msg");
 
     const shipImg = new Image();
@@ -29,6 +30,19 @@
     uranusImg.src = "uranus.svg";
     const neptuneImg = new Image();
     neptuneImg.src = "neptune.svg";
+
+    [
+        mercuryImg,
+        venusImg,
+        earthImg,
+        marsImg,
+        jupiterImg,
+        saturnImg,
+        uranusImg,
+        neptuneImg
+    ].forEach((img) => {
+        img.addEventListener("load", handlePlanetImageLoaded);
+    });
     
 
     const celestialCatalog = {
@@ -92,7 +106,7 @@
 
     const pars = [3, 4, 4, 5, 4, 4, 3, 4, 5, 4, 4, 3, 4, 5, 4, 3, 4, 5]
     const PAR = 72;
-    let currentPar = 0;
+    let scoreToPar = 0;
 
     
     const levels = [
@@ -363,6 +377,22 @@
         resetGame(false);
     }
 
+    function formatScoreToPar(value) {
+        if (value === 0) return "E";
+        return value > 0 ? `+${value}` : `${value}`;
+    }
+
+    function rebuildBodySprites() {
+        for (const body of activeBodies) {
+            body.spriteCanvas = buildBodySprite(body);
+        }
+    }
+
+    function handlePlanetImageLoaded() {
+        rebuildBodySprites();
+        previewDirty = true;
+    }
+
     function buildBodySprite(body) {
         const size = Math.ceil(body.r * 2);
 
@@ -374,6 +404,7 @@
 
         if (body.image && body.image.complete && body.image.naturalWidth > 0) {
             sctx.drawImage(body.image, 0, 0, size, size);
+            spriteCanvas._usedFallback = false;
         } else {
             const g = sctx.createRadialGradient(
                 size * 0.4,
@@ -392,6 +423,7 @@
             sctx.strokeStyle = "#ffd24d";
             sctx.lineWidth = 2;
             sctx.stroke();
+            spriteCanvas._usedFallback = true;
         }
         
         return spriteCanvas;
@@ -611,6 +643,17 @@
         if (activeBodies.length === 0) return;
 
         for ( const body of activeBodies) {
+            
+            if (
+                body.image &&
+                body.image.complete &&
+                body.image.naturalWidth > 0 &&
+                body.spriteCanvas &&
+                body.spriteCanvas._usedFallback
+            ) {
+                body.spriteCanvas = buildBodySprite(body);
+            }
+
             ctx.save();
             ctx.translate(body.x, body.y);
 
@@ -777,10 +820,25 @@
             won = true;
             ship.vx = ship.vy = 0;
 
+            const holePar = pars[currentLevel];
+            const holeScoreToPar = shotsThisLevel - holePar;
+            scoreToPar += holeScoreToPar;
+
+            const holeResultText = formatScoreToPar(holeScoreToPar);
+            const totalResultText = formatScoreToPar(scoreToPar);
+
+            if (hudScoreToPar) {
+                hudScoreToPar.textContent = totalResultText;
+            }
+
             if (currentLevel < levels.length - 1) {
-                msg.innerHTML = `🚀 Direct hit in ${shotsThisLevel} ${shotsThisLevel === 1 ? "shot" : "shots"} this level!<br><small>Total shots: ${totalShots}. Press [Space] for next level.</small>`
+                msg.innerHTML = `🚀 Hole ${currentLevel + 1} complete in ${shotsThisLevel} shot${shotsThisLevel === 1 ? "" : "s"} ` +
+                                `(Par ${holePar}, ${holeResultText}).<br>` +
+                                `<small>Course score: ${totalResultText}. Press [Space] for next level.</small>`;
             } else {
-                msg.innerHTML = `🏆 Course complete! Level shots: ${shotsThisLevel}.<br><small>Total shots across all levels: ${totalShots}. Press [Space] to restart.</small>`;
+                msg.innerHTML = `🏆 Course complete! Hole ${currentLevel + 1}: ${shotsThisLevel} shot${shotsThisLevel === 1 ? "" : "s"} ` +
+                                `(Par ${holePar}, ${holeResultText}).<br>` +
+                                `<small>Final course score: ${totalResultText}. Press [Space] to restart.</small>`;
             }
         }
 
@@ -873,32 +931,39 @@
         if (won) {
             if (currentLevel < levels.length - 1) {
                 currentLevel++;
-                resetGame(false);
+                resetGame(false, true);
             } else {
-                resetGame(true);
+                resetGame(true, true);
             }
         } else {
-            resetGame(false);
+            resetGame(false, false);
         }
     });
 
-    function resetGame(fullRestart = false) {
+    function resetGame(fullRestart = false, resetHoleShots = true) {
 
         previewDirty = true;
 
         if (fullRestart) {
             currentLevel = 0;
             totalShots = 0;
+            scoreToPar = 0;
             hudTotalShots.textContent = "0";
+            if (hudScoreToPar) hudScoreToPar.textContent = "E";
         }    
 
-        shotsThisLevel = 0;
+        if (resetHoleShots) {
+            shotsThisLevel = 0;
+            hudShots.textContent = "0";
+        } else {
+            hudShots.textContent = shotsThisLevel;
+        }
+
         power = MIN_POWER;
         hudPower.textContent = Math.round((power / MAX_POWER) * 100) + "%";
         won = false;
         lost = false;
         msg.innerHTML = "";
-        hudShots.textContent = "0";
 
         loadLevel(currentLevel);
     }
