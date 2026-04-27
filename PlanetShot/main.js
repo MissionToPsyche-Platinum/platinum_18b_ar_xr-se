@@ -173,12 +173,22 @@
         },
         {
             ship: { x: 0.78, y: 0.82 },
-            asteroid: { x: 0}
+            asteroid: { x: 0.32, y: 0.28, r: 40 },
+            previewFraction: 0.5,
+            previewBaseMaxPoints: 60,
+            previewSpeedScale: 40,
+            bodies: [
+                { type: "mercury", x: 0.45, y: 0.68 },
+                { type: "venus", x: 0.26, y: 0.48 },
+                { type: "earth", x: 0.72, y: 0.28}
+            ]
         }
     ];
     
     let currentLevel = 0;
     let activeBodies = [];
+    let cachedTrajectory = [];
+    let previewDirty = true;
 
     const ship = {
         x: 200,
@@ -242,7 +252,43 @@
         resetGame(false);
     }
 
+    function buildBodySprite(body) {
+        const size = Math.ceil(body.r * 2);
+
+        const spriteCanvas = document.createElement("canvas");
+        spriteCanvas.width = size;
+        spriteCanvas.height = size;
+
+        const sctx = spriteCanvas.getContext("2d");
+
+        if (body.image && body.image.complete && body.image.naturalWidth > 0) {
+            sctx.drawImage(body.image, 0, 0, size, size);
+        } else {
+            const g = sctx.createRadialGradient(
+                size * 0.4,
+                size * 0.4,
+                6,
+                size / 2,
+                size / 2,
+                body.r
+            );
+            g.addColorStop(0, "#ffe680");
+            g.addColorStop(1, "#b38f00");
+            sctx.fillStyle = g;
+            sctx.beginPath();
+            sctx.arc(size / 2, size / 2, body.r, 0, Math.PI * 2);
+            sctx.fill();
+            sctx.strokeStyle = "#ffd24d";
+            sctx.lineWidth = 2;
+            sctx.stroke();
+        }
+        
+        return spriteCanvas;
+    }
+
     function loadLevel(index) {
+
+        previewDirty = true;
         
         const level = levels[index];
 
@@ -263,7 +309,7 @@
                 throw new Error(`Unknown celestial body type: ${bodyDef.type}`);
             }
 
-            return {
+            const body = {
                 type: bodyDef.type,
                 name: base.name,
                 x: resolveCoord(bodyDef.x, canvas.width),
@@ -273,6 +319,10 @@
                 soften: bodyDef.soften ?? base.soften,
                 image: base.image
             };
+
+            body.spriteCanvas = buildBodySprite(body);
+
+            return body;
         });
 
         if (activeBodies.length === 0) {
@@ -283,6 +333,7 @@
     }
 
     function resize() {
+        previewDirty = true;
         canvas.width = innerWidth;
         canvas.height = innerHeight;
         loadLevel(currentLevel);
@@ -332,7 +383,9 @@
         const rect = canvas.getBoundingClientRect();
         const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
         const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+        const oldAngle = ship.angle;
         ship.angle = Math.atan2(my - ship.y, mx - ship.x);
+        if (ship.angle !== oldAngle) previewDirty = true;
     });
 
     canvas.addEventListener("wheel", (e) => {
@@ -341,11 +394,15 @@
 
         e.preventDefault();
 
+        const oldPower = power;
+
         if (e.deltaY < 0) {
             power = clampPower(power + POWER_STEP);
         } else {
             power = clampPower(power - POWER_STEP);
         }
+
+        if (oldPower !== power) previewDirty = true;
 
         hudPower.textContent = Math.round((power / MAX_POWER) * 100) + "%";
     }, { passive: false });
@@ -354,11 +411,15 @@
         if (won || lost) return;
         if (isShipMoving()) return;
 
+        const oldPower = power;
+
         if (e.code === "KeyE") {
             power = clampPower(power + POWER_STEP);
         } else if (e.code === "KeyQ") {
             power = clampPower(power - POWER_STEP);
         }
+
+        if (oldPower !== power) previewDirty = true;
 
         hudPower.textContent = Math.round((power / MAX_POWER) * 100) + "%";
 
@@ -440,15 +501,19 @@
 
         for ( const body of activeBodies) {
             ctx.save();
-            const size = body.r * 2;
+            ctx.translate(body.x, body.y);
 
-            if (body.image && body.image.complete && body.image.naturalWidth > 0) {
-                ctx.translate(body.x, body.y);
-                ctx.drawImage(body.image, -size / 2, -size / 2, size, size);
+            if (body.spriteCanvas) {
+                ctx.drawImage(
+                    body.spriteCanvas,
+                    -body.spriteCanvas.width / 2,
+                    -body.spriteCanvas.height / 2
+                );
             } else {
+                const size = body.r * 2;
                 const g = ctx.createRadialGradient(
                     body.x - 6,
-                    body.y - 6,
+                    body.y -6,
                     6,
                     body.x,
                     body.y,
@@ -458,12 +523,13 @@
                 g.addColorStop(1, "#b38f00");
                 ctx.fillStyle = g;
                 ctx.beginPath();
-                ctx.arc(body.x, body.y, body.r, 0, Math.PI * 2);
+                ctx.arc(0, 0, body.r, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.strokeStyle = "#ffd24d";
                 ctx.lineWidth = 2;
                 ctx.stroke();
             }
+
             ctx.restore();
         }
     }
@@ -505,7 +571,7 @@
 
         const dtMs = 16;
         const dt = dtMs / 1000;
-        const maxSteps = 1200;
+        const maxSteps = 600;
 
         for (let i = 0; i < maxSteps; i++) {
             points.push({ x, y });
@@ -612,21 +678,25 @@
     }
 
     function drawTrajectoryPreview() {
+
         if (won || lost) return;
         if (isShipMoving()) return;
-        const points = computeTrajectory(ship.angle, power);
-        if (!points || points.length < 2) return;
+
+        if (previewDirty) {
+            cachedTrajectory = computeTrajectory(ship.angle, power);
+            previewDirty = false;
+        }
+        
+        if (!cachedTrajectory || cachedTrajectory.length < 2) return;
 
         const previewFraction = levels[currentLevel].previewFraction ?? 1.0;
         const previewBaseMaxPoints = levels[currentLevel].previewBaseMaxPoints ?? Infinity;
         const speedNorm = 1.0 - (power / MAX_POWER);
         const previewSpeedScale = levels[currentLevel].previewSpeedScale;
         const dynamicMaxPoints = previewBaseMaxPoints + speedNorm * previewSpeedScale;
-        const visibleFractionCount = Math.max(2, Math.floor(points.length * previewFraction));
-        const visibleCount = Math.max(2, Math.min(points.length, visibleFractionCount, dynamicMaxPoints));
-        const visiblePoints = points.slice(0, visibleCount);
-
-        console.log("Speed Norm:", speedNorm);
+        const visibleFractionCount = Math.max(2, Math.floor(cachedTrajectory.length * previewFraction));
+        const visibleCount = Math.max(2, Math.min(cachedTrajectory.length, visibleFractionCount, dynamicMaxPoints));
+        const visiblePoints = cachedTrajectory.slice(0, visibleCount);
 
         ctx.save();
         ctx.beginPath();
@@ -702,6 +772,9 @@
     });
 
     function resetGame(fullRestart = false) {
+
+        previewDirty = true;
+
         if (fullRestart) {
             currentLevel = 0;
             totalShots = 0;
