@@ -90,28 +90,53 @@
         }
     }
 
+    const pars = [3, 4, 4, 5, 4, 4, 3, 4, 5, 4, 4, 3, 4, 3, 4, 5]
+    const PAR = 72;
+    let currentPar = 0;
+
     
     const levels = [
         {
             ship: { x: 0.12, y: 0.5 },
             asteroid: { x: 0.86, y: 0.5, r: 40 },
+            previewFraction: 0.60,
+            previewBaseMaxPoints: 70,
+            previewSpeedScale: 50,
             bodies: [
                 { type: "mars", x: 0.5, y: 0.5 }
             ]
         },
         {
-            ship: { x: 0.20, y: 0.8 },
-            asteroid: { x: 0.9, y: 0.2, r: 40 },
+            ship: { x: 0.16, y: 0.75 },
+            asteroid: { x: 0.85, y: 0.42, r: 40 },
+            previewFraction: 0.5,
+            previewBaseMaxPoints: 60,
+            previewSpeedScale: 40,
             bodies: [
                 { type: "venus", x: 0.42, y: 0.45 },
-                { type: "mercury", x: 0.72, y: 0.62}
+                { type: "mercury", x: 0.72, y: 0.62 }
+            ]
+        },
+        {
+            ship: { x: 0.20, y: 0.8 },
+            asteroid: { x: 0.9, y: 0.2, r: 40 },
+            previewFraction: 0.5,
+            previewBaseMaxPoints: 60,
+            previewSpeedScale: 40,
+            bodies: [
+                { type: "earth", x: 0.33, y: 0.76 },
+                { type: "mars", x: 0.72, y: 0.25}
             ]
         },
         {
             ship: { x: 0.16, y: 0.2 },
             asteroid: { x: 0.78, y: 0.8, r: 40 },
+            previewFraction: 0.60,
+            previewBaseMaxPoints: 70,
+            previewSpeedScale: 50,
             bodies: [
-                { type: "jupiter", x: 0.5, y:0.5 }
+                { type: "jupiter", x: 0.5, y: 0.5 },
+                { type: "mercury", x: 0.6, y: 0.82}
             ]
         }
     ];
@@ -162,6 +187,16 @@
     function resolveCoord(value, max) {
         if (value == null) return max / 2;
         return value <=1 ? value * max : value;
+    }
+
+    function getCollidingBody(px, py, pr = ship.r) {
+        for (const body of activeBodies) {
+            const d = Math.hypot(px - body.x, py - body.y);
+            if (d <= pr + body.r) {
+                return body;
+            }
+        }
+        return null;
     }
 
     function loadLevel(index) {
@@ -408,6 +443,7 @@
         if (activeBodies.length === 0) return [];
 
         const points = [];
+
         let x = ship.x;
         let y = ship.y;
         const speed = powerValue * SPEED_SCALE;
@@ -420,6 +456,11 @@
 
         for (let i = 0; i < maxSteps; i++) {
             points.push({ x, y });
+
+            const hitBody = getCollidingBody(x, y, ship.r);
+            if (hitBody) {
+                break;
+            }
 
             if (x < -50 || x > canvas.width + 50 || y < -50 || y > canvas.height + 50) break;
 
@@ -464,6 +505,13 @@
             ship.x += ship.vx * dtSec;
             ship.y += ship.vy * dtSec;
 
+            const hitBody = getCollidingBody(ship.x, ship.y);
+            if (!won && !lost && hitBody) {
+                lost = true;
+                ship.vx = ship.vy = 0;
+                msg.innerHTML = `☄️ You crashed into ${hitBody.name}.<br><small>Press [Space] to retry.</small>`;
+            }
+
             const speed = Math.hypot(ship.vx, ship.vy);
             if (speed <= STOP_EPS) {
                 ship.vx = ship.vy = 0;
@@ -481,10 +529,12 @@
             }
 
             if (
+                !lost && (
                 ship.x - ship.r <= 0 ||
                 ship.x + ship.r >= canvas.width ||
                 ship.y - ship.r <= 0 ||
                 ship.y + ship.r >= canvas.height
+                )
             ) {
                 lost = true;
                 ship.vx = ship.vy = 0;
@@ -513,17 +563,29 @@
         if (isShipMoving()) return;
         const points = computeTrajectory(ship.angle, power);
         if (!points || points.length < 2) return;
+
+        const previewFraction = levels[currentLevel].previewFraction ?? 1.0;
+        const previewBaseMaxPoints = levels[currentLevel].previewBaseMaxPoints ?? Infinity;
+        const speedNorm = 1.0 - (power / MAX_POWER);
+        const previewSpeedScale = levels[currentLevel].previewSpeedScale;
+        const dynamicMaxPoints = previewBaseMaxPoints + speedNorm * previewSpeedScale;
+        const visibleFractionCount = Math.max(2, Math.floor(points.length * previewFraction));
+        const visibleCount = Math.max(2, Math.min(points.length, visibleFractionCount, dynamicMaxPoints));
+        const visiblePoints = points.slice(0, visibleCount);
+
+        console.log("Speed Norm:", speedNorm);
+
         ctx.save();
         ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+        ctx.moveTo(visiblePoints[0].x, visiblePoints[0].y);
+        for (let i = 1; i < visiblePoints.length; i++) ctx.lineTo(visiblePoints[i].x, visiblePoints[i].y);
         ctx.strokeStyle = "#00ffb388";
         ctx.lineWidth = 2;
         ctx.setLineDash([8, 6]);
         ctx.stroke();
         ctx.setLineDash([]);
-        for (let i = 0; i < points.length; i += Math.max(1, Math.floor(points.length / 30))) {
-            const p = points[i];
+        for (let i = 0; i < visiblePoints.length; i += Math.max(1, Math.floor(visiblePoints.length / 30))) {
+            const p = visiblePoints[i];
             ctx.beginPath();
             ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
             ctx.fillStyle = "#00ffb3aa";
