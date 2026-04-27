@@ -196,76 +196,103 @@
             ]
         },
         {
-            ship: {},
-            asteroid: {r: 40},
-            previewFraction: 0.5,
-            previewBaseMaxPoints: 60,
-            previewSpeedScale: 40,
-            bodies: []
+            ship: { x: 0.18, y: 0.68 },
+            asteroid: { x: 0.84, y: 0.30, r: 40},
+            previewFraction: 0.45,
+            previewBaseMaxPoints: 55,
+            previewSpeedScale: 35,
+            bodies: [
+                { type: "venus", x: 0.40, y: 0.62 },
+                { type: "earth", x: 0.66, y: 0.36 }
+            ]
         },
         {
-            ship:{},
-            asteroid: {r: 40},
-            previewFraction: 0.5,
-            previewBaseMaxPoints: 60,
-            previewSpeedScale: 40,
-            bodies: []
+            ship:{ x: 0.16, y: 0.34 },
+            asteroid: { x: 0.86, y: 0.70, r: 40},
+            previewFraction: 0.45,
+            previewBaseMaxPoints: 55,
+            previewSpeedScale: 35,
+            bodies: [
+                { type: "earth", x: 0.38, y: 0.30 },
+                { type: "neptune", x: 0.66, y: 0.66 }
+            ]
         },
         {
-            ship: {},
-            asteroid: {r: 40},
-            previewFraction: 0.6,
-            previewBaseMaxPoints: 70,
-            previewSpeedScale: 50,
-            bodies: []
+            ship: { x: 0.18, y: 0.76 },
+            asteroid: { x: 0.84, y: 0.26, r: 40},
+            previewFraction: 0.55,
+            previewBaseMaxPoints: 65,
+            previewSpeedScale: 45,
+            bodies: [
+                { type: "jupiter", x: 0.52, y: 0.56 }
+            ]
         },
         {
-            ship: {},
-            asteroid: {r: 40},
-            previewFraction: 0.5,
-            previewBaseMaxPoints: 60,
-            previewSpeedScale: 40,
-            bodies: []
+            ship: { x: 0.14, y: 0.58 },
+            asteroid: { x: 0.88, y: 0.46, r: 40},
+            previewFraction: 0.45,
+            previewBaseMaxPoints: 55,
+            previewSpeedScale: 35,
+            bodies: [
+                { type: "mars", x: 0.38, y: 0.40 },
+                { type: "neptune", x: 0.66, y: 0.62 }
+            ]
         },
         {
-            ship: {},
-            asteroid: {r: 40},
+            ship: { x: 0.18, y: 0.78 },
+            asteroid: { x: 0.84, y: 0.22, r: 40},
+            previewFraction: 0.35,
+            previewBaseMaxPoints: 45,
+            previewSpeedScale: 25,
+            bodies: [
+                { type: "jupiter", x: 0.48, y: 0.58 },
+                { type: "mercury", x: 0.30, y: 0.32 },
+                { type: "venus", x: 0.74, y: 0.40 }
+            ]
+        },
+        {
+            ship: { x: 0.82, y: 0.70},
+            asteroid: { x: 0.22, y: 0.30, r: 40},
             previewFraction: 0.4,
             previewBaseMaxPoints: 50,
             previewSpeedScale: 30,
-            bodies: []
+            bodies: [
+                { type: "earth", x: 0.64, y: 0.46 },
+                { type: "mars", x: 0.34, y: 0.60 }
+            ]
         },
         {
-            ship: {},
-            asteroid: {r: 40},
+            ship: { x: 0.20, y: 0.26 },
+            asteroid: { x: 0.82, y: 0.72, r: 40},
             previewFraction: 0.5,
             previewBaseMaxPoints: 60,
             previewSpeedScale: 40,
-            bodies: []
+            bodies: [
+                { type: "neptune", x: 0.50, y: 0.48 }
+            ]
         },
         {
-            ship: {},
-            asteroid: {r: 40},
-            previewFraction: 0.6,
-            previewBaseMaxPoints: 70,
-            previewSpeedScale: 50,
-            bodies: []
-        },
-        {
-            ship: {},
-            asteroid: {r: 40},
-            previewFraction: 0.5,
-            previewBaseMaxPoints: 60,
-            previewSpeedScale: 40,
-            bodies: []
-        },
-        {
-            ship: {},
-            asteroid: {r: 40 },
-            previewFraction: 0.5,
+            ship: { x: 0.80, y: 0.24 },
+            asteroid: { x: 0.18, y: 0.78, r: 40},
+            previewFraction: 0.4,
             previewBaseMaxPoints: 50,
             previewSpeedScale: 30,
-            bodies: []
+            bodies: [
+                { type: "venus", x: 0.62, y: 0.38 },
+                { type: "jupiter", x: 0.34, y: 0.62 }
+            ]
+        },
+        {
+            ship: { x: 0.18, y: 0.82 },
+            asteroid: { x: 0.84, y: 0.18, r: 40 },
+            previewFraction: 0.4,
+            previewBaseMaxPoints: 40,
+            previewSpeedScale: 20,
+            bodies: [
+                { type: "jupiter", x: 0.50, y: 0.58 },
+                { type: "venus", x: 0.30, y: 0.34 },
+                { type: "neptune", x: 0.74, y: 0.36 }
+            ]
         }
     ];
     
