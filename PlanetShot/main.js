@@ -90,7 +90,7 @@
         }
     }
 
-    const pars = [3, 4, 4, 5, 4, 4, 3, 4, 5, 4, 4, 3, 4, 3, 4, 5]
+    const pars = [3, 4, 4, 5, 4, 4, 3, 4, 5, 4, 4, 3, 4, 5, 4, 3, 4, 5]
     const PAR = 72;
     let currentPar = 0;
 
@@ -132,12 +132,48 @@
             ship: { x: 0.16, y: 0.2 },
             asteroid: { x: 0.78, y: 0.8, r: 40 },
             previewFraction: 0.60,
-            previewBaseMaxPoints: 70,
-            previewSpeedScale: 50,
+            previewBaseMaxPoints: 50,
+            previewSpeedScale: 30,
             bodies: [
                 { type: "jupiter", x: 0.5, y: 0.5 },
                 { type: "mercury", x: 0.6, y: 0.82}
             ]
+        },
+        {
+            ship: { x: 0.42, y: 0.2 },
+            asteroid: { x: 0.60, y: 0.81, r: 40 },
+            previewFraction: 0.5,
+            previewBaseMaxPoints: 60,
+            previewSpeedScale: 40,
+            bodies: [ 
+                { type: "neptune", x: 0.38, y: 0.42 },
+                { type: "uranus", x: 0.66, y: 0.70 }
+            ]
+        },
+        {
+            ship: { x: 0.61, y: 0.84 },
+            asteroid: { x: 0.2, y: 0.25, r:40 },
+            previewFraction: 0.5,
+            previewBaseMaxPoints: 60,
+            previewSpeedScale: 40,
+            bodies: [
+                { type: "earth", x: 0.38, y: 0.65 },
+                { type: "mars", x: 0.2, y: 0.38 }
+            ]
+        },
+        {
+            ship: { x: 0.85, y: 0.2 },
+            asteroid: { x: 0.24, y: 0.34, r: 40 },
+            previewFraction: 0.6,
+            previewBaseMaxPoints: 70,
+            previewSpeedScale: 50,
+            bodies: [
+                { type: "jupiter", x: 0.5, y: 0.5}
+            ]
+        },
+        {
+            ship: { x: 0.78, y: 0.82 },
+            asteroid: { x: 0}
         }
     ];
     
