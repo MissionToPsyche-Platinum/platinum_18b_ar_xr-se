@@ -169,6 +169,8 @@
     const FRICTION = 0.0;
     const STOP_EPS = 0.05;
 
+    const DEBUG = true;
+
     let charging = false;
     let power = MIN_POWER;
     let shotsThisLevel = 0;
@@ -197,6 +199,11 @@
             }
         }
         return null;
+    }
+
+    function goToLevel(index) {
+        currentLevel = Math.max(0, Math.min(levels.length -1, index));
+        resetGame(false);
     }
 
     function loadLevel(index) {
@@ -318,6 +325,16 @@
         }
 
         hudPower.textContent = Math.round((power / MAX_POWER) * 100) + "%";
+
+        if (!DEBUG) return;
+        
+        if (e.code === "BracketRight") {
+            goToLevel(currentLevel + 1);
+        } else if (e.code === "BracketLeft") {
+            goToLevel(currentLevel - 1);
+        } else if (e.code === "Backslash") {
+            goToLevel(levels.length - 1);
+        }
     });
 
     function drawShip() {
