@@ -21,3 +21,15 @@ Creator: VoiceBosch
 Background Music
 https://pixabay.com/music/modern-classical-relaxing-ambient-music-for-tiktok-videos-312506/
 Creator: Clavier-Music
+
+Failure Sound
+https://pixabay.com/sound-effects/musical-brass-fail-8-a-207130/
+Creator: floraphonic
+
+Countdown Sound
+https://pixabay.com/sound-effects/film-special-effects-321-go-8-bit-video-game-sound-version-1-145007/
+Creator: Make_More_Sound
+
+Success Sound
+https://pixabay.com/sound-effects/film-special-effects-success-fanfare-trumpets-6185/
+Creator: FunWithSound (Freesound)
