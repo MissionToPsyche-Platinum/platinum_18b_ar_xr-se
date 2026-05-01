@@ -223,7 +223,6 @@ export function drawNotification(ctx, W, H) {
 
 
 
-// ── Unlock Logic ─────────────────────────────────────────────────────────────
 /**
  * Call this every update() tick and on relevant events.
  * 
@@ -260,4 +259,35 @@ export function checkAchievements(stats) {
 
   // 🛡️ Untouchable — finish with all 3 lives  
    if (gameOver && livesLost === 0) tryUnlock("untouchable");
+}
+
+export function drawGameOverAchievements(ctx, W, H) {
+  const ids = getSessionUnlocks();
+  if (ids.length === 0) return;
+ 
+  const defs = ids.map(id => ACHIEVEMENT_LIST.find(a => a.id === id)).filter(Boolean);
+ 
+  ctx.save();
+  ctx.textAlign = "center";
+ 
+  // Section header
+  ctx.font = "bold 14px sans-serif";
+  ctx.fillStyle = "gold";
+ 
+  // Position below leaderboard — anchor from bottom up
+  const rowH = 28;
+  const totalH = 20 + defs.length * rowH;
+  let y = H - 44 - totalH;
+ 
+  ctx.fillText("✨ Unlocked This Run", W / 2, y);
+  y += 22;
+ 
+  ctx.font = "15px sans-serif";
+  for (const def of defs) {
+    ctx.fillStyle = "white";
+    ctx.fillText(`${def.icon}  ${def.name}  —  ${def.desc}`, W / 2, y);
+    y += rowH;
+  }
+ 
+  ctx.restore();
 }

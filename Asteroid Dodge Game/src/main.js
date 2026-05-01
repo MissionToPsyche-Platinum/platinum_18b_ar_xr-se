@@ -13,8 +13,7 @@ import { effects } from './effects.js';
 import { CONSTANTS } from "./constants.js";
 import { facts } from "./facts.js";
 import { saveScore, drawLeaderboard } from "./leaderboard.js";
-import { checkAchievements, resetSessionUnlocks, updateNotification, drawNotification } from "./achievements.js";
-
+import { checkAchievements, resetSessionUnlocks, updateNotification, drawNotification, drawGameOverAchievements } from "./achievements.js";
 export let gameState = "start";
 let prevState;
 
@@ -671,11 +670,14 @@ function draw() {
 
     // Draw top-5 leaderboard
     drawLeaderboard(ctx, W, H, score, fontPx);
-
+ 
+    // Draw achievements unlocked this run
+    drawGameOverAchievements(ctx, W, H);
+ 
     ctx.font = fontPx(18, "sans-serif");
     ctx.fillStyle = "lightgray";
     ctx.textAlign = "center";
-    ctx.fillText("Tap to Restart", W / 2, H - 40);
+    ctx.fillText("Tap to Restart", W / 2, H - 40)
   }
 }
 
